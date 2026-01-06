@@ -8,55 +8,142 @@
 
 @section('content')
 
-<x-breadcrumb item="Table" active="Basic initialization"/>
+<x-breadcrumb item="Intrakurikuler" active="Courses View"/>
 
         <!-- [ Main Content ] start -->
         <div class="row">
-          <!-- prettier-ignore -->
-          <x-link title="Simple-datatables" text="A lightweight, extendable, JavaScript HTML table library written in TypeScript and transpilled to Vanilla JavaScript. Similar to jQuery DataTables for use in modern browsers, but without the jQuery dependency." link="https://github.com/fiduswriter/simple-datatables"/>
-        </div>
-        <div class="row">
-          <!-- [ basic-table ] start -->
-          <div class="col-xl-12">
+          <div class="col-12">
             <div class="card">
               <div class="card-header">
-                <h5>Basic Table</h5>
-                <span class="d-block m-t-5">use class <code>table</code> inside table element</span>
+                <div class="d-flex align-items-center justify-content-between">
+                  <h5 class="mb-0">Intrakurikuler</h5>
+                  <div>
+                    <a href="/admins/course-course-add" class="btn btn-primary">Add Student</a>
+                  </div>
+                </div>
               </div>
-              <div class="card-body table-border-style">
-                <div class="table-responsive">
-                  <table class="table" id="pc-dt-simple">
-                    <thead>
-                      <tr>
-                        <th>Name</th>
-                        <th>Ext.</th>
-                        <th>City</th>
-                        <th data-type="date" data-format="YYYY/DD/MM">Start Date</th>
-                        <th>Completion</th>
-                        <th>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>Unity Pugh</td>
-                        <td>9958</td>
-                        <td>Curicó</td>
-                        <td>2005/02/11</td>
-                        <td>37%</td>
-                        <td><button type="button" class="btn btn-light-primary">Primary</button>
-                      <button type="button" class="btn btn-light-primary">Primary</button>
-                    <button type="button" class="btn btn-light-primary">Primary</button></td>
-                      </tr>
-                    </tbody>
-                  </table>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-sm-6 col-lg-4 col-xxl-3">
+                    <div class="card border">
+                      <div class="card-body p-2">
+                        <div class="position-relative">
+                          <img src="/build/images/admin/img-course-1.png" alt="img" class="img-fluid w-100" />
+                          <!-- <div class="position-absolute top-0 end-0 p-2">
+                            <span class="badge text-bg-light text-uppercase">Free</span>
+                          </div> -->
+                        </div>
+                        <ul class="list-group list-group-flush my-2">
+                          <li class="list-group-item px-0 py-2">
+                            <div class="d-flex align-items-center">
+                              <div class="flex-grow-1 me-2">
+                                <h6 class="mb-1">Matematika</h6>
+                                <p class="mb-0 f-w-400">2025/2026 ganjil</p>
+                              </div>
+                            </div>
+                          </li>
+                          <li class="list-group-item px-0 py-2">
+                            <div class="d-flex align-items-center">
+                              <div class="flex-grow-1 me-2">
+                                <p class="mb-0">Kelas</p>
+                              </div>
+                              <div class="flex-shrink-0">
+                                <p class="text-muted mb-0">12 </p>
+                              </div>
+                            </div>
+                          </li>
+                          <li class="list-group-item px-0 py-2">
+                            <div class="d-flex align-items-center">
+                              <div class="flex-grow-1 me-2">
+                                <p class="mb-0">Teacher</p>
+                              </div>
+                              <div class="flex-shrink-0">
+                                <p class="text-muted mb-0">Jimmy Morris</p>
+                              </div>
+                            </div>
+                          </li>
+                          <li class="list-group-item px-0 py-2">
+                            <div class="d-flex align-items-center">
+                              <div class="flex-grow-1 me-2">
+                                <p class="mb-0">Students</p>
+                              </div>
+                              <div class="flex-shrink-0">
+                                <p class="text-muted mb-0">40</p>
+                              </div>
+                            </div>
+                          </li>
+                        </ul>
+                        <div class="d-flex justify-content-end gap-2">
+                          <a href="/components/table_tujuan_pembelajaran" class="btn btn-sm btn-light-primary">Tujuan pembelajaran</a>
+                          <a href="/components/table_lingkup_materi" class="btn btn-sm btn-light-primary">Lingkup materi</a>
+                          <a href="/components/table_siswa" class="btn btn-sm btn-light-primary">Siswa</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-6 col-lg-4 col-xxl-3">
+                    <div class="card border">
+                      <div class="card-body p-2">
+                        <div class="position-relative">
+                          <img src="/build/images/admin/img-course-8.png" alt="img" class="img-fluid w-100" />
+                        </div>
+                        <ul class="list-group list-group-flush my-2">
+                          <li class="list-group-item px-0 py-2">
+                            <div class="d-flex align-items-center">
+                              <div class="flex-grow-1 me-2">
+                                <h6 class="mb-1">SEO Training Course</h6>
+                                <p class="mb-0 f-w-600"><i class="fas fa-star text-warning"></i> 4.3</p>
+                              </div>
+                              <div class="flex-shrink-0">
+                                <a href="#" class="avtar avtar-xs btn-link-secondary">
+                                  <i class="ti ti-edit f-20"></i>
+                                </a>
+                              </div>
+                            </div>
+                          </li>
+                          <li class="list-group-item px-0 py-2">
+                            <div class="d-flex align-items-center">
+                              <div class="flex-grow-1 me-2">
+                                <p class="mb-0">Duration</p>
+                              </div>
+                              <div class="flex-shrink-0">
+                                <p class="text-muted mb-0">10 Months</p>
+                              </div>
+                            </div>
+                          </li>
+                          <li class="list-group-item px-0 py-2">
+                            <div class="d-flex align-items-center">
+                              <div class="flex-grow-1 me-2">
+                                <p class="mb-0">Teacher</p>
+                              </div>
+                              <div class="flex-shrink-0">
+                                <p class="text-muted mb-0">Cedric Kelly</p>
+                              </div>
+                            </div>
+                          </li>
+                          <li class="list-group-item px-0 py-2">
+                            <div class="d-flex align-items-center">
+                              <div class="flex-grow-1 me-2">
+                                <p class="mb-0">Students</p>
+                              </div>
+                              <div class="flex-shrink-0">
+                                <p class="text-muted mb-0">+60</p>
+                              </div>
+                            </div>
+                          </li>
+                        </ul>
+                        <button class="btn btn-sm btn-outline-primary mb-2">Read More</button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-          <!-- [ basic-table ] end -->
         </div>
         <!-- [ Main Content ] end -->
 @endsection
+
 
 @section('scripts')
         <!-- [Page Specific JS] start -->
