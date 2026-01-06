@@ -9,7 +9,7 @@
             <div class="card welcome-banner bg-blue-800">
               <div class="card-body">
                 <div class="row">
-                  <div class="col-sm-6">
+                  <div cldass="col-sm-6">
                     <div class="p-4">
                       <h2 class="text-white">Explore Redesigned Able Pro</h2>
                       <p class="text-white"
