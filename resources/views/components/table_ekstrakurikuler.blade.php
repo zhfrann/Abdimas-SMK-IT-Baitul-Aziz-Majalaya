@@ -37,7 +37,7 @@
                                 <p class="mb-0">Kelas</p>
                               </div>
                               <div class="flex-shrink-0">
-                                <p class="text-muted mb-0">X</p>
+                                <p class="text-muted mb-0">10</p>
                               </div>
                             </div>
                           </li>
@@ -89,7 +89,7 @@
                                 <p class="mb-0">Kelas</p>
                               </div>
                               <div class="flex-shrink-0">
-                                <p class="text-muted mb-0">X</p>
+                                <p class="text-muted mb-0">10</p>
                               </div>
                             </div>
                           </li>

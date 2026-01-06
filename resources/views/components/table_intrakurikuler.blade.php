@@ -73,7 +73,7 @@
                             </div>
                           </li>
                         </ul>
-                        <div class="d-flex justify-content-end gap-2">
+                        <div class="d-flex justify-content-center gap-2 flex-wrap">
                           <a href="/components/table_tujuan_pembelajaran" class="btn btn-sm btn-light-primary">Tujuan pembelajaran</a>
                           <a href="/components/table_lingkup_materi" class="btn btn-sm btn-light-primary">Lingkup materi</a>
                           <a href="/components/table_siswa" class="btn btn-sm btn-light-primary">Siswa</a>
