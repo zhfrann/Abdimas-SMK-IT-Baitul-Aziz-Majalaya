@@ -47,7 +47,7 @@
                                 <p class="mb-0">Guru</p>
                               </div>
                               <div class="flex-shrink-0">
-                                <p class="text-muted mb-0">Jack Ronan</p>
+                                <p class="text-muted mb-0">Jimmy Morris</p>
                               </div>
                             </div>
                           </li>
@@ -99,7 +99,7 @@
                                 <p class="mb-0">Guru</p>
                               </div>
                               <div class="flex-shrink-0">
-                                <p class="text-muted mb-0">Jack Ronan</p>
+                                <p class="text-muted mb-0">Jimmy Morris</p>
                               </div>
                             </div>
                           </li>
