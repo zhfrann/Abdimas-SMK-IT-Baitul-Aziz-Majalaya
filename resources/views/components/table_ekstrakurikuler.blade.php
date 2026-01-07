@@ -16,11 +16,13 @@
             <div class="card">
               <div class="card-body">
                 <div class="row">
+
+                  {{-- OSIS --}}
                   <div class="col-sm-6 col-lg-4 col-xxl-3">
                     <div class="card border">
                       <div class="card-body p-2">
                         <div class="position-relative">
-                          <img src="/build/images/admin/img-course-3.png" alt="img" class="img-fluid w-100" />
+                          <img src="https://www.quipper.com/id/blog/wp-content/uploads/2020/01/OSIS.png" alt="img" class="img-fluid w-100 hei-150 object-fit-cover" />
                         </div>
                         <ul class="list-group list-group-flush my-2">
                           <li class="list-group-item px-0 py-2">
@@ -47,7 +49,7 @@
                                 <p class="mb-0">Guru</p>
                               </div>
                               <div class="flex-shrink-0">
-                                <p class="text-muted mb-0">Jack Ronan</p>
+                                <p class="text-muted mb-0">Jimmy Morris</p>
                               </div>
                             </div>
                           </li>
@@ -68,11 +70,13 @@
                       </div>
                     </div>
                   </div>
+
+                  {{-- Pramuka --}}
                   <div class="col-sm-6 col-lg-4 col-xxl-3">
                     <div class="card border">
                       <div class="card-body p-2">
                         <div class="position-relative">
-                          <img src="/build/images/admin/img-course-2.png" alt="img" class="img-fluid w-100" />
+                          <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgp9IkfZmtYjbSwPGCpCTiSciJFkZZ45Tkrf_sXtRiTOQEqFoXTN1NUEgwIKm14QwR9MxU5GkiSbsZg4QUcLxMmYOigry903nFGvC46wG9H6XDwimb80cqFJIydi-NWr_jTVLGxqbV2i_bM/s1600/ilustrasi-pramuka.jpg" alt="img" class="img-fluid w-100 hei-150 object-fit-cover" />
                         </div>
                         <ul class="list-group list-group-flush my-2">
                           <li class="list-group-item px-0 py-2">
@@ -99,7 +103,7 @@
                                 <p class="mb-0">Guru</p>
                               </div>
                               <div class="flex-shrink-0">
-                                <p class="text-muted mb-0">Jack Ronan</p>
+                                <p class="text-muted mb-0">Jimmy Morris</p>
                               </div>
                             </div>
                           </li>

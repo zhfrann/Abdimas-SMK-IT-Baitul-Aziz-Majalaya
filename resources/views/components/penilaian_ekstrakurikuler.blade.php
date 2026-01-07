@@ -85,6 +85,8 @@
                     </tbody>
                   </table>
                 </div>
+
+              <a href="/components/table_ekstrakurikuler" class="btn btn-light-secondary">Kembali</a>
               </div>
             </div>
           </div>
@@ -94,7 +96,7 @@
 
         <!-- Modal Edit Penilaian -->
         <div class="modal fade" id="penilaianModal" tabindex="-1" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
 
               <div class="modal-header">

@@ -18,8 +18,8 @@
       {{-- Header --}}
       <div class="card-header d-flex align-items-center justify-content-between">
         <div>
-          <h5 class="mb-0">Nama pelajaran: </h5>
-          <span class="d-block m-t-5">kelas</span>
+          <h5 class="mb-0">Pendidikan Agama Islam dan Budi Pekerti</h5>
+          <span class="d-block m-t-5">Kelas 12</span>
         </div>
 
         <button
@@ -32,7 +32,7 @@
           data-id=""
           data-nama=""
         >
-          Add Lingkup Materi
+          Tambah Lingkup Materi
         </button>
       </div>
 
@@ -42,18 +42,16 @@
           <table class="table" id="pc-dt-simple">
             <thead>
               <tr>
-                <th>id</th>
+                <th>No</th>
                 <th>Nama materi</th>
                 <th style="width: 180px">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {{-- CONTOH DATA STATIS (ganti jadi foreach kalau sudah dari DB) --}}
               <tr>
                 <td>1</td>
-                <td>membaca Al-Qur’an dengan meyakini bahwa kontrol diri (Mujahadah An-Nafs) adalah perintah agama</td>
+                <td>A. Kajian Q.S Al-An-fal 8:72 dan hadist tentang pentingnya mengendalikan diri (Mujahadah an-nafs)</td>
                 <td>
-                  {{-- UPDATE => BUKA MODAL EDIT & NGISI DATA DARI data-* --}}
                   <button
                     type="button"
                     class="btn btn-sm btn-light-warning"
@@ -62,7 +60,7 @@
                     data-mode="edit"
                     data-title="Edit Lingkup Materi"
                     data-id="1"
-                    data-nama="membaca Al-Qur’an dengan meyakini bahwa kontrol diri (Mujahadah An-Nafs) adalah perintah agama"
+                    data-nama="A. Kajian Q.S Al-An-fal 8:72 dan hadist tentang pentingnya mengendalikan diri (Mujahadah an-nafs)"
                   >
                     Update
                   </button>
@@ -78,27 +76,152 @@
                   </form>
                 </td>
               </tr>
+              <tr>
+                <td>2</td>
+                <td>B. Kajian Q.S AL-Hujurat / 49 :12 dan Hadist tentang Berprasangka</td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-light-warning"
+                    data-bs-toggle="modal"
+                    data-bs-target="#lingkupMateriModal"
+                    data-mode="edit"
+                    data-title="Edit Lingkup Materi"
+                    data-id="2"
+                    data-nama="B. Kajian Q.S AL-Hujurat / 49 :12 dan Hadist tentang Berprasangka"
+                  >
+                    Update
+                  </button>
 
-              {{-- Kalau kamu sudah dari DB, contoh:
-              @foreach($lingkupMateri as $lm)
-                <tr>
-                  <td>{{ $lm->id }}</td>
-                  <td>{{ $lm->nama }}</td>
-                  <td>
-                    <button ... data-id="{{ $lm->id }}" data-nama="{{ $lm->nama }}">Update</button>
-                    <form action="/lingkup-materi/{{ $lm->id }}" method="POST" class="d-inline">
-                      @csrf @method('DELETE')
-                      <button ...>Delete</button>
-                    </form>
-                  </td>
-                </tr>
-              @endforeach
-              --}}
+                  {{-- DELETE (contoh pakai form biar aman) --}}
+                  <form action="/lingkup-materi/2" method="POST" class="d-inline">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-sm btn-light-danger"
+                      onclick="return confirm('Yakin hapus data ini?')">
+                      Delete
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>C. Kajian Q.S AL-Hujurat 49: 10 dan Hadist tentang Indahnya Persaudaraan (ukkhuwwah)</td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-light-warning"
+                    data-bs-toggle="modal"
+                    data-bs-target="#lingkupMateriModal"
+                    data-mode="edit"
+                    data-title="Edit Lingkup Materi"
+                    data-id="3"
+                    data-nama="C. Kajian Q.S AL-Hujurat 49: 10 dan Hadist tentang Indahnya Persaudaraan (ukkhuwwah)"
+                  >
+                    Update
+                  </button>
+
+                  {{-- DELETE (contoh pakai form biar aman) --}}
+                  <form action="/lingkup-materi/3" method="POST" class="d-inline">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-sm btn-light-danger"
+                      onclick="return confirm('Yakin hapus data ini?')">
+                      Delete
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>D.Kajian Q.S AL-ISRA 17:32 Q.S An-nur 24:2 dan Hadist tentang Menjaga Diri dari Pergaulan Bebas dan perbauatan Mendekati Zina</td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-light-warning"
+                    data-bs-toggle="modal"
+                    data-bs-target="#lingkupMateriModal"
+                    data-mode="edit"
+                    data-title="Edit Lingkup Materi"
+                    data-id="4"
+                    data-nama="D.Kajian Q.S AL-ISRA 17:32 Q.S An-nur 24:2 dan Hadist tentang Menjaga Diri dari Pergaulan Bebas dan perbauatan Mendekati Zina"
+                  >
+                    Update
+                  </button>
+
+                  {{-- DELETE (contoh pakai form biar aman) --}}
+                  <form action="/lingkup-materi/4" method="POST" class="d-inline">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-sm btn-light-danger"
+                      onclick="return confirm('Yakin hapus data ini?')">
+                      Delete
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>E. Meneladani ALLAH SWT melalui Asmaul husna</td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-light-warning"
+                    data-bs-toggle="modal"
+                    data-bs-target="#lingkupMateriModal"
+                    data-mode="edit"
+                    data-title="Edit Lingkup Materi"
+                    data-id="5"
+                    data-nama="E. Meneladani ALLAH SWT melalui Asmaul husna"
+                  >
+                    Update
+                  </button>
+
+                  {{-- DELETE (contoh pakai form biar aman) --}}
+                  <form action="/lingkup-materi/5" method="POST" class="d-inline">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-sm btn-light-danger"
+                      onclick="return confirm('Yakin hapus data ini?')">
+                      Delete
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>F Menghadirkan malaikat dalam kehidupan sehari-hari</td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-light-warning"
+                    data-bs-toggle="modal"
+                    data-bs-target="#lingkupMateriModal"
+                    data-mode="edit"
+                    data-title="Edit Lingkup Materi"
+                    data-id="6"
+                    data-nama="F Menghadirkan malaikat dalam kehidupan sehari-hari"
+                  >
+                    Update
+                  </button>
+
+                  {{-- DELETE (contoh pakai form biar aman) --}}
+                  <form action="/lingkup-materi/6" method="POST" class="d-inline">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-sm btn-light-danger"
+                      onclick="return confirm('Yakin hapus data ini?')">
+                      Delete
+                    </button>
+                  </form>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
-      </div>
 
+        <a href="/components/table_intrakurikuler" class="btn btn-light-secondary">Kembali</a>
+      </div>
     </div>
   </div>
   <!-- [ basic-table ] end -->
@@ -106,7 +229,7 @@
 
 {{-- ===================== MODAL ADD/EDIT ===================== --}}
 <div class="modal fade" id="lingkupMateriModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
 
       <form id="lingkupMateriForm" method="POST" action="/lingkup-materi">

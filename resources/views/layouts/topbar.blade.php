@@ -2,7 +2,7 @@
 <header class="pc-header">
   <div class="header-wrapper"> @include('layouts.header-content') </div>
 </header>
-<div class="offcanvas pc-announcement-offcanvas offcanvas-end" tabindex="-1" id="announcement" aria-labelledby="announcementLabel">
+{{-- <div class="offcanvas pc-announcement-offcanvas offcanvas-end" tabindex="-1" id="announcement" aria-labelledby="announcementLabel">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title" id="announcementLabel">What's new announcement?</h5>
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -69,5 +69,5 @@
       </div>
     </div>
   </div>
-</div>
+</div> --}}
 <!-- [ Header ] end -->

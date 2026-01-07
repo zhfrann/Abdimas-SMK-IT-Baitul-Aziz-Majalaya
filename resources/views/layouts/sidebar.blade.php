@@ -16,8 +16,8 @@
               <img src="/build/images/user/avatar-1.jpg" alt="user-image" class="user-avtar wid-45 rounded-circle" />
             </div>
             <div class="flex-grow-1 ms-3 me-2">
-              <h6 class="mb-0">Jonh Smith</h6>
-              <small>Administrator</small>
+              <h6 class="mb-0">Jimmy Morris</h6>
+              <small>Guru Mapel</small>
             </div>
             <a class="btn btn-icon btn-link-secondary avtar" data-bs-toggle="collapse" href="#pc_sidebar_userlink">
               <svg class="pc-icon">

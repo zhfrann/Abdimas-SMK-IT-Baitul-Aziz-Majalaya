@@ -4,9 +4,10 @@
 <li class="pc-item pc-hasmenu">
   <a href="/dashboard/index" class="pc-link">
     <span class="pc-micon">
-      <svg class="pc-icon">
+      {{-- <svg class="pc-icon">
         <use xlink:href="#custom-status-up"></use>
-      </svg>
+      </svg> --}}
+      <i class="bi bi-columns-gap"></i>
     </span>
     <span class="pc-mtext">Dashboard</span>
   </a>
@@ -21,23 +22,25 @@
 <li class="pc-item pc-hasmenu">
   <a href="/components/table_intrakurikuler" class="pc-link">
     <span class="pc-micon">
-      <svg class="pc-icon">
-        <use xlink:href="#custom-shield"></use>
-      </svg>
+      {{-- <svg class="pc-icon">
+        <use xlink:href="#custom-status-up"></use>
+      </svg> --}}
+      <i class="bi bi-journal-bookmark"></i>
     </span>
     <span class="pc-mtext">Intrakurikuler</span></a>
 </li>
 <li class="pc-item pc-hasmenu">
   <a href="/components/table_ekstrakurikuler" class="pc-link">
     <span class="pc-micon">
-      <svg class="pc-icon">
+      {{-- <svg class="pc-icon">
         <use xlink:href="#custom-shield"></use>
-      </svg>
+      </svg> --}}
+      <i class="bi bi-people"></i>
     </span>
     <span class="pc-mtext">Ekstrakurikuler</span></a>
 </li>
 
-<li class="pc-item pc-caption">
+{{-- <li class="pc-item pc-caption">
   <label>Other</label>
   <svg class="pc-icon">
     <use xlink:href="#custom-notification-status"></use>
@@ -90,4 +93,4 @@
       </ul>
     </li>
   </ul>
-</li>
+</li> --}}

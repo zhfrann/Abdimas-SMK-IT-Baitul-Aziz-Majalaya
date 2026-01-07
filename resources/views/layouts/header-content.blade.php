@@ -12,7 +12,8 @@
         <i class="ti ti-menu-2"></i>
       </a>
     </li>
-    <li class="pc-h-item d-none d-md-inline-flex">
+
+    {{-- <li class="pc-h-item d-none d-md-inline-flex">
       <form class="form-search">
         <i class="search-icon">
           <svg class="pc-icon">
@@ -21,7 +22,8 @@
         </i>
         <input type="search" class="form-control" placeholder="Ctrl + K" />
       </form>
-    </li>
+    </li> --}}
+
   </ul>
 </div>
 <!-- [Mobile Media Block end] -->
@@ -54,7 +56,8 @@
         </a>
       </div>
     </li>
-    <li class="dropdown pc-h-item">
+
+    {{-- <li class="dropdown pc-h-item">
       <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
         <svg class="pc-icon">
           <use xlink:href="#custom-setting-2"></use>
@@ -82,15 +85,17 @@
           <span>Logout</span>
         </a>
       </div>
-    </li>
-    <li class="pc-h-item">
+    </li> --}}
+
+    {{-- <li class="pc-h-item">
       <a href="#" class="pc-head-link me-0" data-bs-toggle="offcanvas" data-bs-target="#announcement" aria-controls="announcement">
         <svg class="pc-icon">
           <use xlink:href="#custom-flash"></use>
         </svg>
       </a>
-    </li>
-    <li class="dropdown pc-h-item">
+    </li> --}}
+
+    {{-- <li class="dropdown pc-h-item">
       <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
         <svg class="pc-icon">
           <use xlink:href="#custom-notification"></use>
@@ -195,7 +200,8 @@
           <a href="#!" class="link-danger">Clear all Notifications</a>
         </div>
       </div>
-    </li>
+    </li> --}}
+    
     <li class="dropdown pc-h-item header-user-profile">
       <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
         <img src="/build/images/user/avatar-2.jpg" alt="user-image" class="user-avtar" />
