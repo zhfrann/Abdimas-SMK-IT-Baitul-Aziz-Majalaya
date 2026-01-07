@@ -84,6 +84,8 @@
             </tbody>
           </table>
         </div>
+
+        <a href="/components/table_intrakurikuler" class="btn btn-light-secondary">Kembali</a>
       </div>
     </div>
   </div>
