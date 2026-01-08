@@ -39,7 +39,7 @@
                 <td>1</td>
                 <td>Pendidikan Agama Islam dan Budi Pekerti</td>
                 <td>2025/2026 Ganjil</td>
-                <td>12</td>
+                <td>11</td>
                 <td>Jimmy Morris</td>
                 <td>40</td>
                 <td>
@@ -67,7 +67,7 @@
                 <td>3</td>
                 <td>Bahasa Indonesia</td>
                 <td>2025/2026 Ganjil</td>
-                <td>12</td>
+                <td>10</td>
                 <td>Jimmy Morris</td>
                 <td>26</td>
                 <td>
