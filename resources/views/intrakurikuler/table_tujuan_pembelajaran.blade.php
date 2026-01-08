@@ -239,8 +239,8 @@
           <input type="hidden" name="id" id="lm_id">
 
           <div class="mb-3">
-            <label class="form-label">Nama materi</label>
-            <input type="text" class="form-control" name="nama" id="lm_nama" placeholder="Masukkan nama materi" required>
+            <label class="form-label">Tujuan Pembelajaran</label>
+            <input type="text" class="form-control" name="nama" id="lm_nama" placeholder="Masukkan tujuan pembelajaran" required>
           </div>
         </div>
 
