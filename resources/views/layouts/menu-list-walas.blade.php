@@ -14,31 +14,16 @@
 </li>
 
 <li class="pc-item pc-caption">
-  <label>Mapel</label>
-  <svg class="pc-icon">
-    <use xlink:href="#custom-flag"></use>
-  </svg>
+  <label>Wali Kelas</label>
 </li>
+
 <li class="pc-item pc-hasmenu">
-  <a href="{{ route('intrakurikuler.index') }}" class="pc-link">
-    <span class="pc-micon">
-      {{-- <svg class="pc-icon">
-        <use xlink:href="#custom-status-up"></use>
-      </svg> --}}
-      <i class="bi bi-journal-bookmark"></i>
-    </span>
-    <span class="pc-mtext">Intrakurikuler</span></a>
+  <a href="{{ route('absensi.index') }}" class="pc-link">
+    <span class="pc-micon"><i class="bi bi-clipboard-check"></i></span>
+    <span class="pc-mtext">Absensi</span>
+  </a>
 </li>
-<li class="pc-item pc-hasmenu">
-  <a href="{{ route('ekstrakurikuler.index') }}" class="pc-link">
-    <span class="pc-micon">
-      {{-- <svg class="pc-icon">
-        <use xlink:href="#custom-shield"></use>
-      </svg> --}}
-      <i class="bi bi-people"></i>
-    </span>
-    <span class="pc-mtext">Ekstrakurikuler</span></a>
-</li>
+<!-- tambah sini mas -->
 
 {{-- <li class="pc-item pc-caption">
   <label>Other</label>

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\AssesmentFormatifController;
 use App\Http\Controllers\AssesmentSumatifController;
 use App\Http\Controllers\EkstrakurikulerController;
@@ -34,6 +35,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('assesment_formatif/detail',[AssesmentFormatifController::class,'detailAssesmentFormatif'])->name('assesment_formatif.detail');
     Route::resource('assesment_formatif', AssesmentFormatifController::class);
     Route::resource('penilaian_ekstrakurikuler', PenilaianEkstrakurikulerController::class);
+    Route::resource('absensi', AbsensiController::class);
     // Define a GET route with dynamic placeholders for route parameters
     Route::get('{routeName}/{name?}', [HomeController::class, 'pageView']);
 });

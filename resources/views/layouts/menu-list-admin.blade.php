@@ -19,26 +19,49 @@
     <use xlink:href="#custom-flag"></use>
   </svg>
 </li>
+
 <li class="pc-item pc-hasmenu">
   <a href="{{ route('intrakurikuler.index') }}" class="pc-link">
-    <span class="pc-micon">
-      {{-- <svg class="pc-icon">
-        <use xlink:href="#custom-status-up"></use>
-      </svg> --}}
-      <i class="bi bi-journal-bookmark"></i>
-    </span>
-    <span class="pc-mtext">Intrakurikuler</span></a>
+    <span class="pc-micon"><i class="bi bi-journal-bookmark"></i></span>
+    <span class="pc-mtext">Intrakurikuler</span>
+  </a>
 </li>
+
 <li class="pc-item pc-hasmenu">
   <a href="{{ route('ekstrakurikuler.index') }}" class="pc-link">
-    <span class="pc-micon">
-      {{-- <svg class="pc-icon">
-        <use xlink:href="#custom-shield"></use>
-      </svg> --}}
-      <i class="bi bi-people"></i>
-    </span>
-    <span class="pc-mtext">Ekstrakurikuler</span></a>
+    <span class="pc-micon"><i class="bi bi-people"></i></span>
+    <span class="pc-mtext">Ekstrakurikuler</span>
+  </a>
 </li>
+
+<li class="pc-item pc-hasmenu">
+  <a href="{{ route('ekstrakurikuler.index') }}" class="pc-link">
+    <span class="pc-micon"><i class="bi bi-people"></i></span>
+    <span class="pc-mtext">Manage Intrakurikuler</span>
+  </a>
+</li>
+
+<li class="pc-item pc-hasmenu">
+  <a href="{{ route('ekstrakurikuler.index') }}" class="pc-link">
+    <span class="pc-micon"><i class="bi bi-people"></i></span>
+    <span class="pc-mtext">Manage Ekstrakurikuler</span>
+  </a>
+</li>
+
+<li class="pc-item pc-hasmenu">
+  <a href="{{ route('ekstrakurikuler.index') }}" class="pc-link">
+    <span class="pc-micon"><i class="bi bi-people"></i></span>
+    <span class="pc-mtext">Asign Intrakurikuler</span>
+  </a>
+</li>
+
+<li class="pc-item pc-hasmenu">
+  <a href="{{ route('ekstrakurikuler.index') }}" class="pc-link">
+    <span class="pc-micon"><i class="bi bi-people"></i></span>
+    <span class="pc-mtext">Asign Ekstrakurikuler</span>
+  </a>
+</li>
+
 
 {{-- <li class="pc-item pc-caption">
   <label>Other</label>
