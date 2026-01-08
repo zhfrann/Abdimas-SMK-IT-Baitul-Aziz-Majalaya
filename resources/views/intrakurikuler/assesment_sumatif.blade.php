@@ -15,10 +15,25 @@
     <div class="card">
 
       {{-- Header --}}
-      <div class="card-header d-flex align-items-center justify-content-between">
+      <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
         <div>
           <h5 class="mb-0">Pendidikan Agama Islam dan Budi Pekerti</h5>
           <span class="d-block m-t-5">Kelas 12</span>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <a href="/template-assesmen-sumatif-excel" class="btn btn-primary">
+            <i class="bi bi-download"></i> Unduh Template Excel
+          </a>
+          <form action="" method="" enctype="multipart/form-data" class="d-flex align-items-center gap-2">
+            @csrf
+            <label class="btn btn-outline-secondary mb-0">
+              <i class="bi bi-upload"></i> Pilih File Excel
+              <input type="file" name="excel" accept=".xlsx,.xls" class="d-none" required onchange="this.form.querySelector('button[type=submit]').disabled = !this.value;">
+            </label>
+            <button type="submit" class="btn btn-success" disabled>
+              <i class="bi bi-save"></i> Simpan Data Excel
+            </button>
+          </form>
         </div>
       </div>
 

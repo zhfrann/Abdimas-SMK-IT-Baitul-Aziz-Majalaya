@@ -3,6 +3,7 @@
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\AssesmentFormatifController;
 use App\Http\Controllers\AssesmentSumatifController;
+use App\Http\Controllers\DummyExcelController;
 use App\Http\Controllers\EkstrakurikulerController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IntrakurikulerController;
@@ -35,8 +36,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('assesment_formatif/detail',[AssesmentFormatifController::class,'detailAssesmentFormatif'])->name('assesment_formatif.detail');
     Route::resource('assesment_formatif', AssesmentFormatifController::class);
     Route::resource('penilaian_ekstrakurikuler', PenilaianEkstrakurikulerController::class);
+<<<<<<< HEAD
     Route::get('absensi/daily',[ AbsensiController::class,'absensiHarian'])->name('absensi.harian');
     Route::resource('absensi', AbsensiController::class);
+=======
+    
+>>>>>>> ae544e8 (feat: menambah generate template asesmen sumatif & formatif)
     // Define a GET route with dynamic placeholders for route parameters
+    Route::get('/template-assesmen-formatif-excel', [DummyExcelController::class, 'downloadFormatif']);
+    Route::get('/template-assesmen-sumatif-excel', [DummyExcelController::class, 'downloadSumatif']);
+    
     Route::get('{routeName}/{name?}', [HomeController::class, 'pageView']);
 });
