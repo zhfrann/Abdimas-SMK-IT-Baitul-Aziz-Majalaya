@@ -2,9 +2,12 @@
 <nav class="pc-sidebar">
   <div class="navbar-wrapper">
     <div class="m-header">
-      <a href="/dashboard/index" class="b-brand text-primary">
-        <img src="/build/images/logo-dark.svg" class="img-fluid logo-lg" alt="logo" />
-        <span class="badge bg-light-success rounded-pill ms-2 theme-version">{{ config('app.APP_VERSION') }}</span>
+      <a href="/dashboard/index" class="b-brand text-primary d-flex align align-items-center gap-2">
+        <img
+          src="https://www.smkitbaitulaziz.sch.id/images/logo.png"
+          style="height: 50px; width: auto;"
+          alt=""  />
+          <h5 class="mt-2"> SMK IT Baitul Azis</h5>
       </a>
     </div>
 
