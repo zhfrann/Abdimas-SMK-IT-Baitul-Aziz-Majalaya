@@ -68,10 +68,10 @@
                           </li>
                         </ul>
                         <div class="d-flex justify-content-center gap-1 flex-wrap">
-                          <a href="/components/table_tujuan_pembelajaran" class="btn btn-sm btn-light-primary">Tujuan pembelajaran</a>
-                          <a href="/components/table_lingkup_materi" class="btn btn-sm btn-light-primary">Lingkup materi</a>
-                          <a href="/components/asesmen_formatif" class="btn btn-sm btn-light-primary">Asesmen Formatif</a>
-                          <a href="/components/asesment_sumatif" class="btn btn-sm btn-light-primary">Asesmen Sumatif</a>
+                          <a href="{{ route('tujuan_pembelajaran.index') }}" class="btn btn-sm btn-light-primary">Tujuan pembelajaran</a>
+                          <a href="{{ route('lingkup_materi.index') }}" class="btn btn-sm btn-light-primary">Lingkup materi</a>
+                          <a href="{{ route('assesment_formatif.index') }}" class="btn btn-sm btn-light-primary">Asesmen Formatif</a>
+                          <a href="{{ route('assesment_sumatif.index') }}" class="btn btn-sm btn-light-primary">Asesmen Sumatif</a>
                         </div>
                       </div>
                     </div>
@@ -128,10 +128,10 @@
                           </li>
                         </ul>
                         <div class="d-flex justify-content-center gap-1 flex-wrap">
-                          <a href="#" class="btn btn-sm btn-light-primary">Tujuan pembelajaran</a>
-                          <a href="#" class="btn btn-sm btn-light-primary">Lingkup materi</a>
-                          <a href="#" class="btn btn-sm btn-light-primary">Asesmen Formatif</a>
-                          <a href="#" class="btn btn-sm btn-light-primary">Asesmen Sumatif</a>
+                          <a href="{{ route('tujuan_pembelajaran.index') }}" class="btn btn-sm btn-light-primary">Tujuan pembelajaran</a>
+                          <a href="{{ route('lingkup_materi.index') }}" class="btn btn-sm btn-light-primary">Lingkup materi</a>
+                          <a href="{{ route('assesment_formatif.index') }}" class="btn btn-sm btn-light-primary">Asesmen Formatif</a>
+                          <a href="{{ route('assesment_sumatif.index') }}" class="btn btn-sm btn-light-primary">Asesmen Sumatif</a>
                         </div>
                       </div>
                     </div>
@@ -188,10 +188,10 @@
                           </li>
                         </ul>
                         <div class="d-flex justify-content-center gap-1 flex-wrap">
-                          <a href="#" class="btn btn-sm btn-light-primary">Tujuan pembelajaran</a>
-                          <a href="#" class="btn btn-sm btn-light-primary">Lingkup materi</a>
-                          <a href="#" class="btn btn-sm btn-light-primary">Asesmen Formatif</a>
-                          <a href="#" class="btn btn-sm btn-light-primary">Asesmen Sumatif</a>
+                          <a href="{{ route('tujuan_pembelajaran.index') }}" class="btn btn-sm btn-light-primary">Tujuan pembelajaran</a>
+                          <a href="{{ route('lingkup_materi.index') }}" class="btn btn-sm btn-light-primary">Lingkup materi</a>
+                          <a href="{{ route('assesment_formatif.index') }}" class="btn btn-sm btn-light-primary">Asesmen Formatif</a>
+                          <a href="{{ route('assesment_sumatif.index') }}" class="btn btn-sm btn-light-primary">Asesmen Sumatif</a>
                         </div>
                       </div>
                     </div>
@@ -248,10 +248,10 @@
                           </li>
                         </ul>
                         <div class="d-flex justify-content-center gap-1 flex-wrap">
-                          <a href="#" class="btn btn-sm btn-light-primary">Tujuan pembelajaran</a>
-                          <a href="#" class="btn btn-sm btn-light-primary">Lingkup materi</a>
-                          <a href="#" class="btn btn-sm btn-light-primary">Asesmen Formatif</a>
-                          <a href="#" class="btn btn-sm btn-light-primary">Asesmen Sumatif</a>
+                          <a href="{{ route('tujuan_pembelajaran.index') }}" class="btn btn-sm btn-light-primary">Tujuan pembelajaran</a>
+                          <a href="{{ route('lingkup_materi.index') }}" class="btn btn-sm btn-light-primary">Lingkup materi</a>
+                          <a href="{{ route('assesment_formatif.index') }}" class="btn btn-sm btn-light-primary">Asesmen Formatif</a>
+                          <a href="{{ route('assesment_sumatif.index') }}" class="btn btn-sm btn-light-primary">Asesmen Sumatif</a>
                         </div>
                       </div>
                     </div>

@@ -86,7 +86,7 @@
                   </table>
                 </div>
 
-              <a href="/components/table_ekstrakurikuler" class="btn btn-light-secondary">Kembali</a>
+              <a href="{{ route('ekstrakurikuler.index') }}" class="btn btn-light-secondary">Kembali</a>
               </div>
             </div>
           </div>

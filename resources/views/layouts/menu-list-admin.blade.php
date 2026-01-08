@@ -20,7 +20,7 @@
   </svg>
 </li>
 <li class="pc-item pc-hasmenu">
-  <a href="/components/table_intrakurikuler" class="pc-link">
+  <a href="{{ route('intrakurikuler.index') }}" class="pc-link">
     <span class="pc-micon">
       {{-- <svg class="pc-icon">
         <use xlink:href="#custom-status-up"></use>
@@ -30,7 +30,7 @@
     <span class="pc-mtext">Intrakurikuler</span></a>
 </li>
 <li class="pc-item pc-hasmenu">
-  <a href="/components/table_ekstrakurikuler" class="pc-link">
+  <a href="{{ route('ekstrakurikuler.index') }}" class="pc-link">
     <span class="pc-micon">
       {{-- <svg class="pc-icon">
         <use xlink:href="#custom-shield"></use>

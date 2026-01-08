@@ -257,7 +257,7 @@
                     <div div class="d-flex justify-content-between align-items-center">
                         <div>
                             <button type="submit" class="btn btn-primary">Simpan</button>
-                            <a href="/components/asesmen_formatif" class="btn btn-light-secondary">Kembali</a>
+                            <a href="{{ route('assesment_formatif.index') }}" class="btn btn-light-secondary">Kembali</a>
                         </div>
                         <div class="d-flex gap-5">
                             <a href="#" class="link-primary"><i class="bi bi-chevron-left"> BABY CANTIKA CAHAYA PERMATA</i></a>

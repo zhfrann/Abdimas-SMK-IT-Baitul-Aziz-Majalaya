@@ -45,7 +45,7 @@
                 <td><span class="badge bg-light-primary">82</span></td>
                 <td><span class="badge bg-light-primary">84</span></td>
                 <td>
-                  <a href="/components/detail_asesmen_sumatif">
+                  <a href="{{ route('assesment_sumatif.detail') }}">
                     <button type="button" class="btn btn-sm btn-light-primary">Detail Nilai</button>
                   </a>
                 </td>
@@ -58,7 +58,7 @@
                 <td><span class="badge bg-light-primary">88</span></td>
                 <td><span class="badge bg-light-primary">89</span></td>
                 <td>
-                  <a href="/components/detail_asesment_sumatif">
+                  <a href="{{ route('assesment_sumatif.detail') }}">
                     <button type="button" class="btn btn-sm btn-light-primary">Detail Nilai</button>
                   </a>
                 </td>
@@ -71,7 +71,7 @@
                 <td><span class="badge bg-light-primary">80</span></td>
                 <td><span class="badge bg-light-primary">82</span></td>
                 <td>
-                  <a href="/components/detail_asesment_sumatif">
+                  <a href="{{ route('assesment_sumatif.detail') }}">
                     <button type="button" class="btn btn-sm btn-light-primary">Detail Nilai</button>
                   </a>
                 </td>
@@ -84,7 +84,7 @@
                 <td><span class="badge bg-light-primary">85</span></td>
                 <td><span class="badge bg-light-primary">87</span></td>
                 <td>
-                  <a href="/components/detail_asesment_sumatif">
+                  <a href="{{ route('assesment_sumatif.detail') }}">
                     <button type="button" class="btn btn-sm btn-light-primary">Detail Nilai</button>
                   </a>
                 </td>
@@ -93,7 +93,7 @@
           </table>
         </div>
 
-        <a href="/components/table_intrakurikuler" class="btn btn-light-secondary">Kembali</a>
+        <a href="{{ route('intrakurikuler.index') }}" class="btn btn-light-secondary">Kembali</a>
       </div>
     </div>
   </div>

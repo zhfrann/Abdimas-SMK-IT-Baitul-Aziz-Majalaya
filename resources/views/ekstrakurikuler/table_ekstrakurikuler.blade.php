@@ -64,7 +64,7 @@
                             </div>
                           </li>
                         </ul>
-                        <a href="/components/penilaian_ekstrakurikuler">
+                        <a href="{{route('penilaian_ekstrakurikuler.index')}}">
                           <button class="btn btn-sm btn-light-primary mb-2">Penilaian</button>
                         </a>
                       </div>
@@ -118,7 +118,7 @@
                             </div>
                           </li>
                         </ul>
-                        <a href="#">
+                        <a href="{{route('penilaian_ekstrakurikuler.index')}}">
                           <button class="btn btn-sm btn-light-primary mb-2">Penilaian</button>
                         </a>
                       </div>

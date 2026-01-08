@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', 'Tujuan Pembelajaran')
+@section('title', 'Lingkup Materi')
 
 @section('css')
   <link rel="stylesheet" href="/build/css/plugins/style.css" />
@@ -8,7 +8,7 @@
 
 @section('content')
 
-<x-breadcrumb item="Intrakurikuler" active="Tujuan Pembelajaran"/>
+<x-breadcrumb item="Intrakurikuler" active="Lingkup Materi"/>
 
 <div class="row">
   <!-- [ basic-table ] start -->
@@ -26,13 +26,13 @@
           type="button"
           class="btn btn-primary"
           data-bs-toggle="modal"
-          data-bs-target="#tujuanPembelajaranModal"
+          data-bs-target="#lingkupMateriModal"
           data-mode="create"
-          data-title="Tambah Tujuan Pembelajaran"
+          data-title="Tambah Lingkup Materi"
           data-id=""
           data-nama=""
         >
-          Tambah Tujuan Pembelajaran
+          Tambah Lingkup Materi
         </button>
       </div>
 
@@ -50,21 +50,22 @@
             <tbody>
               <tr>
                 <td>1</td>
-                <td>membaca Al-Qur’an dengan meyakini bahwa kontrol diri (Mujahadah An-Nafs) adalah perintah agama</td>
+                <td>A. Kajian Q.S Al-An-fal 8:72 dan hadist tentang pentingnya mengendalikan diri (Mujahadah an-nafs)</td>
                 <td>
                   <button
                     type="button"
                     class="btn btn-sm btn-light-warning"
                     data-bs-toggle="modal"
-                    data-bs-target="#tujuanPembelajaranModal"
+                    data-bs-target="#lingkupMateriModal"
                     data-mode="edit"
-                    data-title="Edit Tujuan Pembelajaran"
+                    data-title="Edit Lingkup Materi"
                     data-id="1"
-                    data-nama="membaca Al-Qur’an dengan meyakini bahwa kontrol diri (Mujahadah An-Nafs) adalah perintah agama"
+                    data-nama="A. Kajian Q.S Al-An-fal 8:72 dan hadist tentang pentingnya mengendalikan diri (Mujahadah an-nafs)"
                   >
                     Update
                   </button>
 
+                  {{-- DELETE (contoh pakai form biar aman) --}}
                   <form action="/lingkup-materi/1" method="POST" class="d-inline">
                     @csrf
                     @method('DELETE')
@@ -77,21 +78,22 @@
               </tr>
               <tr>
                 <td>2</td>
-                <td>menunjukan perilaku control diri (Mujahadah An-Nafs), sebagai implementasi dari perintah Q.S. Al-Anfal /8:72 serta Hadits terkait.</td>
+                <td>B. Kajian Q.S AL-Hujurat / 49 :12 dan Hadist tentang Berprasangka</td>
                 <td>
                   <button
                     type="button"
                     class="btn btn-sm btn-light-warning"
                     data-bs-toggle="modal"
-                    data-bs-target="#tujuanPembelajaranModal"
+                    data-bs-target="#lingkupMateriModal"
                     data-mode="edit"
-                    data-title="Edit Tujuan Pembelajaran"
+                    data-title="Edit Lingkup Materi"
                     data-id="2"
-                    data-nama="menunjukan perilaku control diri (Mujahadah An-Nafs), sebagai implementasi dari perintah Q.S. Al-Anfal /8:72 serta Hadits terkait."
+                    data-nama="B. Kajian Q.S AL-Hujurat / 49 :12 dan Hadist tentang Berprasangka"
                   >
                     Update
                   </button>
 
+                  {{-- DELETE (contoh pakai form biar aman) --}}
                   <form action="/lingkup-materi/2" method="POST" class="d-inline">
                     @csrf
                     @method('DELETE')
@@ -104,23 +106,24 @@
               </tr>
               <tr>
                 <td>3</td>
-                <td>menganalisis Q.S. Al-Anfal/8:72, serta hadits tentang control diri (Mujahadah An-Nafs).</td>
+                <td>C. Kajian Q.S AL-Hujurat 49: 10 dan Hadist tentang Indahnya Persaudaraan (ukkhuwwah)</td>
                 <td>
                   <button
                     type="button"
                     class="btn btn-sm btn-light-warning"
                     data-bs-toggle="modal"
-                    data-bs-target="#tujuanPembelajaranModal"
+                    data-bs-target="#lingkupMateriModal"
                     data-mode="edit"
-                    data-title="Edit Tujuan Pembelajaran"
+                    data-title="Edit Lingkup Materi"
                     data-id="3"
-                    data-nama="menganalisis Q.S. Al-Anfal/8:72, serta hadits tentang control diri (Mujahadah An-Nafs)."
+                    data-nama="C. Kajian Q.S AL-Hujurat 49: 10 dan Hadist tentang Indahnya Persaudaraan (ukkhuwwah)"
                   >
                     Update
                   </button>
 
+                  {{-- DELETE (contoh pakai form biar aman) --}}
                   <form action="/lingkup-materi/3" method="POST" class="d-inline">
-                    @csrf 
+                    @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-sm btn-light-danger"
                       onclick="return confirm('Yakin hapus data ini?')">
@@ -131,23 +134,24 @@
               </tr>
               <tr>
                 <td>4</td>
-                <td>membaca Q.S. Al-Anfal/8:72, sesuai dengan kaidah tajwid dan Makharijul Huruf.</td>
+                <td>D.Kajian Q.S AL-ISRA 17:32 Q.S An-nur 24:2 dan Hadist tentang Menjaga Diri dari Pergaulan Bebas dan perbauatan Mendekati Zina</td>
                 <td>
                   <button
                     type="button"
                     class="btn btn-sm btn-light-warning"
                     data-bs-toggle="modal"
-                    data-bs-target="#tujuanPembelajaranModal"
+                    data-bs-target="#lingkupMateriModal"
                     data-mode="edit"
-                    data-title="Edit Tujuan Pembelajaran"
+                    data-title="Edit Lingkup Materi"
                     data-id="4"
-                    data-nama="membaca Q.S. Al-Anfal/8:72, sesuai dengan kaidah tajwid dan Makharijul Huruf."
+                    data-nama="D.Kajian Q.S AL-ISRA 17:32 Q.S An-nur 24:2 dan Hadist tentang Menjaga Diri dari Pergaulan Bebas dan perbauatan Mendekati Zina"
                   >
                     Update
                   </button>
 
+                  {{-- DELETE (contoh pakai form biar aman) --}}
                   <form action="/lingkup-materi/4" method="POST" class="d-inline">
-                    @csrf 
+                    @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-sm btn-light-danger"
                       onclick="return confirm('Yakin hapus data ini?')">
@@ -158,23 +162,24 @@
               </tr>
               <tr>
                 <td>5</td>
-                <td>menghafal Q.S. Al-Anfal/8:72, dengan fasih dan lancar.</td>
+                <td>E. Meneladani ALLAH SWT melalui Asmaul husna</td>
                 <td>
                   <button
                     type="button"
                     class="btn btn-sm btn-light-warning"
                     data-bs-toggle="modal"
-                    data-bs-target="#tujuanPembelajaranModal"
+                    data-bs-target="#lingkupMateriModal"
                     data-mode="edit"
-                    data-title="Edit Tujuan Pembelajaran"
+                    data-title="Edit Lingkup Materi"
                     data-id="5"
-                    data-nama="menghafal Q.S. Al-Anfal/8:72, dengan fasih dan lancar."
+                    data-nama="E. Meneladani ALLAH SWT melalui Asmaul husna"
                   >
                     Update
                   </button>
 
+                  {{-- DELETE (contoh pakai form biar aman) --}}
                   <form action="/lingkup-materi/5" method="POST" class="d-inline">
-                    @csrf 
+                    @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-sm btn-light-danger"
                       onclick="return confirm('Yakin hapus data ini?')">
@@ -185,23 +190,24 @@
               </tr>
               <tr>
                 <td>6</td>
-                <td>menyajikan hubungan antara kualitas keimanan dengan control diri (Mujahadah An-Nafs), sesuai dengan pesan Q.S. Al-Anfal /8:72, serta hadits. </td>
+                <td>F Menghadirkan malaikat dalam kehidupan sehari-hari</td>
                 <td>
                   <button
                     type="button"
                     class="btn btn-sm btn-light-warning"
                     data-bs-toggle="modal"
-                    data-bs-target="#tujuanPembelajaranModal"
+                    data-bs-target="#lingkupMateriModal"
                     data-mode="edit"
-                    data-title="Edit Tujuan Pembelajaran"
+                    data-title="Edit Lingkup Materi"
                     data-id="6"
-                    data-nama="menyajikan hubungan antara kualitas keimanan dengan control diri (Mujahadah An-Nafs), sesuai dengan pesan Q.S. Al-Anfal /8:72, serta hadits. "
+                    data-nama="F Menghadirkan malaikat dalam kehidupan sehari-hari"
                   >
                     Update
                   </button>
 
+                  {{-- DELETE (contoh pakai form biar aman) --}}
                   <form action="/lingkup-materi/6" method="POST" class="d-inline">
-                    @csrf 
+                    @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-sm btn-light-danger"
                       onclick="return confirm('Yakin hapus data ini?')">
@@ -214,7 +220,7 @@
           </table>
         </div>
 
-        <a href="/components/table_intrakurikuler" class="btn btn-light-secondary">Kembali</a>
+        <a href="{{ route('intrakurikuler.index') }}" class="btn btn-light-secondary">Kembali</a>
       </div>
     </div>
   </div>
@@ -222,7 +228,7 @@
 </div>
 
 {{-- ===================== MODAL ADD/EDIT ===================== --}}
-<div class="modal fade" id="tujuanPembelajaranModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="lingkupMateriModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
 
@@ -231,7 +237,7 @@
         <div id="methodSpoof"></div>
 
         <div class="modal-header">
-          <h5 class="modal-title" id="tujuanPembelajaranModalTitle">Tambah Tujuan Pembelajaran</h5>
+          <h5 class="modal-title" id="lingkupMateriModalTitle">Tambah Lingkup Materi</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
 
@@ -250,6 +256,7 @@
         </div>
 
       </form>
+
     </div>
   </div>
 </div>
@@ -263,9 +270,8 @@
     window.dt = new DataTable('#pc-dt-simple');
   </script>
 
-
   <script>
-    const modalEl = document.getElementById('tujuanPembelajaranModal');
+    const modalEl = document.getElementById('lingkupMateriModal');
 
     modalEl.addEventListener('show.bs.modal', function (event) {
       const btn = event.relatedTarget;
@@ -277,7 +283,7 @@
       const nama = btn.getAttribute('data-nama') || '';
 
       // title
-      document.getElementById('tujuanPembelajaranModalTitle').textContent = title;
+      document.getElementById('lingkupMateriModalTitle').textContent = title;
 
       // fill input
       document.getElementById('lm_id').value = id;
@@ -302,7 +308,7 @@
       document.getElementById('lm_nama').value = '';
       document.getElementById('methodSpoof').innerHTML = '';
       document.getElementById('lingkupMateriForm').action = `/lingkup-materi`;
-      document.getElementById('tujuanPembelajaranModalTitle').textContent = 'Tambah Lingkup Materi';
+      document.getElementById('lingkupMateriModalTitle').textContent = 'Tambah Lingkup Materi';
     });
   </script>
   <!-- [Page Specific JS] end -->
