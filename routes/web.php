@@ -36,12 +36,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('assesment_formatif/detail',[AssesmentFormatifController::class,'detailAssesmentFormatif'])->name('assesment_formatif.detail');
     Route::resource('assesment_formatif', AssesmentFormatifController::class);
     Route::resource('penilaian_ekstrakurikuler', PenilaianEkstrakurikulerController::class);
-<<<<<<< HEAD
+    
     Route::get('absensi/daily',[ AbsensiController::class,'absensiHarian'])->name('absensi.harian');
     Route::resource('absensi', AbsensiController::class);
-=======
-    
->>>>>>> ae544e8 (feat: menambah generate template asesmen sumatif & formatif)
+
     // Define a GET route with dynamic placeholders for route parameters
     Route::get('/template-assesmen-formatif-excel', [DummyExcelController::class, 'downloadFormatif']);
     Route::get('/template-assesmen-sumatif-excel', [DummyExcelController::class, 'downloadSumatif']);
