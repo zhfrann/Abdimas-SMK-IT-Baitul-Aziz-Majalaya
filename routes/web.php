@@ -35,6 +35,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('assesment_formatif/detail',[AssesmentFormatifController::class,'detailAssesmentFormatif'])->name('assesment_formatif.detail');
     Route::resource('assesment_formatif', AssesmentFormatifController::class);
     Route::resource('penilaian_ekstrakurikuler', PenilaianEkstrakurikulerController::class);
+    Route::get('absensi/daily',[ AbsensiController::class,'absensiHarian'])->name('absensi.harian');
     Route::resource('absensi', AbsensiController::class);
     // Define a GET route with dynamic placeholders for route parameters
     Route::get('{routeName}/{name?}', [HomeController::class, 'pageView']);

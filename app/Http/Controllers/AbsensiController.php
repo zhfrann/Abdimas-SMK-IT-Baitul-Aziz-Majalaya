@@ -61,4 +61,10 @@ class AbsensiController extends Controller
     {
         //
     }
+
+
+    public function absensiHarian()
+    {
+        return view('absensi.absensi_harian');
+    }
 }

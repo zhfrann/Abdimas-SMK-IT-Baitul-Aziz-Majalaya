@@ -62,25 +62,7 @@
         </li>
 
         {{-- ================== MENU GURU MAPEL + SUPER ADMIN ================== --}}
-        @if($role === 'guru_mapel' || $role === 'super_admin')
-        <!-- <li class="pc-item pc-caption">
-            <label>Mapel</label>
-            <svg class="pc-icon"><use xlink:href="#custom-flag"></use></svg>
-          </li>
-
-          <li class="pc-item pc-hasmenu">
-            <a href="{{ route('intrakurikuler.index') }}" class="pc-link">
-              <span class="pc-micon"><i class="bi bi-journal-bookmark"></i></span>
-              <span class="pc-mtext">Intrakurikuler</span>
-            </a>
-          </li>
-
-          <li class="pc-item pc-hasmenu">
-            <a href="{{ route('ekstrakurikuler.index') }}" class="pc-link">
-              <span class="pc-micon"><i class="bi bi-people"></i></span>
-              <span class="pc-mtext">Ekstrakurikuler</span>
-            </a>
-          </li> -->
+        @if($role === 'guru_mapel')
         @include('layouts.menu-list-mapel', [
         'role' => $role,
         'roleLabel' => $roleLabel
