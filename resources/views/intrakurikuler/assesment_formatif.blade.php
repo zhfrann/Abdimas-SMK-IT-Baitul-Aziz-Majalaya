@@ -31,6 +31,8 @@
               <tr>
                 <th>No</th>
                 <th>Nama</th>
+                <th>TP Tercapai</th>
+                <th>TP Tidak Tercapai</th>
                 <th>Deskripsi Capaian Tertinggi</th>
                 <th>Deskripsi Capaian Terendah</th>
                 <th>Actions</th>
@@ -40,10 +42,12 @@
               <tr>
                 <td>1</td>
                 <td>ADITYA RIZKI ARIFIN</td>
+                <td>8 dari 10</td>
+                <td>2 dari 10</td>
                 <td class="text-wrap">Aditya Rizki Arifin menunjukkan pemahaman dalam membaca Al-Qur’an dengan meyakini bahwa kontrol diri (Mujahadah An-Nafs) adalah perintah agama, menunjukan perilaku control diri (Mujahadah An-Nafs), sebagai implementasi dari perintah Q.S. Al-Anfal /8:72 serta Hadits terkait.,</td>
                 <td class="text-wrap">Aditya Rizki Arifin membutuhkan bimbingan dalam menganalisisQ.S. Al-Hujurat/49:12, serta Hadits prasangka baik (husnuzzan)., membaca Q.S. Al-Hujurat/49:12, sesuai dengan kaidah tajwid dan makharijul huruf,</td>
                 <td>
-                  <a href="{{route('assesment_formatif.detail')}}">
+                  <a href="{{ route('assesment_formatif.detail') }}">
                     <button type="button" class="btn btn-sm btn-light-primary">Detail Nilai</button>
                   </a>
                 </td>
@@ -51,6 +55,8 @@
               <tr>
                 <td>2</td>
                 <td>ALYA NUR ZAHRA</td>
+                <td>8 dari 10</td>
+                <td>2 dari 10</td>
                 <td class="text-wrap">Alya Nur Zahra menunjukkan pemahaman dalam menunjukan perilaku control diri (Mujahadah An-Nafs), sebagai implementasi dari perintah Q.S. Al-Anfal /8:72 serta Hadits terkait., menganalisisQ.S. Al-Hujurat/49:12, serta Hadits prasangka baik (husnuzzan)., membaca Q.S. Al-Hujurat/49:12, sesuai dengan kaidah tajwid dan makharijul huruf, </td>
                 <td class="text-wrap">Alya Nur Zahra membutuhkan bimbingan dalam menghafal Q.S. Al-Hujurat/49:12 dengan fasih dan lancar., </td>
                 <td>
@@ -62,6 +68,8 @@
               <tr>
                 <td>3</td>
                 <td>ARSYAD FATHI MAWARDI</td>
+                <td>8 dari 10</td>
+                <td>2 dari 10</td>
                 <td class="text-wrap">Arsyad Fathi Mawardi menunjukkan pemahaman dalam menunjukan perilaku control diri (Mujahadah An-Nafs), sebagai implementasi dari perintah Q.S. Al-Anfal /8:72 serta Hadits terkait., menganalisisQ.S. Al-Hujurat/49:12, serta Hadits prasangka baik (husnuzzan)., membaca Q.S. Al-Hujurat/49:12, sesuai dengan kaidah tajwid dan makharijul huruf, </td>
                 <td class="text-wrap">Arsyad Fathi Mawardi membutuhkan bimbingan dalam menghafal Q.S. Al-Hujurat/49:12 dengan fasih dan lancar., </td>
                 <td>
@@ -73,6 +81,8 @@
               <tr>
                 <td>4</td>
                 <td>BABY CANTIKA CAHAYA PERMATA</td>
+                <td>8 dari 10</td>
+                <td>2 dari 10</td>
                 <td class="text-wrap">Baby Cantika Cahaya Permata menunjukkan pemahaman dalam menunjukan perilaku control diri (Mujahadah An-Nafs), sebagai implementasi dari perintah Q.S. Al-Anfal /8:72 serta Hadits terkait., menganalisisQ.S. Al-Hujurat/49:12, serta Hadits prasangka baik (husnuzzan)., membaca Q.S. Al-Hujurat/49:12, sesuai dengan kaidah tajwid dan makharijul huruf, </td>
                 <td class="text-wrap">Baby Cantika Cahaya Permata membutuhkan bimbingan dalam menghafal Q.S. Al-Hujurat/49:12 dengan fasih dan lancar., </td>
                 <td>

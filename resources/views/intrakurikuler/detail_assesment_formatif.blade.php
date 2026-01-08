@@ -34,7 +34,7 @@
                         </div>
 
                         {{-- TP 1 --}}
-                        <div class="mb-4 col-md-3">
+                        <div class="mb-4 col-md-6">
                             <label class="form-label fs-5 f-w-600">TP 1</label>
                             <p>Membaca Al-Qur’an dengan meyakini bahwa kontrol diri adalah perintah agama.</p>
 
@@ -48,7 +48,7 @@
 
                             <div class="form-check mt-1">
                                 <input class="form-check-input" type="checkbox" name="tp[1][tampil_rapor]" value="1"
-                                    id="tp1_rapor">
+                                    id="tp1_rapor" checked>
                                 <label class="form-check-label" for="tp1_rapor">
                                     Tampilkan di rapor
                                 </label>
@@ -56,13 +56,13 @@
                         </div>
 
                         {{-- TP 2 --}}
-                        <div class="mb-4 col-md-3">
+                        <div class="mb-4 col-md-6">
                             <label class="form-label fs-5 f-w-600">TP 2</label>
                             <p>Menunjukan perilaku control diri (Mujahadah An-Nafs), sebagai implementasi dari perintah Q.S. Al-Anfal /8:72 serta Hadits terkait.</p>
 
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="tp[2][tercapai]" value="1"
-                                    id="tp2_tercapai">
+                                    id="tp2_tercapai" checked>
                                 <label class="form-check-label" for="tp2_tercapai">
                                     TP tercapai
                                 </label>
@@ -70,7 +70,7 @@
 
                             <div class="form-check mt-1">
                                 <input class="form-check-input" type="checkbox" name="tp[2][tampil_rapor]" value="1"
-                                    id="tp2_rapor">
+                                    id="tp2_rapor" checked>
                                 <label class="form-check-label" for="tp2_rapor">
                                     Tampilkan di rapor
                                 </label>
@@ -78,13 +78,13 @@
                         </div>
 
                         {{-- TP 3 --}}
-                        <div class="mb-4 col-md-3">
+                        <div class="mb-4 col-md-6">
                             <label class="form-label fs-5 f-w-600">TP 3</label>
                             <p>Menganalisis Q.S. Al-Anfal/8:72, serta hadits tentang control diri (Mujahadah An-Nafs).</p>
 
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="tp[3][tercapai]" value="1"
-                                    id="tp3_tercapai">
+                                    id="tp3_tercapai" checked>
                                 <label class="form-check-label" for="tp3_tercapai">
                                     TP tercapai
                                 </label>
@@ -92,7 +92,7 @@
 
                             <div class="form-check mt-1">
                                 <input class="form-check-input" type="checkbox" name="tp[3][tampil_rapor]" value="1"
-                                    id="tp3_rapor">
+                                    id="tp3_rapor" checked>
                                 <label class="form-check-label" for="tp3_rapor">
                                     Tampilkan di rapor
                                 </label>
@@ -100,13 +100,13 @@
                         </div>
 
                         {{-- TP 4 --}}
-                        <div class="mb-4 col-md-3">
+                        <div class="mb-4 col-md-6">
                             <label class="form-label fs-5 f-w-600">TP 4</label>
                             <p>Membaca Q.S. Al-Anfal/8:72, sesuai dengan kaidah tajwid dan Makharijul Huruf.</p>
 
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="tp[4][tercapai]" value="1"
-                                    id="tp4_tercapai">
+                                    id="tp4_tercapai" checked>
                                 <label class="form-check-label" for="tp4_tercapai">
                                     TP tercapai
                                 </label>
@@ -122,7 +122,7 @@
                         </div>
 
                         {{-- TP 5 --}}
-                        <div class="mb-4 col-md-3">
+                        <div class="mb-4 col-md-6">
                             <label class="form-label fs-5 f-w-600">TP 5</label>
                             <p>Menghafal Q.S. Al-Anfal/8:72, dengan fasih dan lancar.</p>
 
@@ -136,7 +136,7 @@
 
                             <div class="form-check mt-1">
                                 <input class="form-check-input" type="checkbox" name="tp[5][tampil_rapor]" value="1"
-                                    id="tp5_rapor">
+                                    id="tp5_rapor" checked>
                                 <label class="form-check-label" for="tp5_rapor">
                                     Tampilkan di rapor
                                 </label>
@@ -144,13 +144,13 @@
                         </div>
 
                         {{-- TP 6 --}}
-                        <div class="mb-4 col-md-3">
+                        <div class="mb-4 col-md-6">
                             <label class="form-label fs-5 f-w-600">TP 6</label>
                             <p>Menyajikan hubungan antara kualitas keimanan dengan control diri (Mujahadah An-Nafs), sesuai dengan pesan Q.S. Al-Anfal /8:72, serta hadits.</p>
 
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="tp[6][tercapai]" value="1"
-                                    id="tp6_tercapai">
+                                    id="tp6_tercapai" checked>
                                 <label class="form-check-label" for="tp6_tercapai">
                                     TP tercapai
                                 </label>
@@ -158,7 +158,7 @@
 
                             <div class="form-check mt-1">
                                 <input class="form-check-input" type="checkbox" name="tp[6][tampil_rapor]" value="1"
-                                    id="tp6_rapor">
+                                    id="tp6_rapor" checked>
                                 <label class="form-check-label" for="tp6_rapor">
                                     Tampilkan di rapor
                                 </label>
@@ -166,13 +166,13 @@
                         </div>
 
                         {{-- TP 7 --}}
-                        <div class="mb-4 col-md-3">
+                        <div class="mb-4 col-md-6">
                             <label class="form-label fs-5 f-w-600">TP 7</label>
                             <p>Membaca Al-Qur’an dengan meyakini bahwa prasangka baik (husnuzzan), adalah perintah agama.</p>
 
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="tp[7][tercapai]" value="1"
-                                    id="tp7_tercapai">
+                                    id="tp7_tercapai" checked>
                                 <label class="form-check-label" for="tp7_tercapai">
                                     TP tercapai
                                 </label>
@@ -180,7 +180,7 @@
 
                             <div class="form-check mt-1">
                                 <input class="form-check-input" type="checkbox" name="tp[7][tampil_rapor]" value="1"
-                                    id="tp7_rapor">
+                                    id="tp7_rapor" checked>
                                 <label class="form-check-label" for="tp7_rapor">
                                     Tampilkan di rapor
                                 </label>
@@ -188,13 +188,13 @@
                         </div>
 
                         {{-- TP 8 --}}
-                        <div class="mb-4 col-md-3">
+                        <div class="mb-4 col-md-6">
                             <label class="form-label fs-5 f-w-600">TP 8</label>
                             <p>MenganalisisQ.S. Al-Hujurat/49:12, serta Hadits prasangka baik (husnuzzan).</p>
 
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="tp[8][tercapai]" value="1"
-                                    id="tp8_tercapai">
+                                    id="tp8_tercapai" checked>
                                 <label class="form-check-label" for="tp8_tercapai">
                                     TP tercapai
                                 </label>
@@ -202,7 +202,7 @@
 
                             <div class="form-check mt-1">
                                 <input class="form-check-input" type="checkbox" name="tp[8][tampil_rapor]" value="1"
-                                    id="tp8_rapor">
+                                    id="tp8_rapor" checked>
                                 <label class="form-check-label" for="tp8_rapor">
                                     Tampilkan di rapor
                                 </label>
@@ -210,13 +210,13 @@
                         </div>
 
                         {{-- TP 9 --}}
-                        <div class="mb-4 col-md-3">
+                        <div class="mb-4 col-md-6">
                             <label class="form-label fs-5 f-w-600">TP 9</label>
                             <p>Membaca Q.S. Al-Hujurat/49:12, sesuai dengan kaidah tajwid dan makharijul huruf</p>
 
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="tp[9][tercapai]" value="1"
-                                    id="tp9_tercapai">
+                                    id="tp9_tercapai" checked>
                                 <label class="form-check-label" for="tp9_tercapai">
                                     TP tercapai
                                 </label>
@@ -224,7 +224,7 @@
 
                             <div class="form-check mt-1">
                                 <input class="form-check-input" type="checkbox" name="tp[9][tampil_rapor]" value="1"
-                                    id="tp9_rapor">
+                                    id="tp9_rapor" checked>
                                 <label class="form-check-label" for="tp9_rapor">
                                     Tampilkan di rapor
                                 </label>
@@ -232,13 +232,13 @@
                         </div>
 
                         {{-- TP 10 --}}
-                        <div class="mb-4 col-md-3">
+                        <div class="mb-4 col-md-6">
                             <label class="form-label fs-5 f-w-600">TP 10</label>
                             <p>Menghafal Q.S. Al-Hujurat/49:12 dengan fasih dan lancar.</p>
 
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="tp[10][tercapai]" value="1"
-                                    id="tp10_tercapai">
+                                    id="tp10_tercapai" checked>
                                 <label class="form-check-label" for="tp10_tercapai">
                                     TP tercapai
                                 </label>
@@ -246,7 +246,7 @@
 
                             <div class="form-check mt-1">
                                 <input class="form-check-input" type="checkbox" name="tp[10][tampil_rapor]" value="1"
-                                    id="tp10_rapor">
+                                    id="tp10_rapor" checked>
                                 <label class="form-check-label" for="tp10_rapor">
                                     Tampilkan di rapor
                                 </label>
