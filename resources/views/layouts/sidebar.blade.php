@@ -10,7 +10,7 @@
 
     @php
     // ===== HARDCODE ROLE (sementara) =====
-    $role = 'super_admin'; // ganti: 'walikelas' / 'super_admin' / 'guru_mapel'
+    $role = 'walikelas'; // ganti: 'walikelas' / 'super_admin' / 'guru_mapel'
 
     $roleLabel = match($role) {
     'guru_mapel' => 'Guru Mapel',
