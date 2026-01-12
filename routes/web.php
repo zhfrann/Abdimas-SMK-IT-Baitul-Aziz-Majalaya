@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\Akademik\StaffController;
 use App\Http\Controllers\AssesmentFormatifController;
 use App\Http\Controllers\AssesmentSumatifController;
 use App\Http\Controllers\Auth\AuthController;
@@ -17,7 +18,8 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    // return view('welcome');
+    return redirect('/login');
 });
 
 // Auth::routes();
@@ -45,6 +47,10 @@ Route::prefix('superadmin')->middleware(['auth', 'role:Super Admin'])->name('sup
 
     // Hapus user
     // Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+});
+
+Route::middleware(['auth', 'role:Bagian Akademik'])->prefix('akademik')->name('akademik.')->group(function () {
+    Route::resource('staff', StaffController::class);
 });
 
 // Define a group of routes with 'auth' middleware applied

@@ -1,77 +1,77 @@
 <li class="pc-item pc-caption">
-  <label>Manajement guru</label>
-  <svg class="pc-icon">
-    <use xlink:href="#custom-flag"></use>
-  </svg>
+    <label>Manajement Staff</label>
+    <svg class="pc-icon">
+        <use xlink:href="#custom-flag"></use>
+    </svg>
 </li>
 <li class="pc-item pc-hasmenu">
-  <a href="{{ route('intrakurikuler.index') }}" class="pc-link">
-    <span class="pc-micon">
-      {{-- <svg class="pc-icon">
+    <a href="{{ route('akademik.staff.index') }}" class="pc-link">
+        <span class="pc-micon">
+            {{-- <svg class="pc-icon">
         <use xlink:href="#custom-status-up"></use>
       </svg> --}}
-      <i class="bi bi-journal-bookmark"></i>
-    </span>
-    <span class="pc-mtext">List guru</span></a>
+            <i class="bi bi-journal-bookmark"></i>
+        </span>
+        <span class="pc-mtext">List Staff</span></a>
 </li>
 <li class="pc-item pc-caption">
-  <label>Manajement kelas</label>
-  <svg class="pc-icon">
-    <use xlink:href="#custom-flag"></use>
-  </svg>
+    <label>Manajement kelas</label>
+    <svg class="pc-icon">
+        <use xlink:href="#custom-flag"></use>
+    </svg>
 </li>
 <li class="pc-item pc-hasmenu">
-  <a href="{{ route('intrakurikuler.index') }}" class="pc-link">
-    <span class="pc-micon">
-      {{-- <svg class="pc-icon">
+    <a href="{{ route('intrakurikuler.index') }}" class="pc-link">
+        <span class="pc-micon">
+            {{-- <svg class="pc-icon">
         <use xlink:href="#custom-status-up"></use>
       </svg> --}}
-      <i class="bi bi-journal-bookmark"></i>
-    </span>
-    <span class="pc-mtext">List kelas</span></a>
+            <i class="bi bi-journal-bookmark"></i>
+        </span>
+        <span class="pc-mtext">List kelas</span></a>
 </li>
 <li class="pc-item pc-caption">
-  <label>Manajement Mapel</label>
-  <svg class="pc-icon">
-    <use xlink:href="#custom-flag"></use>
-  </svg>
+    <label>Manajement Mapel</label>
+    <svg class="pc-icon">
+        <use xlink:href="#custom-flag"></use>
+    </svg>
 </li>
 <li class="pc-item pc-hasmenu">
-  <a href="{{ route('intrakurikuler.index') }}" class="pc-link">
-    <span class="pc-micon">
-      {{-- <svg class="pc-icon">
+    <a href="{{ route('intrakurikuler.index') }}" class="pc-link">
+        <span class="pc-micon">
+            {{-- <svg class="pc-icon">
         <use xlink:href="#custom-status-up"></use>
       </svg> --}}
-      <i class="bi bi-journal-bookmark"></i>
-    </span>
-    <span class="pc-mtext">Intrakurikuler</span></a>
+            <i class="bi bi-journal-bookmark"></i>
+        </span>
+        <span class="pc-mtext">Intrakurikuler</span></a>
 </li>
 <li class="pc-item pc-hasmenu">
-  <a href="{{ route('ekstrakurikuler.index') }}" class="pc-link">
-    <span class="pc-micon">
-      {{-- <svg class="pc-icon">
+    <a href="{{ route('ekstrakurikuler.index') }}" class="pc-link">
+        <span class="pc-micon">
+            {{-- <svg class="pc-icon">
         <use xlink:href="#custom-shield"></use>
       </svg> --}}
-      <i class="bi bi-people"></i>
-    </span>
-    <span class="pc-mtext">Ekstrakurikuler</span></a>
+            <i class="bi bi-people"></i>
+        </span>
+        <span class="pc-mtext">Ekstrakurikuler</span></a>
 </li>
 
 <li class="pc-item pc-caption">
-  <label>Cetak dokument</label>
-  <svg class="pc-icon">
-    <use xlink:href="#custom-flag"></use>
-  </svg>
+    <label>Cetak dokument</label>
+    <svg class="pc-icon">
+        <use xlink:href="#custom-flag"></use>
+    </svg>
 </li>
 <li class="pc-item pc-hasmenu">
-  <a href="{{ route('intrakurikuler.index') }}" class="pc-link">
-    <span class="pc-micon">
-      {{-- <svg class="pc-icon">
+    <a href="{{ route('intrakurikuler.index') }}" class="pc-link">
+        <span class="pc-micon">
+            {{-- <svg class="pc-icon">
         <use xlink:href="#custom-status-up"></use>
       </svg> --}}
-      <i class="bi bi-journal-bookmark"></i>
-    </span>
-    <span class="pc-mtext">document</span></a>
+            <i class="bi bi-journal-bookmark"></i>
+        </span>
+        <span class="pc-mtext">document</span></a>
 </li>
 
 
