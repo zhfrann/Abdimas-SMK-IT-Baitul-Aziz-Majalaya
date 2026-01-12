@@ -9,18 +9,6 @@
             </a>
         </div>
 
-        <!-- @php
-            // ===== HARDCODE ROLE (sementara) =====
-            $role = 'guru_mapel'; // ganti: 'walikelas' / 'super_admin' / 'guru_mapel'
-
-            $roleLabel = match ($role) {
-                'guru_mapel' => 'Guru Mapel',
-                'walikelas' => 'Wali Kelas',
-                'super_admin' => 'Super Admin',
-                default => 'User',
-            };
-        @endphp -->
-
         <div class="navbar-content">
             <div class="card pc-user-card">
                 <div class="card-body">
@@ -30,8 +18,8 @@
                                 class="user-avtar wid-45 rounded-circle" />
                         </div>
                         <div class="flex-grow-1 ms-3 me-2">
-                            <h6 class="mb-0">Jimmy Morris</h6>
-                            <small>{{ $roleLabel }}</small>
+                            <h6 class="mb-0">{{ auth()->user()->name }}</h6>
+                            <small>{{ auth()->user()->roles->first()->name }}</small>
                         </div>
                         <a class="btn btn-icon btn-link-secondary avtar" data-bs-toggle="collapse"
                             href="#pc_sidebar_userlink">
@@ -62,43 +50,36 @@
             </div>
 
             <ul class="pc-navbar">
-                <li class="pc-item pc-caption">
-                    <label>Navigation</label>
-                </li>
-
+              @role('Guru Mapel|Wali Kelas|Bagian Akademik')
+              <li class="pc-item pc-caption">
+                  <label>Navigation</label>
+              </li>
                 <li class="pc-item pc-hasmenu">
                     <a href="/dashboard/index" class="pc-link">
                         <span class="pc-micon"><i class="bi bi-columns-gap"></i></span>
                         <span class="pc-mtext">Dashboard</span>
                     </a>
                 </li>
+                @endrole
                 @role('Super Admin')
                     @include('layouts.menu-list-superadmin')
                 @endrole
 
-                {{-- ================== MENU GURU MAPEL + SUPER ADMIN ================== --}}
-                <!-- @if ($role === 'guru_mapel')
-                    @include('layouts.menu-list-mapel', [
-                        'role' => $role,
-                        'roleLabel' => $roleLabel,
-                    ])
-                @endif
+                @role('Guru Mapel')
 
-                {{-- ================== MENU WALI KELAS + SUPER ADMIN ================== --}}
-                @if ($role === 'walikelas' || $role === 'super_admin')
-                    @include('layouts.menu-list-walas', [
-                        'role' => $role,
-                        'roleLabel' => $roleLabel,
-                    ])
-                @endif
+                    @include('layouts.menu-list-mapel')
+                @endrole
 
-                {{-- ================== MENU SUPER ADMIN ONLY ================== --}}
-                @if ($role === 'super_admin')
-                    @include('layouts.menu-list-admin', [
-                        'role' => $role,
-                        'roleLabel' => $roleLabel,
-                    ])
-                @endif -->
+                @role('Wali Kelas')
+                    @include('layouts.menu-list-walas')
+                @endrole
+
+                @role('Bagian Akademik')
+
+                    @include('layouts.menu-list-akademik')
+                @endrole
+
+
             </ul>
         </div>
     </div>

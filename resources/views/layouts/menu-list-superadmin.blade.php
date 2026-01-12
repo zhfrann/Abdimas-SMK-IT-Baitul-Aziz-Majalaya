@@ -1,5 +1,5 @@
 <li class="pc-item pc-caption">
-  <label>Mapel</label>
+  <label>Manajement user</label>
   <svg class="pc-icon">
     <use xlink:href="#custom-flag"></use>
   </svg>
