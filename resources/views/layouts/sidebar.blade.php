@@ -32,8 +32,6 @@
                     <div class="collapse pc-user-links" id="pc_sidebar_userlink">
                         <div class="pt-3">
                             <a href="#!"><i class="ti ti-user"></i><span>My Account</span></a>
-                            <a href="#!"><i class="ti ti-settings"></i><span>Settings</span></a>
-                            <a href="#!"><i class="ti ti-lock"></i><span>Lock Screen</span></a>
 
                             {{-- Logout Start --}}
                             <a href="#"
