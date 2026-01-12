@@ -13,24 +13,35 @@ class IntrakurikulerController extends Controller
     /**
      * Display a listing of the resource.
      */
+    // public function index()
+    // {
+    //     $intrakurikuler = Intrakurikuler::query()
+    //         ->with([
+    //             'kelasAjar' => function ($q) {
+    //                 $q->with(['kelas', 'tahunAjaran'])
+    //                   ->withCount('riwayatKelas');
+    //             },
+    //             'pengampu.staff',
+    //         ])
+    //         ->orderByDesc('intrakurikuler_id')
+    //         ->get();
+
+    //     return view('intrakurikuler.index', compact('intrakurikuler'));
+    // }
     public function index()
     {
         $intrakurikuler = Intrakurikuler::query()
             ->with([
                 'kelasAjar' => function ($q) {
                     $q->with(['kelas', 'tahunAjaran'])
-                      ->withCount('riwayatKelas');
+                        ->withCount('riwayatKelas');
                 },
                 'pengampu.staff',
             ])
             ->orderByDesc('intrakurikuler_id')
             ->get();
 
-        return view('intrakurikuler.index', compact('intrakurikuler'));
-    }
-
-    public function create()
-    {
+        // buat modal create
         $kelasAjar = KelasAjar::with(['kelas', 'tahunAjaran'])
             ->orderByDesc('tahun_ajaran_id')
             ->orderByDesc('kelas_ajar_id')
@@ -41,14 +52,32 @@ class IntrakurikulerController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('intrakurikuler.create', compact('kelasAjar', 'guru'));
+        return view('intrakurikuler.index', compact('intrakurikuler', 'kelasAjar', 'guru'));
+    }
+
+
+    public function create()
+    {
+        // $kelasAjar = KelasAjar::with(['kelas', 'tahunAjaran'])
+        //     ->orderByDesc('tahun_ajaran_id')
+        //     ->orderByDesc('kelas_ajar_id')
+        //     ->get();
+
+        // $guru = User::role('Guru Mapel')
+        //     ->with('staff')
+        //     ->orderBy('name')
+        //     ->get();
+
+        // return view('intrakurikuler.create', compact('kelasAjar', 'guru'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'nama_pelajaran' => [
-                'required','string','max:255',
+                'required',
+                'string',
+                'max:255',
                 // biar pesan error enak sebelum kena unique index DB
                 Rule::unique('intrakurikuler', 'nama_pelajaran')
                     ->where(fn($q) => $q->where('kelas_ajar_id', $request->kelas_ajar_id)),
