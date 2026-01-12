@@ -70,6 +70,39 @@ return new class extends Migration
                 ->cascadeOnUpdate()->nullOnDelete();
         });
 
+        // ========================
+        // Staff Sekolah
+        // ========================
+        Schema::create('staff', function (Blueprint $table) {
+            $table->id('staff_id');
+
+            // FK ke users.id
+            $table->foreignId('user_id')
+                ->unique()
+                ->constrained('users')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
+
+            $table->string('nip')->unique();
+            $table->string('nama');
+            $table->enum('jenis_kelamin', ['l', 'p']);
+            $table->string('tempat_lahir_kabupaten_id');
+            $table->date('tanggal_lahir');
+            $table->string('agama');
+            $table->string('pendidikan_sebelumnya');
+            $table->text('alamat');
+            $table->string('kelurahan_id');
+            $table->timestamps();
+
+            $table->foreign('tempat_lahir_kabupaten_id')
+                ->references('kabupaten_id')->on('kabupaten')
+                ->cascadeOnUpdate()->restrictOnDelete();
+
+            $table->foreign('kelurahan_id')
+                ->references('kelurahan_id')->on('kelurahan')
+                ->cascadeOnUpdate()->restrictOnDelete();
+        });
+
         // =========================
         // ORANG TUA (profil)
         // =========================
