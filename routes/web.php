@@ -3,7 +3,7 @@
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\AssesmentFormatifController;
 use App\Http\Controllers\AssesmentSumatifController;
-use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DummyExcelController;
 use App\Http\Controllers\EkstrakurikulerController;
 use App\Http\Controllers\HomeController;
@@ -20,9 +20,9 @@ Route::get('/', function () {
 });
 
 // Auth::routes();
-Route::get('login', [LoginController::class, 'showLoginForm'])->name('login')->middleware('guest');
-Route::post('login', [LoginController::class, 'login'])->middleware('guest');
-Route::post('logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
+Route::get('login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
+Route::post('login', [AuthController::class, 'login'])->middleware('guest');
+Route::post('logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // Route untuk manajemen user oleh super admin
 Route::prefix('superadmin')->middleware(['auth', 'role:super admin'])->name('superadmin.')->group(function () {

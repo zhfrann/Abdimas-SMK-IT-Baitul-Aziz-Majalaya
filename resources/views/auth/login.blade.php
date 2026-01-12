@@ -29,7 +29,7 @@
                             <div class="mb-3">
                                 <input type="password" class="form-control @error('password') is-invalid @enderror"
                                     id="floatingInput1" placeholder="Password" name="password" required
-                                    autocomplete="current-password" value="12345678" />
+                                    autocomplete="current-password" value="admin12345" />
                                 @error('password')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
