@@ -9,7 +9,7 @@
             </a>
         </div>
 
-        @php
+        <!-- @php
             // ===== HARDCODE ROLE (sementara) =====
             $role = 'guru_mapel'; // ganti: 'walikelas' / 'super_admin' / 'guru_mapel'
 
@@ -19,7 +19,7 @@
                 'super_admin' => 'Super Admin',
                 default => 'User',
             };
-        @endphp
+        @endphp -->
 
         <div class="navbar-content">
             <div class="card pc-user-card">
@@ -72,9 +72,12 @@
                         <span class="pc-mtext">Dashboard</span>
                     </a>
                 </li>
+                @role('Super Admin')
+                    @include('layouts.menu-list-superadmin')
+                @endrole
 
                 {{-- ================== MENU GURU MAPEL + SUPER ADMIN ================== --}}
-                @if ($role === 'guru_mapel')
+                <!-- @if ($role === 'guru_mapel')
                     @include('layouts.menu-list-mapel', [
                         'role' => $role,
                         'roleLabel' => $roleLabel,
@@ -95,7 +98,7 @@
                         'role' => $role,
                         'roleLabel' => $roleLabel,
                     ])
-                @endif
+                @endif -->
             </ul>
         </div>
     </div>

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.master')
 
 @section('content')
     <div class="container">
@@ -34,3 +34,12 @@
         </form>
     </div>
 @endsection
+
+@section('scripts')
+  <!-- [Page Specific JS] start -->
+  <script type="module">
+    import { DataTable } from '/build/js/plugins/module.js';
+    window.dt = new DataTable('#pc-dt-simple');
+  </script>
+@endsection
+
