@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             RoleSeeder::class,
-            WilayahSeeder::class,
+            // WilayahSeeder::class,
         ]);
 
 

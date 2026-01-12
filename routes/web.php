@@ -13,6 +13,7 @@ use App\Http\Controllers\PenilaianEkstrakurikulerController;
 use App\Http\Controllers\SuperAdmin\UserController;
 use App\Http\Controllers\TujuanPembelajaranController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -72,4 +73,22 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/template-assesmen-sumatif-excel', [DummyExcelController::class, 'downloadSumatif']);
 
     // Route::get('{routeName}/{name?}', [HomeController::class, 'pageView']);
+});
+
+
+Route::get('/wilayah/provinces', function () {
+    $data = Http::get('https://wilayah.id/api/provinces.json')->json();
+    return response()->json($data);
+});
+Route::get('/wilayah/regencies/{province}', function ($province) {
+    $data = Http::get("https://wilayah.id/api/regencies/{$province}.json")->json();
+    return response()->json($data);
+});
+Route::get('/wilayah/districts/{regency}', function ($regency) {
+    $data = Http::get("https://wilayah.id/api/districts/{$regency}.json")->json();
+    return response()->json($data);
+});
+Route::get('/wilayah/villages/{district}', function ($district) {
+    $data = Http::get("https://wilayah.id/api/villages/{$district}.json")->json();
+    return response()->json($data);
 });
