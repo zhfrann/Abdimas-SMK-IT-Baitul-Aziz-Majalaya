@@ -49,8 +49,10 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::resource('intrakurikuler', IntrakurikulerController::class);
+    Route::prefix('intrakurikuler/{intrakurikuler}')->group(function () {
+        Route::resource('lingkup-materi', LingkupMateriController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+    });
     Route::resource('ekstrakurikuler', EkstrakurikulerController::class);
-    Route::resource('lingkup_materi', LingkupMateriController::class);
     Route::resource('tujuan_pembelajaran', TujuanPembelajaranController::class);
     Route::get('assesment_sumatif/detail', [AssesmentSumatifController::class, 'detailAssesmentSumatif'])->name('assesment_sumatif.detail');
     Route::resource('assesment_sumatif', AssesmentSumatifController::class);
