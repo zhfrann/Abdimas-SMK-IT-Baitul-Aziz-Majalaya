@@ -165,6 +165,8 @@ return new class extends Migration
             $table->string('tahun');
             $table->enum('semester', ['Ganjil', 'Genap']);
             $table->timestamps();
+
+            $table->unique(['tahun', 'semester'], 'tahun_semester_unique');
         });
 
         Schema::create('kelas', function (Blueprint $table) {

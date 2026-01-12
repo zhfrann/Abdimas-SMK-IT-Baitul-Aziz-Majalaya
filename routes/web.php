@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\Akademik\KelasController;
 use App\Http\Controllers\Akademik\StaffController;
+use App\Http\Controllers\Akademik\TahunAjaranController;
 use App\Http\Controllers\AssesmentFormatifController;
 use App\Http\Controllers\AssesmentSumatifController;
 use App\Http\Controllers\Auth\AuthController;
@@ -50,6 +52,8 @@ Route::prefix('superadmin')->middleware(['auth', 'role:Super Admin'])->name('sup
 });
 
 Route::middleware(['auth', 'role:Bagian Akademik'])->prefix('akademik')->name('akademik.')->group(function () {
+    Route::resource('tahun_ajaran', TahunAjaranController::class);
+    Route::resource('kelas', KelasController::class);
     Route::resource('staff', StaffController::class);
 });
 

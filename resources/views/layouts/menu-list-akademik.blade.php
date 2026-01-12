@@ -10,7 +10,7 @@
             {{-- <svg class="pc-icon">
         <use xlink:href="#custom-status-up"></use>
       </svg> --}}
-            <i class="bi bi-journal-bookmark"></i>
+            <i class="bi bi-people"></i>
         </span>
         <span class="pc-mtext">List Staff</span></a>
 </li>
@@ -21,12 +21,22 @@
     </svg>
 </li>
 <li class="pc-item pc-hasmenu">
-    <a href="{{ route('intrakurikuler.index') }}" class="pc-link">
+    <a href="{{ route('akademik.tahun_ajaran.index') }}" class="pc-link">
         <span class="pc-micon">
             {{-- <svg class="pc-icon">
         <use xlink:href="#custom-status-up"></use>
       </svg> --}}
-            <i class="bi bi-journal-bookmark"></i>
+            <i class="bi bi-calendar-date"></i>
+        </span>
+        <span class="pc-mtext">Tahun Ajaran</span></a>
+</li>
+<li class="pc-item pc-hasmenu">
+    <a href="{{ route('akademik.kelas.index') }}" class="pc-link">
+        <span class="pc-micon">
+            {{-- <svg class="pc-icon">
+        <use xlink:href="#custom-status-up"></use>
+      </svg> --}}
+            <i class="bi bi-mortarboard"></i>
         </span>
         <span class="pc-mtext">List kelas</span></a>
 </li>
