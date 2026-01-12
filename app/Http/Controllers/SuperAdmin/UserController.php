@@ -13,13 +13,13 @@ class UserController extends Controller
     public function index()
     {
         $users = User::with('roles')->get();
-        return view('superadmin.users.index', compact('users'));
+        return view('super_admin.index', compact('users'));
     }
 
     public function create()
     {
         $roles = Role::all();
-        return view('superadmin.users.create', compact('roles'));
+        return view('super_admin.create', compact('roles'));
     }
 
     public function store(Request $request)

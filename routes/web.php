@@ -25,7 +25,7 @@ Route::post('login', [AuthController::class, 'login'])->middleware('guest');
 Route::post('logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // Route untuk manajemen user oleh super admin
-Route::prefix('superadmin')->middleware(['auth', 'role:super admin'])->name('superadmin.')->group(function () {
+Route::prefix('superadmin')->middleware(['auth', 'role:Super Admin'])->name('superadmin.')->group(function () {
     // List semua user
     Route::get('users', [UserController::class, 'index'])->name('users.index');
     // Form tambah user
