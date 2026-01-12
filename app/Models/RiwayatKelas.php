@@ -1,0 +1,60 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class RiwayatKelas extends Model
+{
+    protected $table = 'riwayat_kelas';
+    protected $primaryKey = 'riwayat_kelas_id';
+    public $incrementing = true;
+    protected $keyType = 'int';
+
+    protected $fillable = [
+        'siswa_id',
+        'kelas_ajar_id',
+    ];
+
+    /**
+     * RiwayatKelas milik satu Siswa
+     */
+    public function siswa(): BelongsTo
+    {
+        return $this->belongsTo(Siswa::class, 'siswa_id', 'siswa_id');
+    }
+
+    /**
+     * RiwayatKelas milik satu KelasAjar
+     */
+    public function kelasAjar(): BelongsTo
+    {
+        return $this->belongsTo(KelasAjar::class, 'kelas_ajar_id', 'kelas_ajar_id');
+    }
+
+    /**
+     * Kehadiran intrakurikuler per siswa per mapel di kelas_ajar ini
+     */
+    public function kehadiranIntrakurikuler(): HasMany
+    {
+        return $this->hasMany(KehadiranIntrakurikuler::class, 'riwayat_kelas_id', 'riwayat_kelas_id');
+    }
+
+    /**
+     * Skor asesmen sumatif per siswa (berdasarkan riwayat_kelas)
+     */
+    public function skorAsesmen(): HasMany
+    {
+        return $this->hasMany(SkorAsesmenSiswa::class, 'riwayat_kelas_id', 'riwayat_kelas_id');
+    }
+
+    /**
+     * Keikutsertaan ekskul siswa pada tahun ajaran/kelas terkait (pivot siswa_ekstrakurikuler)
+     */
+    public function siswaEkstrakurikuler(): HasMany
+    {
+        return $this->hasMany(SiswaEkstrakurikuler::class, 'riwayat_kelas_id', 'riwayat_kelas_id');
+    }
+}

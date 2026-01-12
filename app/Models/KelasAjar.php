@@ -28,4 +28,14 @@ class KelasAjar extends Model
     {
         return $this->belongsTo(User::class, 'wali_user_id');
     }
+
+    public function riwayatKelas()
+    {
+        return $this->hasMany(RiwayatKelas::class, 'kelas_ajar_id', 'kelas_ajar_id');
+    }
+
+    public function intrakurikuler()
+    {
+        return $this->hasMany(Intrakurikuler::class, 'kelas_ajar_id', 'kelas_ajar_id');
+    }
 }
