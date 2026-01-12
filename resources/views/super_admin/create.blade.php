@@ -9,10 +9,10 @@
                 <label>Nama</label>
                 <input type="text" name="name" class="form-control" required>
             </div>
-            <div class="mb-3">
+            {{-- <div class="mb-3">
                 <label>Email</label>
                 <input type="email" name="email" class="form-control" required>
-            </div>
+            </div> --}}
             <div class="mb-3">
                 <label>Username</label>
                 <input type="text" name="username" class="form-control" required>
@@ -40,10 +40,11 @@
 @endsection
 
 @section('scripts')
-  <!-- [Page Specific JS] start -->
-  <script type="module">
-    import { DataTable } from '/build/js/plugins/module.js';
-    window.dt = new DataTable('#pc-dt-simple');
-  </script>
+    <!-- [Page Specific JS] start -->
+    <script type="module">
+        import {
+            DataTable
+        } from '/build/js/plugins/module.js';
+        window.dt = new DataTable('#pc-dt-simple');
+    </script>
 @endsection
-
