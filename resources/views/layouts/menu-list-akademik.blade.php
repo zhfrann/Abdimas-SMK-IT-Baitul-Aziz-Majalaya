@@ -1,5 +1,37 @@
 <li class="pc-item pc-caption">
-  <label>Mapel</label>
+  <label>Manajement guru</label>
+  <svg class="pc-icon">
+    <use xlink:href="#custom-flag"></use>
+  </svg>
+</li>
+<li class="pc-item pc-hasmenu">
+  <a href="{{ route('intrakurikuler.index') }}" class="pc-link">
+    <span class="pc-micon">
+      {{-- <svg class="pc-icon">
+        <use xlink:href="#custom-status-up"></use>
+      </svg> --}}
+      <i class="bi bi-journal-bookmark"></i>
+    </span>
+    <span class="pc-mtext">List guru</span></a>
+</li>
+<li class="pc-item pc-caption">
+  <label>Manajement kelas</label>
+  <svg class="pc-icon">
+    <use xlink:href="#custom-flag"></use>
+  </svg>
+</li>
+<li class="pc-item pc-hasmenu">
+  <a href="{{ route('intrakurikuler.index') }}" class="pc-link">
+    <span class="pc-micon">
+      {{-- <svg class="pc-icon">
+        <use xlink:href="#custom-status-up"></use>
+      </svg> --}}
+      <i class="bi bi-journal-bookmark"></i>
+    </span>
+    <span class="pc-mtext">List kelas</span></a>
+</li>
+<li class="pc-item pc-caption">
+  <label>Manajement Mapel</label>
   <svg class="pc-icon">
     <use xlink:href="#custom-flag"></use>
   </svg>
@@ -24,6 +56,24 @@
     </span>
     <span class="pc-mtext">Ekstrakurikuler</span></a>
 </li>
+
+<li class="pc-item pc-caption">
+  <label>Cetak dokument</label>
+  <svg class="pc-icon">
+    <use xlink:href="#custom-flag"></use>
+  </svg>
+</li>
+<li class="pc-item pc-hasmenu">
+  <a href="{{ route('intrakurikuler.index') }}" class="pc-link">
+    <span class="pc-micon">
+      {{-- <svg class="pc-icon">
+        <use xlink:href="#custom-status-up"></use>
+      </svg> --}}
+      <i class="bi bi-journal-bookmark"></i>
+    </span>
+    <span class="pc-mtext">document</span></a>
+</li>
+
 
 {{-- <li class="pc-item pc-caption">
   <label>Other</label>
