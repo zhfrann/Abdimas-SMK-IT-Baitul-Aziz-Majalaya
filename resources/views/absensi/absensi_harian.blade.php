@@ -258,12 +258,6 @@ default => '-',
                             placeholder="Contoh: demam / izin keluarga / dsb"></textarea>
                         <small class="text-muted" id="noteHint">Wajib diisi untuk status Izin / Sakit.</small>
                     </div>
-
-                    <div class="alert alert-warning mt-3 mb-0">
-                        <small>
-                            Ini masih UI demo. Submit belum tersambung ke backend.
-                        </small>
-                    </div>
                 </div>
 
                 <div class="modal-footer">
