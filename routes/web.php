@@ -31,24 +31,7 @@ Route::post('logout', [AuthController::class, 'logout'])->name('logout')->middle
 
 // Route untuk manajemen user oleh super admin
 Route::prefix('superadmin')->middleware(['auth', 'role:Super Admin'])->name('superadmin.')->group(function () {
-    // List semua user
-    Route::get('users', [UserController::class, 'index'])->name('users.index');
-    // Form tambah user
-    Route::get('users/create', [UserController::class, 'create'])->name('users.create');
-    // Simpan user baru
-    Route::post('users', [UserController::class, 'store'])->name('users.store');
-
-    // Detail user (opsional, jika ingin detail user)
-    // Route::get('users/{user}', [UserController::class, 'show'])->name('users.show');
-
-    // Form edit user
-    // Route::get('users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
-
-    // Update user
-    // Route::put('users/{user}', [UserController::class, 'update'])->name('users.update');
-
-    // Hapus user
-    // Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+    Route::resource('users', UserController::class);
 });
 
 Route::middleware(['auth', 'role:Bagian Akademik'])->prefix('akademik')->name('akademik.')->group(function () {

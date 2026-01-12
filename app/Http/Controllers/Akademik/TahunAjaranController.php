@@ -15,11 +15,6 @@ class TahunAjaranController extends Controller
         return view('akademik.tahun_ajaran.index', compact('tahunAjaran'));
     }
 
-    public function create()
-    {
-        return view('akademik.tahun_ajaran.create');
-    }
-
     public function store(Request $request)
     {
         $request->validate([
