@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,10 +17,21 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Admin',
-            'email' => 'admin@phoenixcoded.com',
-            'password' => bcrypt('12345678'),
+        // User::factory()->create([
+        //     'name' => 'Admin',
+        //     'username' => 'admin',
+        //     'email' => 'admin@phoenixcoded.com',
+        //     'password' => bcrypt('12345678'),
+        // ]);
+
+        $this->call([
+            RoleSeeder::class,
         ]);
+
+        $admin = User::query()->firstOrCreate(
+            ['username' => 'admin'],
+            ['name' => 'Super Admin', 'password' => Hash::make('admin12345')]
+        );
+        $admin->assignRole('Super Admin');
     }
 }

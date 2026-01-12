@@ -6,40 +6,44 @@
 
     @include('layouts/loader')
     <div class="auth-main">
-      <div class="auth-wrapper v1">
-        <div class="auth-form">
-          <div class="card my-5">
-            <div class="card-body">
-            <form method="POST" action="{{ route('login') }}">
-              @csrf
-              <div class="text-center">
-                <a href="#"><img src="/build/images/logo-dark.svg" alt="img" /></a>
-              </div>
-              <h4 class="text-center f-w-500 my-3">Masuk dengan email anda</h4>
-              <div class="mb-3">
-                <input type="email" class="form-control @error('email') is-invalid @enderror" value="admin@phoenixcoded.com" id="floatingInput" name="email" placeholder="Email Address" />
-                @error('email')
-                  <span class="invalid-feedback" role="alert">
-                      <strong>{{ $message }}</strong>
-                  </span>
-              @enderror
-              </div>
-              <div class="mb-3">
-                <input type="password" class="form-control @error('password') is-invalid @enderror" id="floatingInput1" placeholder="Password" name="password" required autocomplete="current-password" value="12345678"/>
-                @error('password')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                    </span>
-                @enderror
-              </div>
-              <div class="d-grid mt-4">
-                <button type="submit" class="btn btn-primary">Login</button>
-              </div>
-            </form>
+        <div class="auth-wrapper v1">
+            <div class="auth-form">
+                <div class="card my-5">
+                    <div class="card-body">
+                        <form method="POST" action="{{ route('login') }}">
+                            @csrf
+                            <div class="text-center">
+                                <a href="#"><img src="/build/images/logo-dark.svg" alt="img" /></a>
+                            </div>
+                            <h4 class="text-center f-w-500 my-3">Masuk dengan kredensial anda</h4>
+                            <div class="mb-3">
+                                <input type="text" class="form-control @error('username') is-invalid @enderror"
+                                    value="admin" id="floatingInput" name="username"
+                                    placeholder="NIS / NIP / Username / Kredensial Unik" />
+                                @error('username')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <input type="password" class="form-control @error('password') is-invalid @enderror"
+                                    id="floatingInput1" placeholder="Password" name="password" required
+                                    autocomplete="current-password" value="admin12345" />
+                                @error('password')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-primary">Login</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
     <!-- [ Main Content ] end -->
 @endsection
