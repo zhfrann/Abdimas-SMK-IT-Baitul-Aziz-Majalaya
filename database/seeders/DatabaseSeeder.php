@@ -26,7 +26,9 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             RoleSeeder::class,
+            WilayahSeeder::class,
         ]);
+
 
         $admin = User::query()->firstOrCreate(
             ['username' => 'admin'],
