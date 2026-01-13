@@ -21,32 +21,35 @@ class AssesmentSumatifController extends Controller
         ]);
 
         $kelasAjarId = $intrakurikuler->kelas_ajar_id;
-        $tahunAjaranId = $intrakurikuler->kelasAjar?->tahun_ajaran_id;
 
-        // daftar siswa di kelas ajar ini
+        // 1) daftar siswa di kelas ajar ini
         $riwayatKelas = RiwayatKelas::query()
             ->where('kelas_ajar_id', $kelasAjarId)
-            ->with(['siswa.user']) // asumsi relasi ada
+            ->with(['siswa.user'])
             ->get();
 
-        // semua asesmen sumatif utk intrakurikuler ini
+        // 2) asesmen untuk intrakurikuler ini
         $asesmen = AsesmenSumatif::query()
             ->where('intrakurikuler_id', $intrakurikuler->intrakurikuler_id)
-            ->when($tahunAjaranId, fn($q) => $q->where('tahun_ajaran_id', $tahunAjaranId))
             ->get();
 
-        $asesmenIds = $asesmen->pluck('asesmen_sumatif_id')->all();
-        $riwayatIds = $riwayatKelas->pluck('riwayat_kelas_id')->all();
+        $riwayatIds = $riwayatKelas->pluck('riwayat_kelas_id');
+        $asesmenIds = $asesmen->pluck('asesmen_sumatif_id');
 
-        $skorGrouped = SkorAsesmenSiswa::query()
-            ->when(count($riwayatIds) > 0, fn($q) => $q->whereIn('riwayat_kelas_id', $riwayatIds))
-            ->when(count($asesmenIds) > 0, fn($q) => $q->whereIn('asesmen_sumatif_id', $asesmenIds))
-            ->get()
-            ->groupBy('riwayat_kelas_id');
+        // kalau tidak ada siswa atau tidak ada asesmen, jangan query skor besar-besaran
+        $skorGrouped = collect();
+        if ($riwayatIds->isNotEmpty() && $asesmenIds->isNotEmpty()) {
+            $skorGrouped = SkorAsesmenSiswa::query()
+                ->whereIn('riwayat_kelas_id', $riwayatIds)
+                ->whereIn('asesmen_sumatif_id', $asesmenIds)
+                ->get()
+                ->groupBy('riwayat_kelas_id');
+        }
 
         $asesmenById = $asesmen->keyBy('asesmen_sumatif_id');
 
-        $avg = function (array $vals) {
+        $avg = function ($vals) {
+            $vals = array_values(array_filter($vals, fn($v) => $v !== null));
             if (count($vals) === 0) return null;
             return (int) round(array_sum($vals) / count($vals));
         };
@@ -59,18 +62,19 @@ class AssesmentSumatifController extends Controller
 
             foreach ($rkSkor as $s) {
                 $as = $asesmenById->get($s->asesmen_sumatif_id);
-                if (!$as || $s->nilai === null) continue;
+                if (!$as) continue;
 
-                if ($as->asesmen_type === 'sumatif_lingkup') $lingkup[] = (int) $s->nilai;
-                if ($as->asesmen_type === 'sas') $sas[] = (int) $s->nilai;
+                $nilai = is_null($s->nilai) ? null : (int) $s->nilai;
+                if ($nilai === null) continue;
+
+                if ($as->asesmen_type === 'sumatif_lingkup') $lingkup[] = $nilai;
+                if ($as->asesmen_type === 'sas') $sas[] = $nilai;
             }
 
             $totalLingkup = $avg($lingkup);
             $totalSas = $avg($sas);
 
-            $rapor = null;
-            $parts = array_filter([$totalLingkup, $totalSas], fn($v) => $v !== null);
-            if (count($parts) > 0) $rapor = (int) round(array_sum($parts) / count($parts));
+            $rapor = $avg(array_filter([$totalLingkup, $totalSas], fn($v) => $v !== null));
 
             return [
                 'riwayat_kelas_id' => $rk->riwayat_kelas_id,
@@ -83,6 +87,7 @@ class AssesmentSumatifController extends Controller
 
         return view('intrakurikuler.assesment_sumatif.index', compact('intrakurikuler', 'rows'));
     }
+
 
     /**
      * Show the form for creating a new resource.
