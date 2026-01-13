@@ -82,3 +82,6 @@ Route::get('/wilayah/provinsi', [WilayahController::class, 'provinsi']);
 Route::get('/wilayah/kabupaten/{provinsi_id}', [WilayahController::class, 'kabupaten']);
 Route::get('/wilayah/kecamatan/{kabupaten_id}', [WilayahController::class, 'kecamatan']);
 Route::get('/wilayah/kelurahan/{kecamatan_id}', [WilayahController::class, 'kelurahan']);
+Route::get('ajax/tempat-lahir/kabupaten', [WilayahController::class, 'searchKabupaten'])->name('ajax.tempat_lahir.kabupaten');
+Route::get('ajax/domisili/kelurahan', [WilayahController::class, 'searchKelurahan'])->name('ajax.domisili.kelurahan');
+
