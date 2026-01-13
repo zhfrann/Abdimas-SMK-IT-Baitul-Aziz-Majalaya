@@ -28,14 +28,14 @@
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
                         </div>
-                        <div class="mb-3">
-                            <label>Username</label>
+                        {{-- <div class="mb-3">
+                            <label>NIP / Kredensial Unik</label>
                             <input type="text" name="username" value="{{ old('username', $user->username) }}"
                                 class="form-control @error('username') is-invalid @enderror" required>
                             @error('username')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
-                        </div>
+                        </div> --}}
                         <div class="mb-3">
                             <label>Password (kosongkan jika tidak diubah)</label>
                             <input type="password" name="password"
@@ -67,14 +67,6 @@
                             @enderror
                         </div> --}}
 
-                        {{-- <div class="mb-3">
-                            <label>NIP</label>
-                            <input type="text" name="nip" value="{{ old('nip', $staff->nip) }}"
-                                class="form-control @error('nip') is-invalid @enderror">
-                            @error('nip')
-                                <span class="invalid-feedback">{{ $message }}</span>
-                            @enderror
-                        </div> --}}
                         <div class="mb-3">
                             <label>Jenis Kelamin</label>
                             <select name="jenis_kelamin" class="form-control @error('jenis_kelamin') is-invalid @enderror"

@@ -27,10 +27,9 @@ class StaffController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users',
+            'username' => 'required|string|max:255|unique:users,username',
             'password' => 'required|string|min:6|confirmed',
             'role' => 'required|in:guru mapel,wali kelas',
-            'nip' => 'required|string|unique:staff,nip',
             'jenis_kelamin' => 'required|in:l,p',
         ]);
 
@@ -45,8 +44,8 @@ class StaffController extends Controller
 
             DB::table('staff')->insert([
                 'user_id' => $user->id,
-                'nip' => $request->nip,
-                'nama' => $request->name,
+                'nip' => $user->username,
+                'nama' => $user->name,
                 'jenis_kelamin' => $request->jenis_kelamin,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -75,7 +74,7 @@ class StaffController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
+            // 'username' => 'required|string|max:255|unique:users,username,' . $user->id,
             // 'role' => 'required|in:guru mapel,wali kelas',
             // 'nip' => 'required|string|unique:staff,nip,' . $staff->staff_id . ',staff_id',
             'jenis_kelamin' => 'required|in:l,p',
