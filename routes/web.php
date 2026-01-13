@@ -13,6 +13,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IntrakurikulerController;
 use App\Http\Controllers\LingkupMateriController;
 use App\Http\Controllers\PenilaianEkstrakurikulerController;
+use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\SuperAdmin\UserController;
 use App\Http\Controllers\TujuanPembelajaranController;
 use Illuminate\Support\Facades\Auth;
@@ -38,6 +39,9 @@ Route::prefix('superadmin')->middleware(['auth', 'role:Super Admin'])->name('sup
 Route::middleware(['auth', 'role:Bagian Akademik'])->prefix('akademik')->name('akademik.')->group(function () {
     Route::resource('tahun_ajaran', TahunAjaranController::class);
     Route::resource('kelas', KelasController::class);
+    Route::prefix('kelas/{kelas_ajar}')->group(function () {
+        Route::resource('siswa', SiswaController::class);
+    });
     Route::resource('staff', StaffController::class);
 });
 

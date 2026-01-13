@@ -28,6 +28,7 @@
                                 <th>Tahun Ajaran</th>
                                 <th>Semester</th>
                                 <th>Wali Kelas</th>
+                                <th>Manage Siswa</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -38,6 +39,10 @@
                                     <td>{{ $ka->tahunAjaran->tahun ?? '-' }}</td>
                                     <td>{{ $ka->tahunAjaran->semester ?? '-' }}</td>
                                     <td>{{ $ka->waliKelas->name ?? '-' }}</td>
+                                    <td>
+                                        <a href="{{ route('akademik.siswa.index', $ka->kelas_ajar_id) }}"
+                                            class="btn btn-sm btn-primary">Manage Siswa</a>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
