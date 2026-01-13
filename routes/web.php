@@ -34,6 +34,7 @@ Route::prefix('superadmin')->middleware(['auth', 'role:Super Admin'])->name('sup
     Route::resource('users', UserController::class);
 });
 
+// Route khusus bagian akademik
 Route::middleware(['auth', 'role:Bagian Akademik'])->prefix('akademik')->name('akademik.')->group(function () {
     Route::resource('tahun_ajaran', TahunAjaranController::class);
     Route::resource('kelas', KelasController::class);
