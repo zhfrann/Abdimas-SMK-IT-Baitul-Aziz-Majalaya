@@ -7,6 +7,7 @@ use App\Models\RiwayatKelas;
 use App\Models\Kabupaten;
 use App\Models\Kelurahan;
 use App\Models\OrangTua;
+use App\Models\Provinsi;
 use App\Models\Siswa;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -34,10 +35,9 @@ class SiswaController extends Controller
         $kelas_ajar->load(['kelas', 'tahunAjaran']);
 
         $orangTua = OrangTua::query()->orderByDesc('orang_tua_id')->get();
-        $kabupaten = Kabupaten::query()->orderBy('nama')->get();
-        $kelurahan = Kelurahan::query()->with('kecamatan.kabupaten')->orderBy('nama')->get();
+        $province = Provinsi::query()->orderBy('nama')->get();
 
-        return view('akademik.siswa.create', compact('kelas_ajar', 'orangTua', 'kabupaten', 'kelurahan'));
+        return view('akademik.siswa.create', compact('kelas_ajar', 'orangTua', 'province'));
     }
 
     public function store(Request $request, KelasAjar $kelas_ajar)

@@ -94,3 +94,5 @@ Route::get('/wilayah/villages/{district}', function ($district) {
     $data = Http::get("https://wilayah.id/api/villages/{$district}.json")->json();
     return response()->json($data);
 });
+
+
