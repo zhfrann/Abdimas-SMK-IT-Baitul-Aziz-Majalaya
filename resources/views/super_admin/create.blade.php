@@ -18,7 +18,7 @@
                             @enderror
                         </div>
                         <div class="mb-3">
-                            <label>Username</label>
+                            <label>NIP / Kredensial Unik</label>
                             <input type="text" name="username"
                                 class="form-control @error('username') is-invalid @enderror">
                             @error('username')
@@ -50,15 +50,6 @@
                                 @endforeach
                             </select>
                             @error('role')
-                                <span class="invalid-feedback">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        <hr>
-                        <h5>Data Staff</h5>
-                        <div class="mb-3">
-                            <label>NIP</label>
-                            <input type="text" name="nip" class="form-control @error('nip') is-invalid @enderror">
-                            @error('nip')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
                         </div>

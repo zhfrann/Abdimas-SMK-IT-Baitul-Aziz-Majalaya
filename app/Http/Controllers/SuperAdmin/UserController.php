@@ -39,8 +39,6 @@ class UserController extends Controller
             'username' => 'required|string|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
             'role' => 'required|in:kepala sekolah,guru mapel,wali kelas,bagian akademik',
-            // Staff fields
-            'nip' => 'required|string|unique:staff,nip',
             'jenis_kelamin' => 'required|in:l,p',
         ]);
 
@@ -56,8 +54,8 @@ class UserController extends Controller
             // Insert ke staff
             DB::table('staff')->insert([
                 'user_id' => $user->id,
-                'nip' => $request->nip,
-                'nama' => $request->name,
+                'nip' => $user->username,
+                'nama' => $user->name,
                 'jenis_kelamin' => $request->jenis_kelamin,
                 'created_at' => now(),
                 'updated_at' => now(),
