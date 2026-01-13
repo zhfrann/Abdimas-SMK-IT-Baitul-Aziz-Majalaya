@@ -43,15 +43,17 @@ Route::middleware(['auth', 'role:Bagian Akademik'])->prefix('akademik')->name('a
 // Define a group of routes with 'auth' middleware applied
 Route::middleware(['auth'])->group(function () {
     // Define a GET route for the root URL ('/')
-    Route::get('/', function () {
+      Route::get('/', function () {
         // Return a view named 'index' when accessing the root URL
-        return view('dashboard.index');
+      return view('dashboard.index');
     });
 
-    Route::resource('intrakurikuler', IntrakurikulerController::class);
+    Route::resource('intrakurikuler', IntrakurikulerController::class)->middleware('role:Guru Mapel|Bagian Akademik');
     Route::prefix('intrakurikuler/{intrakurikuler}')->group(function () {
         Route::resource('lingkup-materi', LingkupMateriController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
-    });
+        Route::resource('assesment-sumatif', AssesmentSumatifController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+    })->middleware('role:Guru Mapel|Bagian Akademik');
+
     Route::resource('ekstrakurikuler', EkstrakurikulerController::class);
     Route::resource('tujuan_pembelajaran', TujuanPembelajaranController::class);
     Route::get('assesment_sumatif/detail', [AssesmentSumatifController::class, 'detailAssesmentSumatif'])->name('assesment_sumatif.detail');
