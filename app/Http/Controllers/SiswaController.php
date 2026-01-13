@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class SiswaController extends Controller
 {
@@ -148,66 +149,151 @@ class SiswaController extends Controller
 
     public function edit(KelasAjar $kelas_ajar, Siswa $siswa)
     {
-        // $kelas_ajar->load(['kelas', 'tahunAjaran']);
-        // $siswa->load(['user']);
+        $kelas_ajar->load(['kelas', 'tahunAjaran']);
 
-        // $orangTua = OrangTua::query()->orderByDesc('orang_tua_id')->get();
-        // $kabupaten = Kabupaten::query()->orderBy('nama')->get();
-        // $kelurahan = Kelurahan::query()->with('kecamatan.kabupaten')->orderBy('nama')->get();
+        $siswa->load([
+            'user',
+            'orangTua.kelurahan.kecamatan.kabupaten.provinsi',
+            'kelurahan.kecamatan.kabupaten.provinsi',
+            'tempatLahirKabupaten', // kalau kamu punya relasi ini di model Siswa
+        ]);
 
-        // return view('akademik.siswa.edit', compact('kelas_ajar', 'siswa', 'orangTua', 'kabupaten', 'kelurahan'));
+        $orangTua = OrangTua::query()
+            ->with('kelurahan')
+            ->orderByDesc('orang_tua_id')
+            ->get();
+
+        $tempatLahirLabel = $siswa->tempatLahirKabupaten?->nama ?? null;
+        $kelurahanLabel   = $siswa->kelurahan?->nama
+            ? ($siswa->kelurahan->nama . ' — ' . $siswa->kelurahan->kecamatan?->nama . ' (' . $siswa->kelurahan->kecamatan?->kabupaten?->nama . ')')
+            : null;
+
+        $ortuKelurahanLabel = $siswa->orangTua?->kelurahan?->nama
+            ? ($siswa->orangTua->kelurahan->nama . ' — ' . $siswa->orangTua->kelurahan->kecamatan?->nama . ' (' . $siswa->orangTua->kelurahan->kecamatan?->kabupaten?->nama . ')')
+            : null;
+
+        return view('akademik.siswa.edit', compact(
+            'kelas_ajar',
+            'siswa',
+            'orangTua',
+            'tempatLahirLabel',
+            'kelurahanLabel',
+            'ortuKelurahanLabel'
+        ));
     }
+
 
     public function update(Request $request, KelasAjar $kelas_ajar, Siswa $siswa)
     {
-        // $siswa->load(['user']);
+        $siswa->load(['user', 'orangTua.user']);
 
-        // $validated = $request->validate([
-        //     'name' => ['required', 'string', 'max:255'],
-        //     'username' => ['required', 'string', 'max:50', Rule::unique('users', 'username')->ignore($siswa->user_id)],
-        //     'email' => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')->ignore($siswa->user_id)],
-        //     'password' => ['nullable', 'string', 'min:6', 'confirmed'],
+        $validated = $request->validate([
+            // user siswa
+            'name' => ['required', 'string', 'max:255'],
+            'password' => ['nullable', 'string', 'min:6', 'confirmed'],
 
-        //     'nis' => ['required', 'string', 'max:50', Rule::unique('siswa', 'nis')->ignore($siswa->siswa_id, 'siswa_id')],
-        //     'nisn' => ['required', 'string', 'max:50', Rule::unique('siswa', 'nisn')->ignore($siswa->siswa_id, 'siswa_id')],
-        //     'jenis_kelamin' => ['required', Rule::in(['l', 'p'])],
-        //     'tempat_lahir_kabupaten_id' => ['required', 'exists:kabupaten,kabupaten_id'],
-        //     'tanggal_lahir' => ['required', 'date'],
-        //     'agama' => ['required', 'string', 'max:100'],
-        //     'pendidikan_sebelumnya' => ['required', 'string', 'max:255'],
-        //     'alamat' => ['required', 'string'],
-        //     'orang_tua_id' => ['required', 'exists:orang_tua,orang_tua_id'],
-        //     'kelurahan_id' => ['required', 'exists:kelurahan,kelurahan_id'],
-        // ]);
+            // siswa
+            'nis' => ['required', 'string', 'max:50', Rule::unique('siswa', 'nis')->ignore($siswa->siswa_id, 'siswa_id')],
+            'nisn' => ['required', 'string', 'max:50', Rule::unique('siswa', 'nisn')->ignore($siswa->siswa_id, 'siswa_id')],
+            'jenis_kelamin' => ['required', Rule::in(['l', 'p'])],
+            'tanggal_lahir' => ['required', 'date'],
+            'agama' => ['required', 'string', 'max:100'],
+            'tempat_lahir_kabupaten_id' => ['required', 'exists:kabupaten,kabupaten_id'],
+            'pendidikan_sebelumnya' => ['required', 'string', 'max:255'],
+            'alamat' => ['required', 'string'],
 
-        // DB::transaction(function () use ($validated, $siswa) {
-        //     $siswa->user->update([
-        //         'name' => $validated['name'],
-        //         'username' => $validated['username'],
-        //         'email' => $validated['email'] ?? null,
-        //         ...(isset($validated['password']) && $validated['password']
-        //             ? ['password' => Hash::make($validated['password'])]
-        //             : []),
-        //     ]);
+            'kelurahan_id_hidden' => ['required', 'exists:kelurahan,kelurahan_id'],
 
-        //     $siswa->update([
-        //         'nis' => $validated['nis'],
-        //         'nisn' => $validated['nisn'],
-        //         'nama' => $validated['name'],
-        //         'jenis_kelamin' => $validated['jenis_kelamin'],
-        //         'tempat_lahir_kabupaten_id' => $validated['tempat_lahir_kabupaten_id'],
-        //         'tanggal_lahir' => $validated['tanggal_lahir'],
-        //         'agama' => $validated['agama'],
-        //         'pendidikan_sebelumnya' => $validated['pendidikan_sebelumnya'],
-        //         'alamat' => $validated['alamat'],
-        //         'orang_tua_id' => $validated['orang_tua_id'],
-        //         'kelurahan_id' => $validated['kelurahan_id'],
-        //     ]);
-        // });
+            'ortu.nama_ayah' => ['required', 'string', 'max:255'],
+            'ortu.nama_ibu' => ['required', 'string', 'max:255'],
+            'ortu.pekerjaan_ayah' => ['required', 'string', 'max:255'],
+            'ortu.pekerjaan_ibu' => ['required', 'string', 'max:255'],
+            'ortu.jalan' => ['required', 'string', 'max:255'],
+            'ortu.kelurahan_id' => ['required', 'exists:kelurahan,kelurahan_id'],
 
-        // return redirect()->route('akademik.siswa.index', $kelas_ajar->kelas_ajar_id)
-        //     ->with('success', 'Data siswa berhasil diperbarui.');
+            'alamat_sama_ortu' => ['nullable'],
+        ]);
+
+        DB::transaction(function () use ($validated, $siswa) {
+
+            $requestUsername = $validated['nis'];
+            $existsUsername = User::where('username', $requestUsername)
+                ->where('id', '!=', $siswa->user_id)
+                ->exists();
+
+            if ($existsUsername) {
+                throw ValidationException::withMessages([
+                    'nis' => 'NIS ini sudah dipakai sebagai username akun lain.',
+                ]);
+            }
+
+            $payloadUser = [
+                'name' => $validated['name'],
+                'username' => $validated['nis'],
+            ];
+
+            if (!empty($validated['password'])) {
+                $payloadUser['password'] = Hash::make($validated['password']);
+            }
+
+            $siswa->user->update($payloadUser);
+
+            if (!$siswa->orangTua) {
+                throw ValidationException::withMessages([
+                    'ortu' => 'Data orang tua tidak ditemukan untuk siswa ini.',
+                ]);
+            }
+
+            $ortuInput = $validated['ortu'];
+
+            $siswa->orangTua->update([
+                'nama_ayah' => $ortuInput['nama_ayah'],
+                'nama_ibu' => $ortuInput['nama_ibu'],
+                'pekerjaan_ayah' => $ortuInput['pekerjaan_ayah'],
+                'pekerjaan_ibu' => $ortuInput['pekerjaan_ibu'],
+                'jalan' => $ortuInput['jalan'],
+                'kelurahan_id' => $ortuInput['kelurahan_id'],
+            ]);
+
+            if ($siswa->orangTua->user) {
+                $payloadUserOrtu = [
+                    'name' => $ortuInput['nama_ayah'],
+                ];
+                if (!empty($validated['password'])) {
+                    $payloadUserOrtu['password'] = Hash::make($validated['password']);
+                }
+                $siswa->orangTua->user->update($payloadUserOrtu);
+            }
+
+            $alamatSiswa = $validated['alamat'];
+            $kelurahanSiswa = $validated['kelurahan_id_hidden'];
+
+            if (!empty($validated['alamat_sama_ortu'])) {
+                $alamatSiswa = $siswa->orangTua->jalan;
+                $kelurahanSiswa = $siswa->orangTua->kelurahan_id;
+            }
+
+            $siswa->update([
+                'nis' => $validated['nis'],
+                'nisn' => $validated['nisn'],
+                'nama' => $validated['name'],
+                'jenis_kelamin' => $validated['jenis_kelamin'],
+                'tempat_lahir_kabupaten_id' => $validated['tempat_lahir_kabupaten_id'],
+                'tanggal_lahir' => $validated['tanggal_lahir'],
+                'agama' => $validated['agama'],
+                'pendidikan_sebelumnya' => $validated['pendidikan_sebelumnya'],
+                'alamat' => $alamatSiswa,
+                'kelurahan_id' => $kelurahanSiswa,
+                'orang_tua_id' => $siswa->orang_tua_id,
+            ]);
+        });
+
+        return redirect()
+            ->route('akademik.siswa.index', $kelas_ajar->kelas_ajar_id)
+            ->with('success', 'Data siswa berhasil diperbarui.');
     }
+
+
 
     public function destroy(KelasAjar $kelas_ajar, Siswa $siswa)
     {

@@ -62,16 +62,6 @@
                       @if($s)
                         <a href="{{ route('akademik.siswa.edit', [$kelas_ajar->kelas_ajar_id, $s->siswa_id]) }}"
                            class="btn btn-sm btn-light-warning mb-1">Edit</a>
-
-                        <form action="{{ route('akademik.siswa.destroy', [$kelas_ajar->kelas_ajar_id, $s->siswa_id]) }}"
-                              method="POST" class="d-inline">
-                          @csrf
-                          @method('DELETE')
-                          <button class="btn btn-sm btn-light-danger mb-1"
-                                  onclick="return confirm('Keluarkan siswa dari kelas ini?')">
-                            Remove
-                          </button>
-                        </form>
                       @endif
                     </td>
                   </tr>
