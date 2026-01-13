@@ -81,10 +81,10 @@ class StaffController extends Controller
             'password' => 'nullable|string|min:6|confirmed',
         ]);
 
+
         DB::beginTransaction();
         try {
             $user->name = $request->name;
-            $user->username = $request->username;
             if ($request->filled('password')) {
                 $user->password = Hash::make($request->password);
             }
