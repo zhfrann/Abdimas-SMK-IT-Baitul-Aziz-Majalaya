@@ -16,6 +16,7 @@ use App\Http\Controllers\PenilaianEkstrakurikulerController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\SuperAdmin\UserController;
 use App\Http\Controllers\TujuanPembelajaranController;
+use App\Http\Controllers\WilayahController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
@@ -48,9 +49,9 @@ Route::middleware(['auth', 'role:Bagian Akademik'])->prefix('akademik')->name('a
 // Define a group of routes with 'auth' middleware applied
 Route::middleware(['auth'])->group(function () {
     // Define a GET route for the root URL ('/')
-      Route::get('/', function () {
+    Route::get('/', function () {
         // Return a view named 'index' when accessing the root URL
-      return view('dashboard.index');
+        return view('dashboard.index');
     });
 
     Route::resource('intrakurikuler', IntrakurikulerController::class)->middleware('role:Guru Mapel|Bagian Akademik');
@@ -77,22 +78,7 @@ Route::middleware(['auth'])->group(function () {
     // Route::get('{routeName}/{name?}', [HomeController::class, 'pageView']);
 });
 
-
-Route::get('/wilayah/provinces', function () {
-    $data = Http::get('https://wilayah.id/api/provinces.json')->json();
-    return response()->json($data);
-});
-Route::get('/wilayah/regencies/{province}', function ($province) {
-    $data = Http::get("https://wilayah.id/api/regencies/{$province}.json")->json();
-    return response()->json($data);
-});
-Route::get('/wilayah/districts/{regency}', function ($regency) {
-    $data = Http::get("https://wilayah.id/api/districts/{$regency}.json")->json();
-    return response()->json($data);
-});
-Route::get('/wilayah/villages/{district}', function ($district) {
-    $data = Http::get("https://wilayah.id/api/villages/{$district}.json")->json();
-    return response()->json($data);
-});
-
-
+Route::get('/wilayah/provinsi', [WilayahController::class, 'provinsi']);
+Route::get('/wilayah/kabupaten/{provinsi_id}', [WilayahController::class, 'kabupaten']);
+Route::get('/wilayah/kecamatan/{kabupaten_id}', [WilayahController::class, 'kecamatan']);
+Route::get('/wilayah/kelurahan/{kecamatan_id}', [WilayahController::class, 'kelurahan']);
