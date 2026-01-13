@@ -56,66 +56,96 @@ class SiswaController extends Controller
 
             // alamat siswa
             'alamat' => ['required', 'string'],
-            'kelurahan_id_hidden' => ['required', 'exists:kelurahan,kelurahan_id'],
 
-            // nested ortu
-            'ortu.nama_ayah' => ['required', 'string', 'max:255'],
-            'ortu.nama_ibu' => ['required', 'string', 'max:255'],
-            'ortu.pekerjaan_ayah' => ['required', 'string', 'max:255'],
-            'ortu.pekerjaan_ibu' => ['required', 'string', 'max:255'],
-            'ortu.jalan' => ['required', 'string', 'max:255'],
-            'ortu.kelurahan_id' => ['required', 'exists:kelurahan,kelurahan_id'],
+            // domisili siswa: bisa dari select (kelurahan_id) atau hidden (kelurahan_id_hidden)
+            'kelurahan_id' => ['nullable', 'exists:kelurahan,kelurahan_id'],
+            'kelurahan_id_hidden' => ['nullable', 'exists:kelurahan,kelurahan_id'],
 
-            // opsional checkbox
+            // pilih ortu existing (opsional)
+            'orang_tua_id' => ['nullable', 'exists:orang_tua,orang_tua_id'],
+
+            // ortu baru (WAJIB hanya jika orang_tua_id kosong)
+            'ortu.nama_ayah' => ['required_without:orang_tua_id', 'string', 'max:255'],
+            'ortu.nama_ibu' => ['required_without:orang_tua_id', 'string', 'max:255'],
+            'ortu.pekerjaan_ayah' => ['required_without:orang_tua_id', 'string', 'max:255'],
+            'ortu.pekerjaan_ibu' => ['required_without:orang_tua_id', 'string', 'max:255'],
+            'ortu.jalan' => ['required_without:orang_tua_id', 'string', 'max:255'],
+            'ortu.kelurahan_id' => ['required_without:orang_tua_id', 'exists:kelurahan,kelurahan_id'],
+
             'alamat_sama_ortu' => ['nullable'],
+        ], [
+            // pesan lebih enak dibaca
+            'ortu.*.required_without' => 'Jika tidak memilih Orang Tua, maka data orang tua baru wajib diisi.',
         ]);
 
-        try {
-            DB::transaction(function () use ($validated, $kelas_ajar) {
+        // ambil kelurahan siswa dari hidden dulu, fallback ke select
+        $kelurahanSiswaInput = $validated['kelurahan_id_hidden']
+            ?? $validated['kelurahan_id']
+            ?? null;
 
+        if (!$kelurahanSiswaInput && empty($validated['alamat_sama_ortu'])) {
+            return back()->withInput()->withErrors([
+                'kelurahan_id' => 'Kelurahan domisili siswa wajib dipilih.',
+            ]);
+        }
+
+        try {
+            DB::transaction(function () use ($validated, $kelas_ajar, $kelurahanSiswaInput) {
+
+                // 1) buat user siswa
                 $userSiswa = User::create([
                     'name' => $validated['name'],
-                    'username' => $validated['nis'],
+                    'username' => $validated['nis'], // username siswa = NIS
                     'email' => null,
                     'password' => Hash::make($validated['password']),
                 ]);
                 $userSiswa->assignRole('Siswa');
 
-                $ortuUsername = 'ortu_' . $validated['nis'];
+                // 2) tentukan orang tua (existing / create baru)
+                $orangTua = null;
 
-                $suffix = 1;
-                $base = $ortuUsername;
-                while (User::where('username', $ortuUsername)->exists()) {
-                    $ortuUsername = $base . '_' . $suffix;
-                    $suffix++;
+                if (!empty($validated['orang_tua_id'])) {
+                    // pakai ortu existing
+                    $orangTua = OrangTua::with('kelurahan')->findOrFail($validated['orang_tua_id']);
+                } else {
+                    // buat ortu baru
+                    $ortuUsernameBase = 'ortu_' . $validated['nis'];
+                    $ortuUsername = $ortuUsernameBase;
+                    $i = 1;
+                    while (User::where('username', $ortuUsername)->exists()) {
+                        $ortuUsername = $ortuUsernameBase . '_' . $i;
+                        $i++;
+                    }
+
+                    $userOrtu = User::create([
+                        'name' => $validated['ortu']['nama_ayah'],
+                        'username' => $ortuUsername,
+                        'email' => null,
+                        'password' => Hash::make($validated['password']), // sama dulu
+                    ]);
+                    $userOrtu->assignRole('Orang Tua');
+
+                    $orangTua = OrangTua::create([
+                        'user_id' => $userOrtu->id,
+                        'nama_ayah' => $validated['ortu']['nama_ayah'],
+                        'nama_ibu' => $validated['ortu']['nama_ibu'],
+                        'pekerjaan_ayah' => $validated['ortu']['pekerjaan_ayah'],
+                        'pekerjaan_ibu' => $validated['ortu']['pekerjaan_ibu'],
+                        'jalan' => $validated['ortu']['jalan'],
+                        'kelurahan_id' => $validated['ortu']['kelurahan_id'],
+                    ]);
                 }
 
-                $userOrtu = User::create([
-                    'name' => $validated['ortu']['nama_ayah'], // atau gabung ayah/ibu
-                    'username' => $ortuUsername,
-                    'email' => null,
-                    'password' => Hash::make($validated['password']), // sama dulu
-                ]);
-                $userOrtu->assignRole('Orang Tua');
+                // 3) alamat/kelurahan siswa
+                $alamatSiswa = $validated['alamat'];
+                $kelurahanSiswa = $kelurahanSiswaInput;
 
-                $orangTua = OrangTua::create([
-                    'user_id' => $userOrtu->id,
-                    'nama_ayah' => $validated['ortu']['nama_ayah'],
-                    'nama_ibu' => $validated['ortu']['nama_ibu'],
-                    'pekerjaan_ayah' => $validated['ortu']['pekerjaan_ayah'],
-                    'pekerjaan_ibu' => $validated['ortu']['pekerjaan_ibu'],
-                    'jalan' => $validated['ortu']['jalan'],
-                    'kelurahan_id' => $validated['ortu']['kelurahan_id'],
-                ]);
+                if (!empty($validated['alamat_sama_ortu']) && $orangTua) {
+                    $alamatSiswa = $orangTua->jalan;
+                    $kelurahanSiswa = $orangTua->kelurahan_id;
+                }
 
-                $alamatSiswa = !empty($validated['alamat_sama_ortu'])
-                    ? $validated['ortu']['jalan']
-                    : $validated['alamat'];
-
-                $kelurahanSiswa = !empty($validated['alamat_sama_ortu'])
-                    ? $validated['ortu']['kelurahan_id']
-                    : $validated['kelurahan_id_hidden'];
-
+                // 4) buat siswa
                 $siswa = Siswa::create([
                     'user_id' => $userSiswa->id,
                     'nis' => $validated['nis'],
@@ -131,6 +161,7 @@ class SiswaController extends Controller
                     'kelurahan_id' => $kelurahanSiswa,
                 ]);
 
+                // 5) masuk ke kelas ajar ini
                 RiwayatKelas::create([
                     'siswa_id' => $siswa->siswa_id,
                     'kelas_ajar_id' => $kelas_ajar->kelas_ajar_id,
@@ -139,13 +170,14 @@ class SiswaController extends Controller
 
             return redirect()
                 ->route('akademik.siswa.index', $kelas_ajar->kelas_ajar_id)
-                ->with('success', 'Siswa & akun orang tua berhasil dibuat, dan siswa dimasukkan ke kelas ini.');
+                ->with('success', 'Siswa berhasil ditambahkan ke kelas ini.');
         } catch (\Throwable $e) {
             return back()
                 ->withInput()
                 ->withErrors(['error' => 'Gagal menyimpan data: ' . $e->getMessage()]);
         }
     }
+
 
     public function edit(KelasAjar $kelas_ajar, Siswa $siswa)
     {

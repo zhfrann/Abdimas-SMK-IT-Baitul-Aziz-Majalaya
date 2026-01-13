@@ -11,42 +11,32 @@
         border-color: rgba(255, 255, 255, .18) !important;
         color: rgba(255, 255, 255, .90) !important;
     }
-
     body[data-pc-theme="dark"] .choices__input {
         background-color: transparent !important;
         color: rgba(255, 255, 255, .92) !important;
     }
-
     body[data-pc-theme="dark"] .choices__input::placeholder {
         color: rgba(255, 255, 255, .55) !important;
     }
-
     body[data-pc-theme="dark"] .choices__list--dropdown,
     body[data-pc-theme="dark"] .choices__list[aria-expanded] {
         background-color: #1b1f24 !important;
         border-color: rgba(255, 255, 255, .14) !important;
         color: rgba(255, 255, 255, .92) !important;
     }
-
     body[data-pc-theme="dark"] .choices__list--dropdown .choices__item {
         color: rgba(255, 255, 255, .92) !important;
     }
-
     body[data-pc-theme="dark"] .choices__list--dropdown .choices__item--selectable.is-highlighted {
         background-color: rgba(255, 255, 255, .08) !important;
     }
-
     body[data-pc-theme="dark"] .choices__item--selectable {
         color: rgba(255, 255, 255, .92) !important;
     }
-
-    /* selected item chip (kalau single select, ini text yang tampil) */
     body[data-pc-theme="dark"] .choices__item--selectable,
     body[data-pc-theme="dark"] .choices__list--single .choices__item {
         color: rgba(255, 255, 255, .92) !important;
     }
-
-    /* kalau invalid, tetap merah */
     body[data-pc-theme="dark"] select.is-invalid+.choices .choices__inner {
         border-color: #dc3545 !important;
     }
@@ -159,7 +149,6 @@
                                 data-trigger>
                                 <option value="">Ketik untuk mencari...</option>
 
-                                {{-- kalau old ada, inject option supaya tetap kepilih setelah submit gagal --}}
                                 @if(old('tempat_lahir_kabupaten_id') && isset($tempatLahirLabel))
                                 <option value="{{ old('tempat_lahir_kabupaten_id') }}" selected>
                                     {{ $tempatLahirLabel }}
@@ -205,6 +194,13 @@
                                 </option>
                                 @endforeach
                             </select>
+
+                            {{-- ✅ hidden mirror: dipakai kalau select disabled --}}
+                            <input type="hidden"
+                                   id="orang_tua_id_hidden"
+                                   name="orang_tua_id_hidden"
+                                   value="{{ old('orang_tua_id') }}">
+
                             @error('orang_tua_id')
                             <span class="invalid-feedback d-block">{{ $message }}</span>
                             @enderror
@@ -217,6 +213,7 @@
                             </button>
                         </div>
                     </div>
+
                     {{-- Collapse tambah orang tua --}}
                     <div class="collapse" id="collapseOrtu">
                         <div class="card card-body border mt-2">
@@ -272,19 +269,17 @@
                                 <small class="text-muted">Cari bisa kena kelurahan/kecamatan/kabupaten/provinsi</small>
                             </div>
 
-
                             <small class="text-muted d-block">
                                 * Jika orang_tua_id kosong tapi ortu[...] terisi, controller bisa membuat orang tua baru lalu pakai id-nya.
                             </small>
                         </div>
                     </div>
 
-                    {{-- ROW: Kelurahan domisili di bawah --}}
+                    {{-- Kelurahan domisili siswa --}}
                     <div class="row">
                         <div class="col-12 mb-3">
                             <label>Kelurahan Domisili Siswa</label>
 
-                            {{-- Select ini dipakai Choices (remote search) --}}
                             <select
                                 name="kelurahan_id"
                                 id="kelurahan_id"
@@ -292,13 +287,11 @@
                                 data-trigger>
                                 <option value="">Ketik untuk mencari kelurahan...</option>
 
-                                {{-- kalau old ada, biar tetap kepilih --}}
                                 @if(old('kelurahan_id') && isset($kelurahanLabel))
                                 <option value="{{ old('kelurahan_id') }}" selected>{{ $kelurahanLabel }}</option>
                                 @endif
                             </select>
 
-                            {{-- hidden ini dipakai saat checkbox dicentang (karena select akan di-disable dan tidak terkirim) --}}
                             <input type="hidden" id="kelurahan_id_hidden" name="kelurahan_id_hidden" value="">
 
                             @error('kelurahan_id')
@@ -308,7 +301,7 @@
                         </div>
                     </div>
 
-                    {{-- Checkbox di bawah --}}
+                    {{-- Checkbox alamat sama ortu --}}
                     <div class="row">
                         <div class="col-12 mb-3">
                             <div class="form-check">
@@ -321,7 +314,7 @@
                         </div>
                     </div>
 
-                    {{-- Alamat di bawah, otomatis isi kalau sama ortu --}}
+                    {{-- Alamat siswa --}}
                     <div class="row">
                         <div class="col-12 mb-3" id="alamat_wrap">
                             <label>Alamat (Jalan / RT RW / Detail)</label>
@@ -332,8 +325,6 @@
                             @enderror
                         </div>
                     </div>
-
-
 
                     <div class="d-flex gap-2 mt-3">
                         <button class="btn btn-success">Simpan</button>
@@ -351,252 +342,231 @@
 <script src="/build/js/plugins/choices.min.js"></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
 
-        // ===== Utils =====
-        function debounce(fn, ms) {
-            let t;
-            return (...args) => {
-                clearTimeout(t);
-                t = setTimeout(() => fn(...args), ms);
-            };
+    // ===== Utils =====
+    function debounce(fn, ms) {
+        let t;
+        return (...args) => {
+            clearTimeout(t);
+            t = setTimeout(() => fn(...args), ms);
+        };
+    }
+
+    async function fetchSelect2Results(urlStr) {
+        const res = await fetch(urlStr, { headers: { 'Accept': 'application/json' } });
+        if (!res.ok) return [];
+        const data = await res.json();
+        return (data.results || []).map(r => ({ value: r.id, label: r.text }));
+    }
+
+    function initRemoteChoices(selectId, routeUrl, {
+        placeholder = 'Ketik untuk mencari...',
+        searchPlaceholder = 'Cari...',
+        minInput = 2
+    } = {}) {
+        const el = document.getElementById(selectId);
+        if (!el) return null;
+
+        const instance = new Choices(el, {
+            searchEnabled: true,
+            placeholder: true,
+            placeholderValue: placeholder,
+            searchPlaceholderValue: searchPlaceholder,
+            shouldSort: false,
+            itemSelectText: '',
+            searchResultLimit: 15,
+            renderChoiceLimit: 15
+        });
+
+        const doSearch = debounce(async (value) => {
+            const q = (value || '').trim();
+            if (q.length < minInput) return;
+
+            const url = new URL(routeUrl, window.location.origin);
+            url.searchParams.set('q', q);
+            url.searchParams.set('page', '1');
+
+            const items = await fetchSelect2Results(url.toString());
+            instance.setChoices(items, 'value', 'label', true);
+        }, 300);
+
+        el.addEventListener('search', function(event) {
+            doSearch(event.detail.value);
+        });
+
+        return instance;
+    }
+
+    function getSelectedOption(selectEl) {
+        if (!selectEl) return null;
+        return selectEl.options[selectEl.selectedIndex] || null;
+    }
+
+    function setKelurahanSiswaValue(kelChoices, kelSelectEl, hiddenEl, kelId, kelLabel) {
+        if (!kelId) return;
+
+        if (hiddenEl) hiddenEl.value = kelId;
+
+        if (kelChoices) {
+            kelChoices.setChoices([{ value: kelId, label: kelLabel || 'Kelurahan' }], 'value', 'label', true);
+            kelChoices.setChoiceByValue(kelId);
+            kelChoices.disable();
         }
 
-        async function fetchSelect2Results(urlStr) {
-            const res = await fetch(urlStr, {
-                headers: {
-                    'Accept': 'application/json'
-                }
-            });
-            if (!res.ok) return [];
-            const data = await res.json();
-            return (data.results || []).map(r => ({
-                value: r.id,
-                label: r.text
-            }));
-        }
+        if (kelSelectEl) kelSelectEl.disabled = true;
+    }
 
-        function initRemoteChoices(selectId, routeUrl, {
-            placeholder = 'Ketik untuk mencari...',
-            searchPlaceholder = 'Cari...',
-            minInput = 2
-        } = {}) {
-            const el = document.getElementById(selectId);
-            if (!el) return null;
+    function enableKelurahanSiswa(kelChoices, kelSelectEl, hiddenEl) {
+        if (kelChoices) kelChoices.enable();
+        if (kelSelectEl) kelSelectEl.disabled = false;
+        if (hiddenEl && kelSelectEl) hiddenEl.value = kelSelectEl.value || '';
+    }
 
-            const instance = new Choices(el, {
-                searchEnabled: true,
-                placeholder: true,
-                placeholderValue: placeholder,
-                searchPlaceholderValue: searchPlaceholder,
-                shouldSort: false,
-                itemSelectText: '',
-                searchResultLimit: 15,
-                renderChoiceLimit: 15
-            });
+    // ===== Init choices remote =====
+    initRemoteChoices(
+        'tempat_lahir_kabupaten_id',
+        "{{ route('ajax.tempat_lahir.kabupaten') }}",
+        { placeholder: 'Ketik untuk mencari...', searchPlaceholder: 'Cari kabupaten / provinsi...' }
+    );
 
-            const doSearch = debounce(async (value) => {
-                const q = (value || '').trim();
-                if (q.length < minInput) return;
+    const kelSiswaChoices = initRemoteChoices(
+        'kelurahan_id',
+        "{{ route('ajax.domisili.kelurahan') }}",
+        { placeholder: 'Ketik untuk mencari kelurahan...', searchPlaceholder: 'Cari kelurahan / kecamatan / kabupaten / provinsi...' }
+    );
 
-                const url = new URL(routeUrl, window.location.origin);
-                url.searchParams.set('q', q);
-                url.searchParams.set('page', '1');
+    initRemoteChoices(
+        'ortu_kelurahan_id',
+        "{{ route('ajax.domisili.kelurahan') }}",
+        { placeholder: 'Ketik untuk mencari kelurahan...', searchPlaceholder: 'Cari kelurahan / kecamatan / kabupaten / provinsi...' }
+    );
 
-                const items = await fetchSelect2Results(url.toString());
-                instance.setChoices(items, 'value', 'label', true);
-            }, 300);
+    // ===== Elements =====
+    const ortuSelect   = document.getElementById('orang_tua_id');
+    const ortuHidden   = document.getElementById('orang_tua_id_hidden'); // ✅ mirror
+    const alamatSama   = document.getElementById('alamat_sama_ortu');
+    const alamat       = document.getElementById('alamat');
 
-            el.addEventListener('search', function(event) {
-                doSearch(event.detail.value);
-            });
+    const kelSiswaEl       = document.getElementById('kelurahan_id');
+    const hiddenKelSiswa   = document.getElementById('kelurahan_id_hidden');
 
-            return instance;
-        }
+    const collapseEl = document.getElementById('collapseOrtu');
 
-        function getSelectedOption(selectEl) {
-            if (!selectEl) return null;
-            return selectEl.options[selectEl.selectedIndex] || null;
-        }
+    // sync hidden kelurahan siswa
+    if (kelSiswaEl && hiddenKelSiswa) {
+        hiddenKelSiswa.value = kelSiswaEl.value || '';
+        kelSiswaEl.addEventListener('change', function() {
+            if (!alamatSama?.checked) hiddenKelSiswa.value = kelSiswaEl.value || '';
+        });
+    }
 
-        function setKelurahanSiswaValue(kelChoices, kelSelectEl, hiddenEl, kelId, kelLabel) {
-            if (!kelId) return;
+    // ✅ sync hidden orang_tua_id agar aman walau select disabled
+    if (ortuSelect && ortuHidden) {
+        ortuHidden.value = ortuSelect.value || '';
+        ortuSelect.addEventListener('change', () => {
+            ortuHidden.value = ortuSelect.value || '';
+        });
+    }
 
-            // set hidden agar tetap terkirim walau select disabled
-            if (hiddenEl) hiddenEl.value = kelId;
+    // field ortu baru
+    const ortuJalanEl = document.getElementById('ortu_jalan');
+    const ortuKelEl   = document.getElementById('ortu_kelurahan_id');
 
-            // inject ke UI choices supaya terlihat
-            if (kelChoices) {
-                kelChoices.setChoices([{
-                    value: kelId,
-                    label: kelLabel || 'Kelurahan'
-                }], 'value', 'label', true);
-                kelChoices.setChoiceByValue(kelId);
-                kelChoices.disable();
+    function isCreateOrtuOpen() {
+        return !!(collapseEl && collapseEl.classList.contains('show'));
+    }
+
+    function getAlamatKelurahanSource() {
+        if (isCreateOrtuOpen()) {
+            const jalan = (ortuJalanEl?.value || '').trim();
+            const kelId = (ortuKelEl?.value || '').trim();
+
+            let kelLabel = '';
+            if (ortuKelEl?.selectedOptions?.[0]) {
+                kelLabel = (ortuKelEl.selectedOptions[0].text || '').trim();
             }
 
-            if (kelSelectEl) kelSelectEl.disabled = true;
+            return { jalan, kelId, kelLabel, mode: 'create' };
         }
 
-        function enableKelurahanSiswa(kelChoices, kelSelectEl, hiddenEl) {
-            if (kelChoices) kelChoices.enable();
-            if (kelSelectEl) kelSelectEl.disabled = false;
-            if (hiddenEl) hiddenEl.value = '';
+        const opt = getSelectedOption(ortuSelect);
+        const jalan    = (opt?.dataset?.jalan || '').trim();
+        const kelId    = (opt?.dataset?.kelurahanId || '').trim();
+        const kelLabel = (opt?.dataset?.kelurahanLabel || '').trim();
+
+        return { jalan, kelId, kelLabel, mode: 'existing' };
+    }
+
+    function applyAlamatOrtu() {
+        const same = !!(alamatSama && alamatSama.checked);
+
+        if (!same) {
+            enableKelurahanSiswa(kelSiswaChoices, kelSiswaEl, hiddenKelSiswa);
+            if (alamat) alamat.readOnly = false;
+            return;
         }
 
-        // ===== Init choices remote =====
-        const tempatLahirChoices = initRemoteChoices(
-            'tempat_lahir_kabupaten_id',
-            "{{ route('ajax.tempat_lahir.kabupaten') }}", {
-                placeholder: 'Ketik untuk mencari...',
-                searchPlaceholder: 'Cari kabupaten / provinsi...'
-            }
-        );
+        const src = getAlamatKelurahanSource();
 
-        const kelSiswaChoices = initRemoteChoices(
-            'kelurahan_id',
-            "{{ route('ajax.domisili.kelurahan') }}", {
-                placeholder: 'Ketik untuk mencari kelurahan...',
-                searchPlaceholder: 'Cari kelurahan / kecamatan / kabupaten / provinsi...'
-            }
-        );
-
-        const kelOrtuChoices = initRemoteChoices(
-            'ortu_kelurahan_id',
-            "{{ route('ajax.domisili.kelurahan') }}", {
-                placeholder: 'Ketik untuk mencari kelurahan...',
-                searchPlaceholder: 'Cari kelurahan / kecamatan / kabupaten / provinsi...'
-            }
-        );
-
-        // ===== Elements =====
-        const ortuSelect = document.getElementById('orang_tua_id');
-        const alamatSama = document.getElementById('alamat_sama_ortu');
-        const alamat = document.getElementById('alamat');
-
-        const kelSiswaEl = document.getElementById('kelurahan_id');
-        const hiddenKelSiswa = document.getElementById('kelurahan_id_hidden');
-
-        const collapseEl = document.getElementById('collapseOrtu');
-
-        // field ortu baru
-        const ortuJalanEl = document.getElementById('ortu_jalan'); // <-- pastikan ada id ini
-        const ortuKelEl = document.getElementById('ortu_kelurahan_id');
-
-        function isCreateOrtuOpen() {
-            // bootstrap collapse pakai class "show"
-            return !!(collapseEl && collapseEl.classList.contains('show'));
+        if (alamat) {
+            alamat.value = src.jalan || '';
+            alamat.readOnly = true;
         }
 
-        // Ambil sumber alamat & kelurahan dari:
-        // - existing ortu (select)
-        // - atau ortu baru (form collapse)
-        function getAlamatKelurahanSource() {
-            if (isCreateOrtuOpen()) {
-                const jalan = (ortuJalanEl?.value || '').trim();
-
-                // ambil value dan label dari select ortu kelurahan (Choices)
-                const kelId = (ortuKelEl?.value || '').trim();
-
-                let kelLabel = '';
-                if (ortuKelEl && ortuKelEl.selectedOptions && ortuKelEl.selectedOptions[0]) {
-                    kelLabel = (ortuKelEl.selectedOptions[0].text || '').trim();
-                }
-
-                return {
-                    jalan,
-                    kelId,
-                    kelLabel,
-                    mode: 'create'
-                };
-            }
-
-            const opt = getSelectedOption(ortuSelect);
-            const jalan = (opt?.dataset?.jalan || '').trim();
-            const kelId = (opt?.dataset?.kelurahanId || '').trim();
-            const kelLabel = (opt?.dataset?.kelurahanLabel || '').trim();
-
-            return {
-                jalan,
-                kelId,
-                kelLabel,
-                mode: 'existing'
-            };
+        if (src.kelId) {
+            setKelurahanSiswaValue(kelSiswaChoices, kelSiswaEl, hiddenKelSiswa, src.kelId, src.kelLabel || 'Kelurahan');
+        } else {
+            if (kelSiswaChoices) kelSiswaChoices.disable();
+            if (kelSiswaEl) kelSiswaEl.disabled = true;
+            if (hiddenKelSiswa) hiddenKelSiswa.value = '';
         }
+    }
 
-        // ===== Checkbox logic =====
-        function applyAlamatOrtu() {
-            const same = !!(alamatSama && alamatSama.checked);
+    // ===== Events =====
+    if (alamatSama) alamatSama.addEventListener('change', applyAlamatOrtu);
 
-            // kalau tidak sama ortu: normal
-            if (!same) {
-                enableKelurahanSiswa(kelSiswaChoices, kelSiswaEl, hiddenKelSiswa);
-                if (alamat) alamat.readOnly = false;
-                return;
-            }
+    if (ortuSelect) {
+        ortuSelect.addEventListener('change', function() {
+            if (alamatSama?.checked && !isCreateOrtuOpen()) applyAlamatOrtu();
+        });
+    }
 
-            // sama ortu: ambil dari source yang benar
-            const src = getAlamatKelurahanSource();
+    if (ortuJalanEl) {
+        ortuJalanEl.addEventListener('input', function() {
+            if (alamatSama?.checked && isCreateOrtuOpen()) applyAlamatOrtu();
+        });
+    }
 
-            if (alamat) {
-                alamat.value = src.jalan || '';
-                alamat.readOnly = true;
-            }
+    if (ortuKelEl) {
+        ortuKelEl.addEventListener('change', function() {
+            if (alamatSama?.checked && isCreateOrtuOpen()) applyAlamatOrtu();
+        });
+    }
 
-            if (src.kelId) {
-                setKelurahanSiswaValue(kelSiswaChoices, kelSiswaEl, hiddenKelSiswa, src.kelId, src.kelLabel || 'Kelurahan');
-            } else {
-                // kalau kelurahan belum dipilih (ortu baru belum pilih kel)
-                if (kelSiswaChoices) kelSiswaChoices.disable();
-                if (kelSiswaEl) kelSiswaEl.disabled = true;
-                if (hiddenKelSiswa) hiddenKelSiswa.value = '';
-            }
-        }
+    // ✅ collapse: disable select, tapi hidden yang menentukan mode
+    if (collapseEl) {
+        collapseEl.addEventListener('show.bs.collapse', function() {
+            if (ortuSelect) ortuSelect.disabled = true;
 
-        // ===== Events =====
-        if (alamatSama) {
-            alamatSama.addEventListener('change', applyAlamatOrtu);
-        }
+            // mode create -> kosongkan hidden supaya server "tahu" harus validasi ortu[]
+            if (ortuHidden) ortuHidden.value = '';
 
-        if (ortuSelect) {
-            ortuSelect.addEventListener('change', function() {
-                if (alamatSama && alamatSama.checked && !isCreateOrtuOpen()) applyAlamatOrtu();
-            });
-        }
+            applyAlamatOrtu();
+        });
 
-        // kalau user ngisi ortu baru, dan checkbox aktif => update realtime
-        if (ortuJalanEl) {
-            ortuJalanEl.addEventListener('input', function() {
-                if (alamatSama && alamatSama.checked && isCreateOrtuOpen()) applyAlamatOrtu();
-            });
-        }
-        if (ortuKelEl) {
-            ortuKelEl.addEventListener('change', function() {
-                if (alamatSama && alamatSama.checked && isCreateOrtuOpen()) applyAlamatOrtu();
-            });
-        }
+        collapseEl.addEventListener('hidden.bs.collapse', function() {
+            if (ortuSelect) ortuSelect.disabled = false;
 
-        // ===== Disable select orang tua saat create ortu dibuka (checkbox TETAP bisa dipakai) =====
-        if (collapseEl) {
-            collapseEl.addEventListener('show.bs.collapse', function() {
-                // disable pilih ortu existing
-                if (ortuSelect) ortuSelect.disabled = true;
+            // mode existing -> isi hidden dari select lagi
+            if (ortuHidden && ortuSelect) ortuHidden.value = ortuSelect.value || '';
 
-                // checkbox tetap aktif -> jangan disable, jangan auto-uncheck
-                // tapi kita re-apply supaya sumber data pindah ke "ortu baru"
-                applyAlamatOrtu();
-            });
+            applyAlamatOrtu();
+        });
+    }
 
-            collapseEl.addEventListener('hidden.bs.collapse', function() {
-                if (ortuSelect) ortuSelect.disabled = false;
-
-                // balik ke mode existing -> re-apply supaya sumber data balik ke select
-                applyAlamatOrtu();
-            });
-        }
-
-        // initial run
-        applyAlamatOrtu();
-    });
+    // initial run
+    applyAlamatOrtu();
+});
 </script>
 @endsection
