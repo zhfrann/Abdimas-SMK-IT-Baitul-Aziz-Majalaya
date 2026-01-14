@@ -9,6 +9,7 @@ use App\Http\Controllers\AssesmentSumatifController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DummyExcelController;
 use App\Http\Controllers\EkstrakurikulerController;
+use App\Http\Controllers\EkstrakurikulerSiswaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IntrakurikulerController;
 use App\Http\Controllers\LingkupMateriController;
@@ -60,7 +61,21 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('assesment-sumatif', AssesmentSumatifController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
     })->middleware('role:Guru Mapel|Bagian Akademik');
 
-    Route::resource('ekstrakurikuler', EkstrakurikulerController::class);
+    Route::resource('ekstrakurikuler', EkstrakurikulerController::class)->middleware('role:Guru Mapel|Bagian Akademik');
+    Route::prefix('ekstrakurikuler/{ekstrakurikuler}')->group(function () {
+        Route::get('manage-siswa/create', [EkstrakurikulerSiswaController::class, 'create'])
+            ->name('ekstrakurikuler.manage-siswa.create');
+        Route::post('manage-siswa', [EkstrakurikulerSiswaController::class, 'store'])
+            ->name('ekstrakurikuler.manage-siswa.store');
+        Route::post('manage-siswa/add-existing', [EkstrakurikulerSiswaController::class, 'addExistingSiswa'])
+            ->name('ekstrakurikuler.manage-siswa.add-existing');
+        Route::resource('manage-siswa', EkstrakurikulerSiswaController::class)
+            ->only(['index', 'destroy'])
+            ->names('ekstrakurikuler.manage-siswa');
+
+        Route::get('ajax/search-siswa', [EkstrakurikulerSiswaController::class, 'ajaxSearchSiswa'])
+            ->name('ekstrakurikuler.ajax.search-siswa');
+    })->middleware('role:Guru Mapel|Bagian Akademik');
 
     Route::resource('tujuan_pembelajaran', TujuanPembelajaranController::class);
     Route::get('assesment_sumatif/detail', [AssesmentSumatifController::class, 'detailAssesmentSumatif'])->name('assesment_sumatif.detail');

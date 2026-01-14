@@ -393,19 +393,20 @@ return new class extends Migration
 
         Schema::create('siswa_ekstrakurikuler', function (Blueprint $table) {
             $table->increments('siswa_ekstrakurikuler_id');
-            $table->unsignedInteger('riwayat_kelas_id');
+            $table->unsignedBigInteger('siswa_id');
+
             $table->unsignedInteger('ekstrakurikuler_id');
             $table->timestamps();
 
-            $table->foreign('riwayat_kelas_id')
-                ->references('riwayat_kelas_id')->on('riwayat_kelas')
+            $table->foreign('siswa_id')
+                ->references('siswa_id')->on('siswa')
                 ->cascadeOnUpdate()->cascadeOnDelete();
 
             $table->foreign('ekstrakurikuler_id')
                 ->references('ekstrakurikuler_id')->on('ekstrakurikuler')
                 ->cascadeOnUpdate()->cascadeOnDelete();
 
-            $table->unique(['riwayat_kelas_id', 'ekstrakurikuler_id'], 'uniq_siswa_ekskul');
+            $table->unique(['siswa_id', 'ekstrakurikuler_id'], 'uniq_siswa_ekskul');
         });
     }
 

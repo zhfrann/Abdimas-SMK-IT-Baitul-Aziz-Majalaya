@@ -13,13 +13,13 @@ class SiswaEkstrakurikuler extends Model
     protected $keyType = 'int';
 
     protected $fillable = [
-        'riwayat_kelas_id',
+        'siswa_id',
         'ekstrakurikuler_id',
     ];
 
-    public function riwayatKelas(): BelongsTo
+    public function siswa(): BelongsTo
     {
-        return $this->belongsTo(RiwayatKelas::class, 'riwayat_kelas_id', 'riwayat_kelas_id');
+        return $this->belongsTo(Siswa::class, 'siswa_id', 'siswa_id');
     }
 
     public function ekstrakurikuler(): BelongsTo

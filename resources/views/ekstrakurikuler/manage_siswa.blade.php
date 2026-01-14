@@ -1,0 +1,172 @@
+@extends('layouts.master')
+
+@section('title', 'Manage Siswa Ekstrakurikuler')
+
+@section('css')
+    <link rel="stylesheet" href="/build/css/plugins/style.css" />
+    <style>
+        /* ...dark mode css... */
+    </style>
+@endsection
+
+@section('content')
+    <x-breadcrumb item="Ekstrakurikuler" link="{{ route('ekstrakurikuler.index') }}" active="Manage Siswa" />
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h5>Kelola Siswa Ekstrakurikuler: {{ $ekskul->nama_pelajaran }} ({{ $ekskul->tahunAjaran->tahun }}
+                {{ $ekskul->tahunAjaran->semester }})</h5>
+            <div>
+                <button type="button" class="btn btn-info mb-3" data-bs-toggle="modal" data-bs-target="#modalLoadSiswa">
+                    Load Siswa
+                </button>
+                <a href="{{ route('ekstrakurikuler.manage-siswa.create', $ekskul->ekstrakurikuler_id) }}"
+                    class="btn btn-success mb-3 ms-2">
+                    Tambah Siswa Baru
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+
+            <div class="mb-3">
+                <label for="siswa_id">Pilih Siswa</label>
+                <div class="table-responsive" style="max-height:400px;">
+                    <table class="table" id="pc-dt-simple">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Siswa</th>
+                                <th>NIS</th>
+                                <th>Kelas Terakhir</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($siswaEkskul as $item)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $item->siswa->nama ?? '-' }}</td>
+                                    <td>{{ $item->siswa->nis ?? '-' }}</td>
+                                    <td>
+                                        @php
+                                            $rk = $item->siswa->riwayatKelas()->latest('riwayat_kelas_id')->first();
+                                        @endphp
+                                        {{ $rk?->kelasAjar?->kelas?->nama_kelas ?? '-' }}
+                                    </td>
+                                    <td>
+                                        <form method="POST"
+                                            action="{{ route('ekstrakurikuler.manage-siswa.destroy', [$ekskul->ekstrakurikuler_id, $item->siswa_ekstrakurikuler_id]) }}"
+                                            class="d-inline delete-siswa-form">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-light-danger btn-sm">Hapus</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                @error('siswa_id')
+                    <div class="text-danger">{{ $message }}</div>
+                @enderror
+            </div>
+            <a href="{{ route('ekstrakurikuler.index') }}" class="btn btn-secondary">Kembali</a>
+        </div>
+    </div>
+
+    {{-- Modal Load Siswa --}}
+    <div class="modal fade" id="modalLoadSiswa" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form id="formLoadSiswa" method="POST"
+                    action="{{ route('ekstrakurikuler.manage-siswa.add-existing', $ekskul->ekstrakurikuler_id) }}">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title">Load Siswa ke Ekstrakurikuler</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="selectSiswa" class="form-label">Cari Siswa (Nama, Kelas, Tahun, NIS/NISN)</label>
+                            <select id="selectSiswa" name="siswa_id" class="form-select" style="width:100%"
+                                required></select>
+                            @error('siswa_id')
+                                <div class="text-danger mt-2">{{ $message }}</div>
+                            @enderror
+                            <div id="infoSiswaTerpilih" class="mt-2"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Tambahkan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@section('scripts')
+    <script type="module">
+        import {
+            DataTable
+        } from '/build/js/plugins/module.js';
+        window.dt = new DataTable('#pc-dt-simple');
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.delete-siswa-form').forEach(function(form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    if (confirm('Yakin ingin menghapus siswa dari ekskul ini?')) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script src="/build/js/plugins/choices.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectSiswa = document.getElementById('selectSiswa');
+            if (selectSiswa) {
+                const siswaChoices = new Choices(selectSiswa, {
+                    searchEnabled: true,
+                    placeholder: true,
+                    placeholderValue: 'Cari siswa...',
+                    shouldSort: false,
+                    itemSelectText: '',
+                    searchResultLimit: 15,
+                    renderChoiceLimit: 15
+                });
+
+                let debounceTimeout;
+                selectSiswa.addEventListener('search', function(event) {
+                    clearTimeout(debounceTimeout);
+                    const q = event.detail.value;
+                    if (!q || q.length < 2) return;
+                    debounceTimeout = setTimeout(function() {
+                        fetch("{{ route('ekstrakurikuler.ajax.search-siswa', $ekskul->ekstrakurikuler_id) }}?q=" +
+                                encodeURIComponent(q))
+                            .then(res => res.json())
+                            .then(data => {
+                                siswaChoices.setChoices(data.results, 'id', 'text', true);
+                            });
+                    }, 300);
+                });
+
+                selectSiswa.addEventListener('change', function() {
+                    const label = siswaChoices.getValue().length ? siswaChoices.getValue()[0].label : '';
+                    document.getElementById('infoSiswaTerpilih').textContent = label ? 'Terpilih: ' +
+                        label : '';
+                });
+            }
+        });
+    </script>
+@endsection

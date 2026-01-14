@@ -80,7 +80,8 @@
                                             </form>
                                         </td>
                                         <td>
-                                            <a href="#" class="btn btn-sm btn-light-primary mb-1">Manage Siswa</a>
+                                            <a href="{{ route('ekstrakurikuler.manage-siswa.index', $item->ekstrakurikuler_id) }}"
+                                                class="btn btn-sm btn-light-primary mb-1">Manage Siswa</a>
                                             <a href="{{ route('penilaian_ekstrakurikuler.index') }}"
                                                 class="btn btn-sm btn-light-primary mb-1">Penilaian</a>
                                         </td>
