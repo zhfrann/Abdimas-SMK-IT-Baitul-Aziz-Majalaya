@@ -1,0 +1,185 @@
+Provinsi
+PK  provinsi_id STRING NOT NULL
+    nama        STRING NOT NULL
+
+
+Kabupaten
+PK  kabupaten_id STRING NOT NULL
+FK  provinsi_id  STRING NOT NULL
+    nama         STRING NOT NULL
+
+
+Kecamatan
+PK  kecamatan_id STRING NOT NULL
+FK  kabupaten_id STRING NOT NULL
+    nama         STRING NOT NULL
+
+
+Kelurahan
+PK  kelurahan_id STRING NOT NULL
+FK  kecamatan_id STRING NOT NULL
+    nama         STRING NOT NULL
+
+
+Sekolah
+PK  npsn         INT NOT NULL
+    nama_sekolah STRING NOT NULL
+    nss
+    alamat
+    kode_pos
+FK  kelurahan_id
+    website
+    email
+    nama_kepala_sekolah
+
+
+Staff
+PK  staff_id INT NOT NULL
+    nip      STRING NOT NULL
+    nama     STRING NOT NULL
+    jenis_kelamin ENUM('l', 'p') NOT NULL
+
+
+Siswa
+PK  siswa_id 	          INT NOT NULL
+    nis      	          STRING NOT NULL UNIQUE
+    nisn     	          STRING NOT NULL UNIQUE
+    nama                  STRING NOT NULL
+    jenis_kelamin         ENUM('l','p') NOT NULL
+FK  tempat_lahirtempat_lahir_kabupaten_id          STRING NOT NULL          *pakai data kabupaten
+    tanggal_lahir         DATE NOT NULL
+    agama                 STRING NOT NULL
+    pendidikan_sebelumnya STRING NOT NULL
+    alamat                STRING NOT NULL
+FK  orang_tua_id          INT NOT NULL
+FK  kelurahan_id          STRING NOT NULL
+FK  user_id               INT NOT NULL
+
+
+Orang_Tua
+PK  orang_tua_id   INT NOT NULL
+    nama_ayah      STRING NOT NULL
+    nama_ibu       STRING NOT NULL
+    pekerjaan_ayah STRING NOT NULL
+    pekerjaan_ibu  STRING NOT NULL
+    jalan          STRING NOT NULL
+FK  kelurahan_id   STRING NOT NULL
+FK  user_id        INT NOT NULL
+
+
+User
+PK  user_id      INT NOT NULL
+    nama         STRING NOT NULL
+    username     STRING NOT NULL UNIQUE
+    password     STRING NOT NULL
+FK  siswa_id     INT NULLABLE
+FK  orang_tua_id INT NULLABLE
+FK  pegawai_id   INT NULLABLE
+
+
+Tahun_Ajaran
+PK  tahun_ajaran_id INT NOT NULL
+    tahun           STRING NOT NULL
+    semester        ENUM('Ganjil', 'Genap') NOT NULL
+
+
+Kelas
+PK  kelas_id   INT NOT NULL
+    nama_kelas STRING NOT NULL
+
+
+Riwayat_Kelas
+PK  riwayat_kelas_id INT NOT NULL
+FK  siswa_id         INT NOT NULL
+FK  kelas_ajar_id    INT NOT NULL
+
+
+Kelas_Ajar
+PK  kelas_ajar_id   INT NOT NULL
+FK  kelas_id        INT NOT NULL
+FK  tahun_ajaran_id INT NOT NULL
+FK  wali_user_id    INT NOT NULL
+
+
+Intrakurikuler
+PK  intrakurikuler_id INT NOT NULL
+    nama_pelajaran    STRING NOT NULL
+FK  kelas_ajar_id     INT NOT NULL
+FK  pengampu_user_id  INT NOT NULL    *sebagai guru pengampu mapel intrakurikuler
+
+
+Kehadiran_Intrakurikuler
+PK  kehadiran_intrakurikuler_id INT NOT NULL
+FK  intrakurikuler_id           INT NOT NULL
+    sakit                       INT NOT NULL DEFAULT(0)
+    izin                        INT NOT NULL DEFAULT(0)
+    absen                       INT NOT NULL DEFAULT(0)
+FK  riwayat_kelas_id            INT NOT NULL
+
+
+Tujuan_Pembelajajaran
+PK  tujuan_pembelajaran_id INT NOT NULL
+FK  intrakurikuler_id      INT NOT NULL
+    deskripsi              STRING NOT NULL
+
+
+Asesmen_Formatif
+PK  asesmen_formatif_id         INT NOT NULL
+FK  intrakurikuler_id           INT NOT NULL
+    deskripsi_catatan_tertinggi TEXT NOT NULL
+    deskripsi_cacatan_terendah  TEXT NOT NULL
+
+
+Asesmen_Formatif_Detail
+PK  asesmen_formatif_detail_id INT NOT NULL
+FK  asesmen_formatif_id        INT NOT NULL
+FK  tujuan_pembelajaran_id     INT NOT NULL
+    kktp                       BOOL NOT NULL  *1 jika tujuan pembelajaran tercapai, 0 sebaliknya
+    tampil                     BOOL NOT NULL  *1 jika ingin ditampilkan di rapor, 0 sebaliknya
+
+
+Lingkup_Materi
+PK  lingkup_materi_id INT NOT NULL
+FK  intrakurikuler_id INT NOT NULL
+    nama_materi       STRING NOT NULL
+
+
+Asesmen_Sumatif
+PK  asesmen_sumatif_id INT NOT NULL
+FK  intrakurikuler_id  INT NOT NULL
+FK  tahun_ajaran_id    INT NOT NULL
+    asesmen_type       ENUM(sumatif_lingkup, test, non_test, sas)
+FK  lingkup_materi_id  INT NULLABLE
+    asesment_no        INT NULLABLE
+
+
+Skor_Asesmen_Siswa
+PK  skor_asesmen_siswa_id INT NOT NULL
+FK  riwayat_kelas_id      INT NOT NULL UNIQUE
+FK  asesmen_sumatif_id    INT NOT NULL UNIQUE
+    nilai                 INT NULLABLE
+    tahun_ajaran_id       INT NOT NULL
+
+
+Ekstrakurikuler
+PK  ekstrakurikuler_id INT NOT NULL
+    nama_pelajaran     STRING NOT NULL
+FK  tahun_ajaran_id    INT NOT NULL
+FK  user_id            INT NOT NULL
+
+
+Kehadiran_Ekstrakurikuler
+PK  kehadiran_ekstrakurikuler_id INT NOT NULL
+FK  ekstrakurikuler_id           INT NOT NULL
+    sakit                        INT NOT NULL DEFAULT(0)
+    izin                         INT NOT NULL DEFAULT(0)
+    absen                        INT NOT NULL DEFAULT(0)
+
+
+Siswa_Ekstrakurikuler
+PK  siswa_ekstrakurikuler_id INT NOT NULL
+FK  siswa_id                 INT NOT NULL
+FK  ekstrakurikuler_id       INT NOT NULL
+
+
+
