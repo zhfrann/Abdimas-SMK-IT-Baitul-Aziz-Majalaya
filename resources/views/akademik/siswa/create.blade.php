@@ -443,6 +443,12 @@
                 if (kelChoices) kelChoices.enable();
                 if (kelSelectEl) kelSelectEl.disabled = false;
                 if (hiddenEl) hiddenEl.value = '';
+
+                // if (kelSelectEl) {
+                //     kelSelectEl.addEventListener('change', function() {
+                //         if (hiddenEl) hiddenEl.value = kelSelectEl.value;
+                //     });
+                // }
             }
 
             // ===== Init choices remote =====
@@ -477,6 +483,11 @@
 
             const kelSiswaEl = document.getElementById('kelurahan_id');
             const hiddenKelSiswa = document.getElementById('kelurahan_id_hidden');
+            if (kelSiswaEl && hiddenKelSiswa) {
+                kelSiswaEl.addEventListener('change', function() {
+                    hiddenKelSiswa.value = kelSiswaEl.value;
+                });
+            }
 
             const collapseEl = document.getElementById('collapseOrtu');
 
