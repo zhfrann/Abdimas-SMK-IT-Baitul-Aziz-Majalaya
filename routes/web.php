@@ -61,6 +61,7 @@ Route::middleware(['auth'])->group(function () {
     })->middleware('role:Guru Mapel|Bagian Akademik');
 
     Route::resource('ekstrakurikuler', EkstrakurikulerController::class);
+
     Route::resource('tujuan_pembelajaran', TujuanPembelajaranController::class);
     Route::get('assesment_sumatif/detail', [AssesmentSumatifController::class, 'detailAssesmentSumatif'])->name('assesment_sumatif.detail');
     Route::resource('assesment_sumatif', AssesmentSumatifController::class);
@@ -84,4 +85,3 @@ Route::get('/wilayah/kecamatan/{kabupaten_id}', [WilayahController::class, 'keca
 Route::get('/wilayah/kelurahan/{kecamatan_id}', [WilayahController::class, 'kelurahan']);
 Route::get('ajax/tempat-lahir/kabupaten', [WilayahController::class, 'searchKabupaten'])->name('ajax.tempat_lahir.kabupaten');
 Route::get('ajax/domisili/kelurahan', [WilayahController::class, 'searchKelurahan'])->name('ajax.domisili.kelurahan');
-
