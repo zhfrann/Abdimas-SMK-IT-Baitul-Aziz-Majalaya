@@ -60,7 +60,7 @@ class StaffController extends Controller
             return redirect()->route('akademik.staff.index')->with('success', 'Guru berhasil dibuat');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'Gagal menyimpan data: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'Terjadi kesalahan. Gagal menyimpan data.']);
         }
     }
 
@@ -94,7 +94,7 @@ class StaffController extends Controller
                 $user->password = Hash::make($request->password);
             }
             $user->save();
-            // $user->syncRoles([$request->role]);
+            // $user->syncRoles([$request->role]);  //karena role tidak bisa diupdate
 
             DB::table('staff')->where('staff_id', $staff->staff_id)->update([
                 // 'nip' => $request->nip,
@@ -107,7 +107,25 @@ class StaffController extends Controller
             return redirect()->route('akademik.staff.index')->with('success', 'Data staff berhasil diupdate');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'Gagal update data: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'Terjadi kesalahan. Gagal update data.']);
+        }
+    }
+
+    public function destroy($id)
+    {
+        $user = User::findOrFail($id);
+        DB::beginTransaction();
+        try {
+            // Hapus data staff di tabel staff
+            DB::table('staff')->where('user_id', $user->id)->delete();
+
+            // Hapus user
+            $user->delete();
+            DB::commit();
+            return redirect()->route('akademik.staff.index')->with('success', 'Staff berhasil dihapus');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Tidak dapat menghapus staff. Pastikan tidak ada data terkait.');
         }
     }
 }

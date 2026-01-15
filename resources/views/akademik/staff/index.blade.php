@@ -25,7 +25,10 @@
                 </div>
                 <div class="card-body table-border-style">
                     @if (session('success'))
-                        <div class="alert alert-success mb-3">{{ session('success') }}</div>
+                        <div class="alert alert-success">{{ session('success') }}</div>
+                    @endif
+                    @if (session('error'))
+                        <div class="alert alert-danger">{{ session('error') }}</div>
                     @endif
                     <div class="table-responsive">
                         <table class="table" id="pc-dt-simple">
@@ -48,6 +51,13 @@
                                         <td>
                                             <a href="{{ route('akademik.staff.edit', $user->id) }}"
                                                 class="btn btn-sm btn-light-warning mb-1">Edit</a>
+                                            <form action="{{ route('akademik.staff.destroy', $user->id) }}" method="POST"
+                                                class="d-inline form-delete-staff">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                    class="btn btn-sm btn-light-danger mb-1">Hapus</button>
+                                            </form>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -69,4 +79,17 @@
         window.dt = new DataTable('#pc-dt-simple');
     </script>
     <!-- [Page Specific JS] end -->
+
+    <script>
+        // Konfirmasi hapus staff (event delegation agar support DataTables)
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.form-delete-staff').forEach(function(form) {
+                form.addEventListener('submit', function(e) {
+                    if (!window.confirm('Yakin ingin menghapus staff ini?')) {
+                        e.preventDefault();
+                    }
+                });
+            });
+        });
+    </script>
 @endsection
