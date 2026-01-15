@@ -63,7 +63,76 @@ class KelasController extends Controller
             return redirect()->route('akademik.kelas.index')->with('success', 'Kelas ajar berhasil ditambah');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->withErrors(['nama_kelas' => 'Terjadi kesalahan: ' . $e->getMessage()])->withInput();
+            return redirect()->back()->withErrors(['nama_kelas' => 'Terjadi kesalahan. Gagal menambah kelas.'])->withInput();
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'nama_kelas' => 'required|string|max:100',
+            'tahun_ajaran_id' => 'required|exists:tahun_ajaran,tahun_ajaran_id',
+            'wali_user_id' => 'required|exists:users,id',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $kelasAjar = KelasAjar::findOrFail($id);
+
+            // Update nama kelas jika berubah
+            $kelas = Kelas::firstOrCreate([
+                'nama_kelas' => $request->nama_kelas,
+            ]);
+
+            // Cek duplikat kelas ajar (kelas_id + tahun_ajaran_id, kecuali diri sendiri)
+            $exists = KelasAjar::where('kelas_id', $kelas->kelas_id)
+                ->where('tahun_ajaran_id', $request->tahun_ajaran_id)
+                ->where('kelas_ajar_id', '!=', $id)
+                ->exists();
+            if ($exists) {
+                DB::rollBack();
+                return redirect()->back()
+                    ->withErrors(['nama_kelas' => 'Kombinasi kelas dan tahun ajaran sudah ada!'])
+                    ->withInput();
+            }
+
+            $kelasAjar->update([
+                'kelas_id' => $kelas->kelas_id,
+                'tahun_ajaran_id' => $request->tahun_ajaran_id,
+                'wali_user_id' => $request->wali_user_id,
+            ]);
+
+            DB::commit();
+            return redirect()->route('akademik.kelas.index')->with('success', 'Kelas ajar berhasil diupdate');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withErrors(['nama_kelas' => 'Terjadi kesalahan. Gagal perbarui data kelas.'])->withInput();
+        }
+    }
+
+    public function destroy($id)
+    {
+        DB::beginTransaction();
+        try {
+            $kelasAjar = KelasAjar::findOrFail($id);
+            $kelas_id = $kelasAjar->kelas_id;
+
+            // Hapus kelas ajar
+            $kelasAjar->delete();
+
+            // Cek apakah masih ada kelas ajar lain dengan kelas_id yang sama
+            $remaining = KelasAjar::where('kelas_id', $kelas_id)->exists();
+
+            // Jika tidak ada, hapus data di entitas Kelas
+            if (!$remaining) {
+                Kelas::where('kelas_id', $kelas_id)->delete();
+            }
+
+            DB::commit();
+            return redirect()->route('akademik.kelas.index')->with('success', 'Kelas ajar berhasil dihapus');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Tidak dapat menghapus kelas ajar. Pastikan tidak ada data terkait.');
         }
     }
 }

@@ -20,6 +20,12 @@
                     </button>
                 </div>
                 <div class="card-body">
+                    @if (session('success'))
+                        <div class="alert alert-success">{{ session('success') }}</div>
+                    @endif
+                    @if (session('error'))
+                        <div class="alert alert-danger">{{ session('error') }}</div>
+                    @endif
                     <table class="table" id="pc-dt-simple">
                         <thead>
                             <tr>
@@ -29,6 +35,7 @@
                                 <th>Semester</th>
                                 <th>Wali Kelas</th>
                                 <th>Manage Siswa</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -43,6 +50,21 @@
                                         <a href="{{ route('akademik.siswa.index', $ka->kelas_ajar_id) }}"
                                             class="btn btn-sm btn-primary">Manage Siswa</a>
                                     </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-light-warning btn-edit-kelas"
+                                            data-id="{{ $ka->kelas_ajar_id }}"
+                                            data-nama_kelas="{{ $ka->kelas->nama_kelas ?? '' }}"
+                                            data-tahun_ajaran_id="{{ $ka->tahunAjaran->tahun_ajaran_id ?? '' }}"
+                                            data-wali_user_id="{{ $ka->waliKelas->id ?? '' }}">
+                                            Edit
+                                        </button>
+                                        <form action="{{ route('akademik.kelas.destroy', $ka->kelas_ajar_id) }}"
+                                            method="POST" class="d-inline form-delete-kelas">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-light-danger">Hapus</button>
+                                        </form>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -55,10 +77,11 @@
     <!-- Modal Create Kelas Ajar -->
     <div class="modal fade" id="modalCreateKelasAjar" tabindex="-1" aria-labelledby="modalCreateKelasAjarLabel"
         aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <form id="formCreateKelasAjar" method="POST" action="{{ route('akademik.kelas.store') }}">
                     @csrf
+                    <input type="hidden" name="_method" id="kelasAjarMethod" value="POST">
                     <div class="modal-header">
                         <h5 class="modal-title" id="modalCreateKelasAjarLabel">Tambah Kelas Ajar</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -128,5 +151,49 @@
                 myModal.show();
             });
         @endif
+
+        // Modal edit kelas (event delegation agar support DataTables)
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('btn-edit-kelas')) {
+                const btn = e.target;
+                const id = btn.getAttribute('data-id');
+                const nama_kelas = btn.getAttribute('data-nama_kelas');
+                const tahun_ajaran_id = btn.getAttribute('data-tahun_ajaran_id');
+                const wali_user_id = btn.getAttribute('data-wali_user_id');
+                const modal = new bootstrap.Modal(document.getElementById('modalCreateKelasAjar'));
+                // Set form action & method
+                const form = document.getElementById('formCreateKelasAjar');
+                form.action = "{{ url('akademik/kelas') }}/" + id;
+                document.getElementById('kelasAjarMethod').value = 'PUT';
+                // Set value
+                document.getElementById('nama_kelas').value = nama_kelas;
+                document.getElementById('tahun_ajaran_id').value = tahun_ajaran_id;
+                document.getElementById('wali_user_id').value = wali_user_id;
+                // Set modal title
+                document.getElementById('modalCreateKelasAjarLabel').textContent = 'Edit Kelas Ajar';
+                modal.show();
+            }
+        });
+
+        // Modal tambah (reset ke mode tambah)
+        document.querySelector('[data-bs-target="#modalCreateKelasAjar"]').addEventListener('click', function() {
+            const form = document.getElementById('formCreateKelasAjar');
+            form.action = "{{ route('akademik.kelas.store') }}";
+            document.getElementById('kelasAjarMethod').value = 'POST';
+            document.getElementById('nama_kelas').value = '';
+            document.getElementById('tahun_ajaran_id').value = '';
+            document.getElementById('wali_user_id').value = '';
+            document.getElementById('modalCreateKelasAjarLabel').textContent = 'Tambah Kelas Ajar';
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.form-delete-kelas').forEach(function(form) {
+                form.addEventListener('submit', function(e) {
+                    if (!window.confirm('Yakin ingin menghapus kelas ajar ini?')) {
+                        e.preventDefault();
+                    }
+                });
+            });
+        });
     </script>
 @endsection

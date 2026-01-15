@@ -70,7 +70,7 @@
     <!-- Modal Create/Edit Tahun Ajaran -->
     <div class="modal fade" id="modalCreateTahunAjaran" tabindex="-1" aria-labelledby="modalCreateTahunAjaranLabel"
         aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <form id="formCreateTahunAjaran" method="POST" action="{{ route('akademik.tahun_ajaran.store') }}">
                     @csrf
