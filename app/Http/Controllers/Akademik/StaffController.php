@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Role;
 
 class StaffController extends Controller
@@ -25,11 +26,15 @@ class StaffController extends Controller
 
     public function store(Request $request)
     {
+        $allowedRoles = Role::whereIn('name', ['Guru Mapel', 'Wali Kelas'])
+            ->pluck('name')
+            ->toArray();
+
         $request->validate([
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users,username',
             'password' => 'required|string|min:6|confirmed',
-            'role' => 'required|in:guru mapel,wali kelas',
+            'role' => ['required', Rule::in($allowedRoles)],
             'jenis_kelamin' => 'required|in:l,p',
         ]);
 
