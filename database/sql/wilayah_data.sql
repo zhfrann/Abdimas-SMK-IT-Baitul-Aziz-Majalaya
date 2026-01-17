@@ -16,8 +16,8 @@
 
 
 -- Dumping database structure for abdimas_test
-CREATE DATABASE IF NOT EXISTS `abdimas_test` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `abdimas_test`;
+CREATE DATABASE IF NOT EXISTS `abdimas` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `abdimas`;
 
 -- Dumping structure for table abdimas_test.kabupaten
 CREATE TABLE IF NOT EXISTS `kabupaten` (
