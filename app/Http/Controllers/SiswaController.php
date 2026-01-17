@@ -340,4 +340,81 @@ class SiswaController extends Controller
         // return redirect()->route('akademik.siswa.index', $kelas_ajar->kelas_ajar_id)
         //     ->with('success', 'Siswa berhasil dikeluarkan dari kelas ini.');
     }
+
+    public function ajaxSearchSiswa(Request $request, KelasAjar $kelas_ajar)
+    {
+        $q = $request->input('q');
+        $tahunAjaranId = $kelas_ajar->tahun_ajaran_id;
+
+        // Cari siswa yang pernah punya riwayat kelas di tahun ajaran sebelumnya, tapi belum ada di kelas_ajar ini
+        $siswaQuery = Siswa::query()
+            ->whereHas('riwayatKelas', function ($q1) use ($tahunAjaranId) {
+                $q1->whereHas('kelasAjar', function ($q2) use ($tahunAjaranId) {
+                    $q2->where('tahun_ajaran_id', '<', $tahunAjaranId);
+                });
+            })
+            ->whereDoesntHave('riwayatKelas', function ($q3) use ($kelas_ajar) {
+                $q3->where('kelas_ajar_id', $kelas_ajar->kelas_ajar_id);
+            })
+            ->where(function ($query) use ($q) {
+                $query->where('nama', 'like', "%$q%")
+                    ->orWhere('nis', 'like', "%$q%")
+                    ->orWhere('nisn', 'like', "%$q%");
+            });
+
+        $results = $siswaQuery->get()->map(function ($siswa) {
+            $rk = $siswa->riwayatKelas()->latest('riwayat_kelas_id')->first();
+            $kelas = $rk?->kelasAjar?->kelas?->nama_kelas ?? '-';
+            $tahun = $rk?->kelasAjar?->tahunAjaran?->tahun ?? '-';
+            $semester = $rk?->kelasAjar?->tahunAjaran?->semester ?? '-';
+
+            return [
+                'id' => $siswa->siswa_id,
+                'text' => "{$siswa->nama} | Kelas: {$kelas} | Tahun: {$tahun} {$semester} | NIS: {$siswa->nis} | NISN: {$siswa->nisn}"
+            ];
+        });
+
+        return response()->json(['results' => $results]);
+    }
+
+    public function addExistingSiswa(Request $request, KelasAjar $kelas_ajar)
+    {
+        $request->validate([
+            'siswa_id' => 'required|exists:siswa,siswa_id',
+        ]);
+
+        // Cek apakah sudah ada di kelas ini
+        $exists = RiwayatKelas::where('kelas_ajar_id', $kelas_ajar->kelas_ajar_id)
+            ->where('siswa_id', $request->siswa_id)
+            ->exists();
+
+        if ($exists) {
+            return back()->withErrors(['siswa_id' => 'Siswa sudah terdaftar di kelas ini.']);
+        }
+
+        // Cek apakah siswa sudah punya kelas lain di tahun ajaran & semester yang sama
+        $tahunAjaranId = $kelas_ajar->tahun_ajaran_id;
+        $semester = $kelas_ajar->tahunAjaran->semester;
+
+        $sudahAdaDiTahunAjaranIni = RiwayatKelas::where('siswa_id', $request->siswa_id)
+            ->whereHas('kelasAjar', function ($q) use ($tahunAjaranId, $semester) {
+                $q->where('tahun_ajaran_id', $tahunAjaranId)
+                    ->whereHas('tahunAjaran', function ($q2) use ($semester) {
+                        $q2->where('semester', $semester);
+                    });
+            })
+            ->exists();
+
+        if ($sudahAdaDiTahunAjaranIni) {
+            return back()->withErrors(['siswa_id' => 'Siswa sudah terdaftar di kelas lain pada tahun ajaran & semester ini.']);
+        }
+
+        // Tambahkan ke kelas_ajar (naik kelas)
+        RiwayatKelas::create([
+            'siswa_id' => $request->siswa_id,
+            'kelas_ajar_id' => $kelas_ajar->kelas_ajar_id,
+        ]);
+
+        return back()->with('success', 'Siswa berhasil dimasukkan ke kelas.');
+    }
 }
