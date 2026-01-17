@@ -3,87 +3,167 @@
 @section('title', 'Manajemen Siswa')
 
 @section('css')
-  <link rel="stylesheet" href="/build/css/plugins/style.css" />
+    <link rel="stylesheet" href="/build/css/plugins/style.css" />
 @endsection
 
 @section('content')
-  <x-breadcrumb item="Manajemen Siswa" active="Manajemen Siswa" />
+    <x-breadcrumb item="Manajemen Siswa" active="Manajemen Siswa" />
 
-  <div class="row">
-    <div class="col-xl-12">
-      <div class="card">
-        <div class="card-header d-flex align-items-center justify-content-between">
-          <div>
-            <h5 class="mb-0">Daftar Siswa</h5>
-            <span class="d-block m-t-5">
-              {{ $kelas_ajar->tahunAjaran->tahun ?? '-' }} {{ $kelas_ajar->tahunAjaran->semester ?? '' }}
-              • {{ $kelas_ajar->kelas->nama_kelas ?? '-' }}
-            </span>
-          </div>
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <div>
+                        <h5 class="mb-0">Daftar Siswa</h5>
+                        <span class="d-block m-t-5">
+                            {{ $kelas_ajar->tahunAjaran->tahun ?? '-' }} {{ $kelas_ajar->tahunAjaran->semester ?? '' }}
+                            • {{ $kelas_ajar->kelas->nama_kelas ?? '-' }}
+                        </span>
+                    </div>
 
-          <div class="d-flex align-items-center gap-2 flex-wrap">
-            <a href="{{ route('akademik.siswa.create', $kelas_ajar->kelas_ajar_id) }}" class="btn btn-primary">
-              <i class="bi bi-plus-lg"></i> Tambah Siswa
-            </a>
-          </div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#modalAddExistingSiswa">
+                            Tambah Siswa dari Tahun Ajaran Sebelumnya
+                        </button>
+                        <a href="{{ route('akademik.siswa.create', $kelas_ajar->kelas_ajar_id) }}" class="btn btn-primary">
+                            <i class="bi bi-plus-lg"></i> Tambah Siswa
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body table-border-style">
+                    @if (session('success'))
+                        <div class="alert alert-success mb-3">{{ session('success') }}</div>
+                    @endif
+                    @if (session('error'))
+                        <div class="alert alert-danger">{{ session('error') }}</div>
+                    @endif
+                    @error('siswa_id')
+                        <div class="alert alert-danger mb-3">{{ $message }}</div>
+                    @enderror
+                    <div class="table-responsive">
+                        <table class="table" id="pc-dt-simple">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama</th>
+                                    <th>Username</th>
+                                    <th>NIS / NISN</th>
+                                    <th>Domisili</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @forelse ($riwayat as $r)
+                                    @php($s = $r->siswa)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $s?->user?->name ?? ($s?->nama ?? '-') }}</td>
+                                        <td>{{ $s?->user?->username ?? '-' }}</td>
+                                        <td>{{ $s?->nis ?? '-' }} / {{ $s?->nisn ?? '-' }}</td>
+                                        <td>
+                                            {{ $s?->kelurahan?->nama ?? '-' }},
+                                            {{ $s?->kelurahan?->kecamatan?->nama ?? '-' }}
+                                        </td>
+                                        <td>
+                                            @if ($s)
+                                                <a href="{{ route('akademik.siswa.edit', [$kelas_ajar->kelas_ajar_id, $s->siswa_id]) }}"
+                                                    class="btn btn-sm btn-light-warning mb-1">Edit</a>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center">Belum ada data siswa di kelas ini.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+
+            </div>
         </div>
-
-        <div class="card-body table-border-style">
-          @if (session('success'))
-            <div class="alert alert-success mb-3">{{ session('success') }}</div>
-          @endif
-
-          <div class="table-responsive">
-            <table class="table" id="pc-dt-simple">
-              <thead>
-                <tr>
-                  <th>No</th>
-                  <th>Nama</th>
-                  <th>Username</th>
-                  <th>NIS / NISN</th>
-                  <th>Domisili</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                @forelse ($riwayat as $r)
-                  @php($s = $r->siswa)
-                  <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $s?->user?->name ?? $s?->nama ?? '-' }}</td>
-                    <td>{{ $s?->user?->username ?? '-' }}</td>
-                    <td>{{ $s?->nis ?? '-' }} / {{ $s?->nisn ?? '-' }}</td>
-                    <td>
-                      {{ $s?->kelurahan?->nama ?? '-' }},
-                      {{ $s?->kelurahan?->kecamatan?->nama ?? '-' }}
-                    </td>
-                    <td>
-                      @if($s)
-                        <a href="{{ route('akademik.siswa.edit', [$kelas_ajar->kelas_ajar_id, $s->siswa_id]) }}"
-                           class="btn btn-sm btn-light-warning mb-1">Edit</a>
-                      @endif
-                    </td>
-                  </tr>
-                @empty
-                  <tr>
-                    <td colspan="6" class="text-center">Belum ada data siswa di kelas ini.</td>
-                  </tr>
-                @endforelse
-              </tbody>
-
-            </table>
-          </div>
-        </div>
-
-      </div>
     </div>
-  </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modalAddExistingSiswa" tabindex="-1" aria-labelledby="modalAddExistingSiswaLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="POST" action="{{ route('akademik.kelas.add-existing-siswa', $kelas_ajar->kelas_ajar_id) }}">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalAddExistingSiswaLabel">Pilih Siswa</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="existing_siswa_id">Cari Siswa</label>
+                        <select id="existing_siswa_id" name="siswa_id" class="form-control" required></select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Tambah</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection
 
 @section('scripts')
-  <script type="module">
-    import { DataTable } from '/build/js/plugins/module.js';
-    window.dt = new DataTable('#pc-dt-simple');
-  </script>
+    <script type="module">
+        import {
+            DataTable
+        } from '/build/js/plugins/module.js';
+        window.dt = new DataTable('#pc-dt-simple');
+    </script>
+
+    <script src="/build/js/plugins/choices.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const siswaSelect = document.getElementById('existing_siswa_id');
+            if (siswaSelect) {
+                const instance = new Choices(siswaSelect, {
+                    searchEnabled: true,
+                    placeholder: true,
+                    placeholderValue: 'Ketik nama/NIS/NISN...',
+                    searchPlaceholderValue: 'Cari...',
+                    shouldSort: false,
+                    itemSelectText: '',
+                    searchResultLimit: 15,
+                    renderChoiceLimit: 15
+                });
+
+                function debounce(fn, ms) {
+                    let t;
+                    return (...args) => {
+                        clearTimeout(t);
+                        t = setTimeout(() => fn(...args), ms);
+                    };
+                }
+
+                const doSearch = debounce(async (value) => {
+                    const q = (value || '').trim();
+                    if (q.length < 2) return;
+                    const url = new URL(
+                        "{{ route('akademik.kelas.ajax.search-siswa', $kelas_ajar->kelas_ajar_id) }}",
+                        window.location.origin);
+                    url.searchParams.set('q', q);
+                    const res = await fetch(url.toString());
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    instance.setChoices((data.results || []).map(r => ({
+                        value: r.id,
+                        label: r.text
+                    })), 'value', 'label', true);
+                }, 300);
+
+                siswaSelect.addEventListener('search', function(event) {
+                    doSearch(event.detail.value);
+                });
+            }
+        });
+    </script>
 @endsection

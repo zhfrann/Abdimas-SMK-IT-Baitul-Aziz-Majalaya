@@ -43,6 +43,8 @@ Route::middleware(['auth', 'role:Bagian Akademik'])->prefix('akademik')->name('a
     Route::resource('kelas', KelasController::class);
     Route::prefix('kelas/{kelas_ajar}')->group(function () {
         Route::resource('siswa', SiswaController::class);
+        Route::get('ajax/search-siswa', [SiswaController::class, 'ajaxSearchSiswa'])->name('kelas.ajax.search-siswa');
+        Route::post('add-existing-siswa', [SiswaController::class, 'addExistingSiswa'])->name('kelas.add-existing-siswa');
     });
     Route::resource('staff', StaffController::class);
 });
