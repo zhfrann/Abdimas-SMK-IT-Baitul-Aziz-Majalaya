@@ -61,9 +61,17 @@
                                 <td><span class="badge bg-light-primary">{{ $r['total_akhir_semester'] ?? '-' }}</span></td>
                                 <td><span class="badge bg-light-primary">{{ $r['nilai_rapor'] ?? '-' }}</span></td>
                                 <td>
-                                    <a href="{{ route('assesment_sumatif.detail', [$intrakurikuler->intrakurikuler_id, $r['riwayat_kelas_id']]) }}">
+                                    {{-- 
+                                        - sumatif akhir lingkup materi (ambil datanya)
+                                        - sumatif akhir Semester
+                                        - 
+                                    --}}
+                                    <a href="{{ route('assesment_sumatif.detail', [
+                                        'intrakurikuler' => $intrakurikuler->intrakurikuler_id,
+                                        'riwayatKelas' => $r['riwayat_kelas_id'],
+                                    ]) }}">
                                         <button type="button" class="btn btn-sm btn-light-primary">Detail Nilai</button>
-                                    </a>
+                                    </a>  
                                 </td>
                             </tr>
                             @empty

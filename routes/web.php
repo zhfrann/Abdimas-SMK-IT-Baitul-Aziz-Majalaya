@@ -57,11 +57,31 @@ Route::middleware(['auth'])->group(function () {
         return view('dashboard.index');
     });
 
-    Route::resource('intrakurikuler', IntrakurikulerController::class)->middleware('role:Guru Mapel|Bagian Akademik');
-    Route::prefix('intrakurikuler/{intrakurikuler}')->group(function () {
-        Route::resource('lingkup-materi', LingkupMateriController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
-        Route::resource('assesment-sumatif', AssesmentSumatifController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
-    })->middleware('role:Guru Mapel|Bagian Akademik');
+    Route::resource('intrakurikuler', IntrakurikulerController::class)
+        ->middleware('role:Guru Mapel|Bagian Akademik');
+
+    Route::prefix('intrakurikuler/{intrakurikuler}')
+        ->middleware('role:Guru Mapel|Bagian Akademik')
+        ->group(function () {
+
+            Route::resource('lingkup-materi', LingkupMateriController::class)
+                ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+
+            Route::resource('assesment-sumatif', AssesmentSumatifController::class)
+                ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+
+            // ✅ DETAIL (GET)
+            Route::get('assesment-sumatif/{riwayatKelas}/detail', [AssesmentSumatifController::class, 'detailAssesmentSumatif'])
+                ->name('assesment_sumatif.detail');
+
+            // ✅ SIMPAN (POST kalau belum ada skor sama sekali)
+            Route::post('assesment-sumatif/{riwayatKelas}/detail', [AssesmentSumatifController::class, 'storeDetailAssesmentSumatif'])
+                ->name('assesment_sumatif.detail.store');
+
+            // ✅ UPDATE (PUT kalau sudah ada skor)
+            Route::put('assesment-sumatif/{riwayatKelas}/detail', [AssesmentSumatifController::class, 'updateDetailAssesmentSumatif'])
+                ->name('assesment_sumatif.detail.update');
+        });
 
     Route::resource('ekstrakurikuler', EkstrakurikulerController::class)->middleware('role:Guru Mapel|Bagian Akademik');
     Route::prefix('ekstrakurikuler/{ekstrakurikuler}')->group(function () {
@@ -80,8 +100,8 @@ Route::middleware(['auth'])->group(function () {
     })->middleware('role:Guru Mapel|Bagian Akademik');
 
     Route::resource('tujuan_pembelajaran', TujuanPembelajaranController::class);
-    Route::get('assesment_sumatif/detail', [AssesmentSumatifController::class, 'detailAssesmentSumatif'])->name('assesment_sumatif.detail');
-    Route::resource('assesment_sumatif', AssesmentSumatifController::class);
+    // Route::get('assesment_sumatif/detail', [AssesmentSumatifController::class, 'detailAssesmentSumatif'])->name('assesment_sumatif.detail');
+    // Route::resource('assesment_sumatif', AssesmentSumatifController::class);
     Route::get('assesment_formatif/detail', [AssesmentFormatifController::class, 'detailAssesmentFormatif'])->name('assesment_formatif.detail');
     Route::resource('assesment_formatif', AssesmentFormatifController::class);
     Route::resource('penilaian_ekstrakurikuler', PenilaianEkstrakurikulerController::class);
