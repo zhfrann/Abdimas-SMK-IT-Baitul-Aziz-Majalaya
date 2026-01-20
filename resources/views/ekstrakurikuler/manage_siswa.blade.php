@@ -46,15 +46,21 @@
                         </thead>
                         <tbody>
                             @foreach ($siswaEkskul as $item)
+                                @php
+                                    $nama_kelas_terakhir =
+                                        $item->siswa->riwayatKelasTerakhir->kelasAjar->kelas->nama_kelas ?? '-';
+
+                                    $tahun_ajaran_terakhir =
+                                        $item->siswa->riwayatKelasTerakhir->kelasAjar->tahunAjaran->tahun;
+
+                                    $semester_terakhir =
+                                        $item->siswa->riwayatKelasTerakhir->kelasAjar->tahunAjaran->semester;
+                                @endphp
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $item->siswa->nama ?? '-' }}</td>
                                     <td>{{ $item->siswa->nis ?? '-' }}</td>
-                                    <td>
-                                        @php
-                                            $rk = $item->siswa->riwayatKelas()->latest('riwayat_kelas_id')->first();
-                                        @endphp
-                                        {{ $rk?->kelasAjar?->kelas?->nama_kelas ?? '-' }}
+                                    <td>{{ $nama_kelas_terakhir . ' (' . $tahun_ajaran_terakhir . ' ' . $semester_terakhir . ')' }}
                                     </td>
                                     <td>
                                         <form method="POST"
@@ -74,7 +80,7 @@
                     <div class="text-danger">{{ $message }}</div>
                 @enderror
             </div>
-            <a href="{{ route('ekstrakurikuler.index') }}" class="btn btn-secondary">Kembali</a>
+            <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
         </div>
     </div>
 

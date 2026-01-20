@@ -82,8 +82,8 @@
 
                         </table>
                     </div>
+                    <a href="{{ url()->previous() }}" class="btn btn-light-secondary">Kembali</a>
                 </div>
-
             </div>
         </div>
     </div>

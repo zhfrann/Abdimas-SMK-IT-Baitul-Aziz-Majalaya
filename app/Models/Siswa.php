@@ -76,4 +76,10 @@ class Siswa extends Model
     {
         return $this->hasMany(SiswaEkstrakurikuler::class, 'siswa_id', 'siswa_id');
     }
+
+    public function riwayatKelasTerakhir()
+    {
+        return $this->hasOne(RiwayatKelas::class, 'siswa_id', 'siswa_id')
+            ->latest('riwayat_kelas_id');
+    }
 }

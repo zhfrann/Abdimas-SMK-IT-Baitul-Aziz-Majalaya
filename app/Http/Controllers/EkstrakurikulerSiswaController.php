@@ -19,7 +19,7 @@ class EkstrakurikulerSiswaController extends Controller
     {
         $ekskul = Ekstrakurikuler::with('tahunAjaran')->findOrFail($ekstrakurikuler_id);
 
-        $siswaEkskul = SiswaEkstrakurikuler::with('siswa.user')
+        $siswaEkskul = SiswaEkstrakurikuler::with(['siswa.user', 'siswa.riwayatKelasTerakhir.kelasAjar.kelas'])
             ->where('ekstrakurikuler_id', $ekskul->ekstrakurikuler_id)
             ->get();
 
