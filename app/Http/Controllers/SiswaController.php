@@ -417,4 +417,118 @@ class SiswaController extends Controller
 
         return back()->with('success', 'Siswa berhasil dimasukkan ke kelas.');
     }
+
+    public function ajaxSearchKelas(Request $request)
+    {
+        $q = $request->input('q');
+        $kelasAjar = KelasAjar::with(['kelas', 'tahunAjaran'])
+            ->whereHas('kelas', function ($query) use ($q) {
+                if ($q) $query->where('nama_kelas', 'like', "%$q%");
+            })
+            ->orWhereHas('tahunAjaran', function ($query) use ($q) {
+                if ($q) $query->where('tahun', 'like', "%$q%")->orWhere('semester', 'like', "%$q%");
+            })
+            ->limit(20)
+            ->get();
+
+        $results = $kelasAjar->map(function ($ka) {
+            return [
+                'id' => $ka->kelas_ajar_id,
+                'text' => "{$ka->kelas->nama_kelas} - {$ka->tahunAjaran->tahun} {$ka->tahunAjaran->semester}"
+            ];
+        });
+
+        return response()->json(['results' => $results]);
+    }
+
+    public function showLoadSiswaForm($kelas_ajar_id, Request $request)
+    {
+        $kelasTujuan = KelasAjar::with(['kelas', 'tahunAjaran'])->findOrFail($kelas_ajar_id);
+        $kelasAsalId = $request->input('kelas_asal_id');
+        $siswaList = [];
+        $kelasAsal = null;
+
+        if ($kelasAsalId) {
+            $riwayat = RiwayatKelas::where('kelas_ajar_id', $kelasAsalId)
+                ->with(['siswa.user'])
+                ->get();
+            $siswaList = $riwayat->map(function ($r) {
+                return $r->siswa;
+            });
+
+            $kelasAsal = KelasAjar::query()->with(['kelas', 'tahunAjaran'])->find($kelasAsalId);
+        }
+
+        return view('akademik.siswa.load_siswa', compact('kelasTujuan', 'kelasAsalId', 'siswaList', 'kelasAsal'));
+    }
+
+    public function loadSiswaFromKelas(Request $request, $kelas_ajar_id)
+    {
+        $request->validate([
+            'kelas_asal_id' => 'required|exists:kelas_ajar,kelas_ajar_id',
+            'siswa_ids' => 'required|array',
+            'siswa_ids.*' => 'exists:siswa,siswa_id',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $kelasTujuan = KelasAjar::with('tahunAjaran')->findOrFail($kelas_ajar_id);
+            $kelasAsal = KelasAjar::with('tahunAjaran')->findOrFail($request->kelas_asal_id);
+
+            function getTahunAwal($tahunStr)
+            {
+                return (int)explode('/', $tahunStr)[0];
+            }
+
+            $tahunTujuan = getTahunAwal($kelasTujuan->tahunAjaran->tahun);
+            $tahunAsal = getTahunAwal($kelasAsal->tahunAjaran->tahun);
+            $semesterTujuan = $kelasTujuan->tahunAjaran->semester;
+            $semesterAsal = $kelasAsal->tahunAjaran->semester;
+
+            $semesterMap = [
+                'Ganjil' => 1,
+                'Genap' => 2,
+            ];
+            $semTujuan = $semesterMap[$semesterTujuan] ?? 0;
+            $semAsal = $semesterMap[$semesterAsal] ?? 0;
+
+            if (
+                $tahunTujuan < $tahunAsal ||
+                ($tahunTujuan == $tahunAsal && $semTujuan <= $semAsal)
+            ) {
+                DB::rollBack();
+                return back()->withErrors(['kelas_asal_id' => 'Tidak bisa memindahkan ke tahun ajaran/semester yang sama atau lebih rendah.']);
+            }
+
+            $count = 0;
+            $tahunAjaranId = $kelasTujuan->tahun_ajaran_id;
+            foreach ($request->siswa_ids as $siswaId) {
+                $sudahAda = RiwayatKelas::where('siswa_id', $siswaId)
+                    ->whereHas('kelasAjar', function ($q) use ($tahunAjaranId) {
+                        $q->where('tahun_ajaran_id', $tahunAjaranId);
+                    })->exists();
+                if (!$sudahAda) {
+                    RiwayatKelas::create([
+                        'siswa_id' => $siswaId,
+                        'kelas_ajar_id' => $kelas_ajar_id,
+                    ]);
+                    $count++;
+                }
+            }
+
+            if ($count <= 0) {
+                DB::commit();
+                return redirect()->route('akademik.siswa.index', $kelas_ajar_id)
+                    ->with('warning', "$count siswa dimasukkan ke kelas. Semua siswa dari kelas asal sudah terdaftar di kelas tujuan pada tahun ajaran & semester ini.");
+            }
+
+            DB::commit();
+            return redirect()->route('akademik.siswa.index', $kelas_ajar_id)
+                ->with('success', "$count siswa berhasil dimasukkan ke kelas.");
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->withInput()->withErrors(['error' => 'Terjadi kesalahan. Gagal memuat data siswa']);
+        }
+    }
 }

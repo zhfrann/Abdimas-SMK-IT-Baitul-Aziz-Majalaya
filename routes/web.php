@@ -45,9 +45,15 @@ Route::middleware(['auth', 'role:Bagian Akademik'])->prefix('akademik')->name('a
         Route::resource('siswa', SiswaController::class);
         Route::get('ajax/search-siswa', [SiswaController::class, 'ajaxSearchSiswa'])->name('kelas.ajax.search-siswa');
         Route::post('add-existing-siswa', [SiswaController::class, 'addExistingSiswa'])->name('kelas.add-existing-siswa');
+
+        Route::get('load-siswa', [SiswaController::class, 'showLoadSiswaForm'])->name('kelas.show-load-siswa');
+        Route::post('load-siswa', [SiswaController::class, 'loadSiswaFromKelas'])->name('kelas.load-siswa');
+        // Route::get('ajax/kelas/search', [SiswaController::class, 'ajaxSearchKelas'])->name('ajax.kelas.search');
     });
+    Route::get('kelas/ajax/kelas/search', [SiswaController::class, 'ajaxSearchKelas'])->name('ajax.kelas.search');
     Route::resource('staff', StaffController::class);
 });
+
 
 // Define a group of routes with 'auth' middleware applied
 Route::middleware(['auth'])->group(function () {

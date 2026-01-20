@@ -22,6 +22,10 @@
                     </div>
 
                     <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <a href="{{ route('akademik.kelas.show-load-siswa', $kelas_ajar->kelas_ajar_id) }}"
+                            class="btn btn-info">
+                            Load Siswa dari Kelas Lain
+                        </a>
                         <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#modalAddExistingSiswa">
                             Tambah Siswa dari Tahun Ajaran Sebelumnya
                         </button>
@@ -34,6 +38,9 @@
                 <div class="card-body table-border-style">
                     @if (session('success'))
                         <div class="alert alert-success mb-3">{{ session('success') }}</div>
+                    @endif
+                    @if (session('warning'))
+                        <div class="alert alert-warning mb-3">{{ session('warning') }}</div>
                     @endif
                     @if (session('error'))
                         <div class="alert alert-danger">{{ session('error') }}</div>
