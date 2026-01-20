@@ -15,11 +15,11 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 
--- Dumping database structure for abdimas_test
+-- Dumping database structure for abdimas
 CREATE DATABASE IF NOT EXISTS `abdimas` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `abdimas`;
 
--- Dumping structure for table abdimas_test.kabupaten
+-- Dumping structure for table abdimas.kabupaten
 CREATE TABLE IF NOT EXISTS `kabupaten` (
   `kabupaten_id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `provinsi_id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `kabupaten` (
   CONSTRAINT `kabupaten_provinsi_id_foreign` FOREIGN KEY (`provinsi_id`) REFERENCES `provinsi` (`provinsi_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table abdimas_test.kabupaten: ~105 rows (approximately)
+-- Dumping data for table abdimas.kabupaten: ~105 rows (approximately)
 INSERT INTO `kabupaten` (`kabupaten_id`, `provinsi_id`, `nama`, `created_at`, `updated_at`) VALUES
 	('11.01', '11', 'Kabupaten Aceh Selatan', '2026-01-11 23:16:17', '2026-01-11 23:16:17'),
 	('11.02', '11', 'Kabupaten Aceh Tenggara', '2026-01-11 23:16:17', '2026-01-11 23:16:17'),
@@ -548,7 +548,7 @@ INSERT INTO `kabupaten` (`kabupaten_id`, `provinsi_id`, `nama`, `created_at`, `u
 	('96.05', '96', 'Kabupaten Maybrat', '2026-01-11 23:16:17', '2026-01-11 23:16:17'),
 	('96.71', '96', 'Kota Sorong', '2026-01-11 23:16:17', '2026-01-11 23:16:17');
 
--- Dumping structure for table abdimas_test.kecamatan
+-- Dumping structure for table abdimas.kecamatan
 CREATE TABLE IF NOT EXISTS `kecamatan` (
   `kecamatan_id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `kabupaten_id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -560,7 +560,7 @@ CREATE TABLE IF NOT EXISTS `kecamatan` (
   CONSTRAINT `kecamatan_kabupaten_id_foreign` FOREIGN KEY (`kabupaten_id`) REFERENCES `kabupaten` (`kabupaten_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table abdimas_test.kecamatan: ~1,510 rows (approximately)
+-- Dumping data for table abdimas.kecamatan: ~1,510 rows (approximately)
 INSERT INTO `kecamatan` (`kecamatan_id`, `kabupaten_id`, `nama`, `created_at`, `updated_at`) VALUES
 	('11.01.01', '11.01', 'Bakongan', '2026-01-11 23:16:17', '2026-01-11 23:16:17'),
 	('11.01.02', '11.01', 'Kluet Utara', '2026-01-11 23:16:17', '2026-01-11 23:16:17'),
@@ -7848,7 +7848,7 @@ INSERT INTO `kecamatan` (`kecamatan_id`, `kabupaten_id`, `nama`, `created_at`, `
 	('96.71.09', '96.71', 'Malaimsimsa', '2026-01-11 23:16:17', '2026-01-11 23:16:17'),
 	('96.71.10', '96.71', 'Maladum Mes', '2026-01-11 23:16:17', '2026-01-11 23:16:17');
 
--- Dumping structure for table abdimas_test.kelurahan
+-- Dumping structure for table abdimas.kelurahan
 CREATE TABLE IF NOT EXISTS `kelurahan` (
   `kelurahan_id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `kecamatan_id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -7860,7 +7860,7 @@ CREATE TABLE IF NOT EXISTS `kelurahan` (
   CONSTRAINT `kelurahan_kecamatan_id_foreign` FOREIGN KEY (`kecamatan_id`) REFERENCES `kecamatan` (`kecamatan_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table abdimas_test.kelurahan: ~48,697 rows (approximately)
+-- Dumping data for table abdimas.kelurahan: ~48,697 rows (approximately)
 INSERT INTO `kelurahan` (`kelurahan_id`, `kecamatan_id`, `nama`, `created_at`, `updated_at`) VALUES
 	('11.01.01.2001', '11.01.01', 'Keude Bakongan', '2026-01-11 23:16:17', '2026-01-11 23:16:17'),
 	('11.01.01.2002', '11.01.01', 'Ujong Mangki', '2026-01-11 23:16:17', '2026-01-11 23:16:17'),
@@ -91633,7 +91633,7 @@ INSERT INTO `kelurahan` (`kelurahan_id`, `kecamatan_id`, `nama`, `created_at`, `
 	('96.71.10.1003', '96.71.10', 'Saoka', '2026-01-11 23:16:17', '2026-01-11 23:16:17'),
 	('96.71.10.1004', '96.71.10', 'Tanjung Kasuari', '2026-01-11 23:16:17', '2026-01-11 23:16:17');
 
--- Dumping structure for table abdimas_test.provinsi
+-- Dumping structure for table abdimas.provinsi
 CREATE TABLE IF NOT EXISTS `provinsi` (
   `provinsi_id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `nama` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -91642,7 +91642,7 @@ CREATE TABLE IF NOT EXISTS `provinsi` (
   PRIMARY KEY (`provinsi_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table abdimas_test.provinsi: ~38 rows (approximately)
+-- Dumping data for table abdimas.provinsi: ~38 rows (approximately)
 INSERT INTO `provinsi` (`provinsi_id`, `nama`, `created_at`, `updated_at`) VALUES
 	('11', 'Aceh', '2026-01-11 23:16:17', '2026-01-11 23:16:17'),
 	('12', 'Sumatera Utara', '2026-01-11 23:16:17', '2026-01-11 23:16:17'),
