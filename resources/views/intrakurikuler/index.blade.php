@@ -4,6 +4,54 @@
 
 @section('css')
     <link rel="stylesheet" href="/build/css/plugins/style.css" />
+
+    <style>
+        /* ===== Choices DARK MODE FIX (Able Pro uses body[data-pc-theme="dark"]) ===== */
+        body[data-pc-theme="dark"] .choices__inner {
+            background-color: rgba(255, 255, 255, .06) !important;
+            border-color: rgba(255, 255, 255, .18) !important;
+            color: rgba(255, 255, 255, .90) !important;
+        }
+
+        body[data-pc-theme="dark"] .choices__input {
+            background-color: transparent !important;
+            color: rgba(255, 255, 255, .92) !important;
+        }
+
+        body[data-pc-theme="dark"] .choices__input::placeholder {
+            color: rgba(255, 255, 255, .55) !important;
+        }
+
+        body[data-pc-theme="dark"] .choices__list--dropdown,
+        body[data-pc-theme="dark"] .choices__list[aria-expanded] {
+            background-color: #1b1f24 !important;
+            border-color: rgba(255, 255, 255, .14) !important;
+            color: rgba(255, 255, 255, .92) !important;
+        }
+
+        body[data-pc-theme="dark"] .choices__list--dropdown .choices__item {
+            color: rgba(255, 255, 255, .92) !important;
+        }
+
+        body[data-pc-theme="dark"] .choices__list--dropdown .choices__item--selectable.is-highlighted {
+            background-color: rgba(255, 255, 255, .08) !important;
+        }
+
+        body[data-pc-theme="dark"] .choices__item--selectable {
+            color: rgba(255, 255, 255, .92) !important;
+        }
+
+        /* selected item chip (kalau single select, ini text yang tampil) */
+        body[data-pc-theme="dark"] .choices__item--selectable,
+        body[data-pc-theme="dark"] .choices__list--single .choices__item {
+            color: rgba(255, 255, 255, .92) !important;
+        }
+
+        /* kalau invalid, tetap merah */
+        body[data-pc-theme="dark"] select.is-invalid+.choices .choices__inner {
+            border-color: #dc3545 !important;
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -17,11 +65,11 @@
                     class="card-header d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-2">
                     <div>
                         <h5 class="mb-0">Daftar Mata Pelajaran Intrakurikuler</h5>
-                        <span class="d-block m-t-5">
+                        {{-- <span class="d-block m-t-5">
                             Tahun Ajaran
                             {{ $intrakurikuler->first()?->kelasAjar?->tahunAjaran?->tahun ?? '-' }}
                             {{ $intrakurikuler->first()?->kelasAjar?->tahunAjaran?->semester ?? '' }}
-                        </span>
+                        </span> --}}
                     </div>
 
                     @role('Bagian Akademik|Super Admin')
@@ -49,6 +97,7 @@
                                     <th>No</th>
                                     <th>Mata Pelajaran</th>
                                     <th>Tahun Ajaran</th>
+                                    <th>Semester</th>
                                     <th>Kelas</th>
                                     <th>Guru</th>
                                     <th>Jumlah Siswa</th>
@@ -65,7 +114,9 @@
                                         <td>{{ $item->nama_pelajaran }}</td>
                                         <td>
                                             {{ $item->kelasAjar?->tahunAjaran?->tahun ?? '-' }}
-                                            - {{ ucfirst($item->kelasAjar?->tahunAjaran?->semester ?? '-') }}
+                                        </td>
+                                        <td>
+                                            {{ ucfirst($item->kelasAjar?->tahunAjaran?->semester ?? '-') }}
                                         </td>
                                         <td>{{ $item->kelasAjar?->kelas?->nama_kelas ?? '-' }}</td>
                                         <td>{{ $item->pengampu?->staff?->nama ?? ($item->pengampu?->name ?? 'N/A') }}</td>
@@ -88,11 +139,9 @@
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-light-danger mb-1">
-                                                        Delete
+                                                        Hapus
                                                     </button>
                                                 </form>
-
-                                                
                                             @endrole
                                         </td>
 
@@ -156,12 +205,13 @@
                         <div class="mb-3">
                             <label>Kelas Ajar</label>
                             <select name="kelas_ajar_id" id="intra_kelas"
-                                class="form-control @error('kelas_ajar_id') is-invalid @enderror">
+                                class="form-control @error('kelas_ajar_id') is-invalid @enderror" required>
+                                <option value="">Pilih Kelas Ajar</option>
                                 @foreach ($kelasAjar as $ka)
                                     <option value="{{ $ka->kelas_ajar_id }}"
                                         {{ old('kelas_ajar_id') == $ka->kelas_ajar_id ? 'selected' : '' }}>
-                                        {{ $ka->tahunAjaran->tahun }} {{ $ka->tahunAjaran->semester }} •
-                                        {{ $ka->kelas->nama_kelas }}
+                                        {{ $ka->kelas->nama_kelas }} • {{ $ka->tahunAjaran->tahun }}
+                                        {{ $ka->tahunAjaran->semester }}
                                     </option>
                                 @endforeach
                             </select>
@@ -173,7 +223,7 @@
                         <div class="mb-3">
                             <label>Guru Pengampu</label>
                             <select name="pengampu_user_id" id="intra_guru"
-                                class="form-control @error('pengampu_user_id') is-invalid @enderror">
+                                class="form-control @error('pengampu_user_id') is-invalid @enderror" required>
                                 <option value="">Pilih Guru</option>
                                 @foreach ($guru as $g)
                                     <option value="{{ $g->id }}"
@@ -301,5 +351,27 @@
                 setCreateMode();
             @endif
         @endif
+    </script>
+
+    <script src="/build/js/plugins/choices.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            new Choices('#intra_kelas', {
+                searchEnabled: true,
+                placeholder: true,
+                itemSelectText: '',
+                shouldSort: false,
+                searchResultLimit: 15,
+                renderChoiceLimit: 15
+            });
+            new Choices('#intra_guru', {
+                searchEnabled: true,
+                placeholder: true,
+                itemSelectText: '',
+                shouldSort: false,
+                searchResultLimit: 15,
+                renderChoiceLimit: 15
+            });
+        });
     </script>
 @endsection
