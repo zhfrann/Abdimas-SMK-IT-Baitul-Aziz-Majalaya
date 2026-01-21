@@ -141,11 +141,7 @@
         import {
             DataTable
         } from '/build/js/plugins/module.js';
-        window.dt = new DataTable('#pc-dt-simple', {
-            search: {
-                smart: false
-            }
-        });
+        window.dt = new DataTable('#pc-dt-simple');
     </script>
 
     <script>
