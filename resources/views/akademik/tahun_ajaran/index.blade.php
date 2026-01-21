@@ -83,7 +83,7 @@
                         <div class="mb-3">
                             <label for="tahun" class="form-label">Tahun</label>
                             <input type="text" class="form-control @error('tahun') is-invalid @enderror" id="tahun"
-                                name="tahun" value="{{ old('tahun') }}" required>
+                                name="tahun" value="{{ old('tahun') }}" placeholder="2025/2026" required>
                             @error('tahun')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

@@ -19,16 +19,26 @@ class TahunAjaranController extends Controller
     {
         $request->validate([
             'tahun' => [
+                'bail',
                 'required',
                 'string',
                 'max:20',
                 Rule::unique('tahun_ajaran')->where(function ($query) use ($request) {
                     return $query->where('semester', $request->semester);
                 }),
+                'regex:/^\d{4}\/\d{4}$/',  //format YYYY/YYYY
+                // validasi logika tahun +1
+                function ($attribute, $value, $fail) {
+                    [$start, $end] = explode('/', $value);
+                    if ((int)$end !== ((int)$start + 1)) {
+                        $fail('Tahun ajaran harus berurutan, contoh: 2025/2026');
+                    }
+                },
             ],
             'semester' => 'required|in:Ganjil,Genap',
         ], [
             // optional: custom message
+            'tahun.regex' => 'Format tahun ajaran harus seperti 2025/2026.',
             'tahun.unique' => 'Kombinasi tahun dan semester tersebut sudah ada.',
         ]);
 
