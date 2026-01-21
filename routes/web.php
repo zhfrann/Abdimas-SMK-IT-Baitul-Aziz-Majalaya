@@ -87,6 +87,17 @@ Route::middleware(['auth'])->group(function () {
             // ✅ UPDATE (PUT kalau sudah ada skor)
             Route::put('assesment-sumatif/{riwayatKelas}/detail', [AssesmentSumatifController::class, 'updateDetailAssesmentSumatif'])
                 ->name('assesment_sumatif.detail.update');
+
+
+            Route::resource('tujuan-pembelajaran', TujuanPembelajaranController::class)
+                ->except(['show']);
+
+
+            // Route::get('assesment_sumatif/detail', [AssesmentSumatifController::class, 'detailAssesmentSumatif'])->name('assesment_sumatif.detail');
+            // Route::resource('assesment_sumatif', AssesmentSumatifController::class);
+            Route::get('assesment_formatif/detail', [AssesmentFormatifController::class, 'detailAssesmentFormatif'])->name('assesment_formatif.detail');
+            Route::resource('assesment_formatif', AssesmentFormatifController::class);
+            Route::resource('penilaian_ekstrakurikuler', PenilaianEkstrakurikulerController::class);
         });
 
     Route::resource('ekstrakurikuler', EkstrakurikulerController::class)->middleware('role:Guru Mapel|Bagian Akademik');
@@ -104,13 +115,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('ajax/search-siswa', [EkstrakurikulerSiswaController::class, 'ajaxSearchSiswa'])
             ->name('ekstrakurikuler.ajax.search-siswa');
     })->middleware('role:Guru Mapel|Bagian Akademik');
-
-    Route::resource('tujuan_pembelajaran', TujuanPembelajaranController::class);
-    // Route::get('assesment_sumatif/detail', [AssesmentSumatifController::class, 'detailAssesmentSumatif'])->name('assesment_sumatif.detail');
-    // Route::resource('assesment_sumatif', AssesmentSumatifController::class);
-    Route::get('assesment_formatif/detail', [AssesmentFormatifController::class, 'detailAssesmentFormatif'])->name('assesment_formatif.detail');
-    Route::resource('assesment_formatif', AssesmentFormatifController::class);
-    Route::resource('penilaian_ekstrakurikuler', PenilaianEkstrakurikulerController::class);
 
     Route::get('absensi/daily', [AbsensiController::class, 'absensiHarian'])->name('absensi.harian');
     Route::resource('absensi', AbsensiController::class);
