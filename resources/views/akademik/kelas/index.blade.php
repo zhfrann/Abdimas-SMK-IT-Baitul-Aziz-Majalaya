@@ -141,8 +141,13 @@
         import {
             DataTable
         } from '/build/js/plugins/module.js';
-        window.dt = new DataTable('#pc-dt-simple');
+        window.dt = new DataTable('#pc-dt-simple', {
+            search: {
+                smart: false
+            }
+        });
     </script>
+
     <script>
         // Jika ada error validasi, buka modal otomatis
         @if ($errors->any())
@@ -193,6 +198,28 @@
                         e.preventDefault();
                     }
                 });
+            });
+        });
+    </script>
+
+    <script src="/build/js/plugins/choices.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            new Choices('#tahun_ajaran_id', {
+                searchEnabled: true,
+                placeholder: true,
+                itemSelectText: '',
+                shouldSort: false,
+                searchResultLimit: 15,
+                renderChoiceLimit: 15
+            });
+            new Choices('#wali_user_id', {
+                searchEnabled: true,
+                placeholder: true,
+                itemSelectText: '',
+                shouldSort: false,
+                searchResultLimit: 15,
+                renderChoiceLimit: 15
             });
         });
     </script>
