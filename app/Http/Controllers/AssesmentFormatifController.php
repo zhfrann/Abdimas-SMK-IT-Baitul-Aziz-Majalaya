@@ -7,6 +7,7 @@ use App\Models\AsesmenFormatifDetail;
 use App\Models\Intrakurikuler;
 use App\Models\RiwayatKelas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AssesmentFormatifController extends Controller
 {
@@ -157,32 +158,39 @@ class AssesmentFormatifController extends Controller
             'deskripsi_catatan_terendah' => $request->capaian_terendah ?? '',
         ]);
 
-        $formatif->deskripsi_catatan_tertinggi = $request->capaian_tertinggi;
-        $formatif->deskripsi_catatan_terendah = $request->capaian_terendah;
-        $formatif->save();
+        DB::beginTransaction();
+        try {
+            $formatif->deskripsi_catatan_tertinggi = $request->capaian_tertinggi;
+            $formatif->deskripsi_catatan_terendah = $request->capaian_terendah;
+            $formatif->save();
 
-        $tpData = $request->input('tp', []);
-        $intrakurikuler = Intrakurikuler::with('tujuanPembelajaran')->findOrFail($intrakurikuler_id);
+            $tpData = $request->input('tp', []);
+            $intrakurikuler = Intrakurikuler::with('tujuanPembelajaran')->findOrFail($intrakurikuler_id);
 
-        foreach ($intrakurikuler->tujuanPembelajaran as $tp) {
-            $tp_id = $tp->tujuan_pembelajaran_id;
-            $data = $tpData[$tp_id] ?? [];
-            $kktp = isset($data['tercapai']) && $data['tercapai'] == 1;
-            $tampil = isset($data['tampil_rapor']) && $data['tampil_rapor'] == 1;
+            foreach ($intrakurikuler->tujuanPembelajaran as $tp) {
+                $tp_id = $tp->tujuan_pembelajaran_id;
+                $data = $tpData[$tp_id] ?? [];
+                $kktp = isset($data['tercapai']) && $data['tercapai'] == 1;
+                $tampil = isset($data['tampil_rapor']) && $data['tampil_rapor'] == 1;
 
-            AsesmenFormatifDetail::updateOrCreate(
-                [
-                    'asesmen_formatif_id' => $formatif->asesmen_formatif_id,
-                    'tujuan_pembelajaran_id' => $tp_id,
-                ],
-                [
-                    'kktp' => $kktp,
-                    'tampil' => $tampil,
-                ]
-            );
+                AsesmenFormatifDetail::updateOrCreate(
+                    [
+                        'asesmen_formatif_id' => $formatif->asesmen_formatif_id,
+                        'tujuan_pembelajaran_id' => $tp_id,
+                    ],
+                    [
+                        'kktp' => $kktp,
+                        'tampil' => $tampil,
+                    ]
+                );
+            }
+
+            DB::commit();
+            return redirect()->route('assesment-formatif.index', $intrakurikuler_id)
+                ->with('success', 'Data asesmen formatif berhasil disimpan.');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan asesmen formatif.');
         }
-
-        return redirect()->route('assesment-formatif.index', $intrakurikuler_id)
-            ->with('success', 'Data asesmen formatif berhasil disimpan.');
     }
 }

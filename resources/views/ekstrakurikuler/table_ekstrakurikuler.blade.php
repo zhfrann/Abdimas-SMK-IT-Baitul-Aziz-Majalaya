@@ -94,6 +94,7 @@
                                     <th>Ekstrakurikuler</th>
                                     <th>Tahun Ajaran</th>
                                     <th>Guru</th>
+                                    <th>Jumlah Siswa</th>
                                     <th>Action</th>
                                     <th>Akademik</th>
                                 </tr>
@@ -108,6 +109,7 @@
                                             {{ $item->tahunAjaran?->semester ?? '' }}
                                         </td>
                                         <td>{{ $item->pembina?->name ?? '-' }}</td>
+                                        <td>{{ $item->peserta_count ?? '-' }}</td>
                                         <td>
                                             <button type="button" class="btn btn-sm btn-light-warning mb-1"
                                                 data-bs-toggle="modal" data-bs-target="#modalEkstra" data-mode="edit"
@@ -130,7 +132,7 @@
                                         <td>
                                             <a href="{{ route('ekstrakurikuler.manage-siswa.index', $item->ekstrakurikuler_id) }}"
                                                 class="btn btn-sm btn-light-primary mb-1">Manage Siswa</a>
-                                            <a href="{{ route('penilaian_ekstrakurikuler.index') }}"
+                                            <a href="{{ route('penilaian_ekstrakurikuler.index', $item->ekstrakurikuler_id) }}"
                                                 class="btn btn-sm btn-light-primary mb-1">Penilaian</a>
                                         </td>
                                     </tr>
@@ -172,7 +174,7 @@
                             <label>Nama Ekstrakurikuler</label>
                             <input type="text" name="nama_pelajaran" id="ekstra_nama"
                                 value="{{ old('nama_pelajaran') }}"
-                                class="form-control @error('nama_pelajaran') is-invalid @enderror">
+                                class="form-control @error('nama_pelajaran') is-invalid @enderror" required>
                             @error('nama_pelajaran')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
@@ -181,7 +183,7 @@
                         <div class="mb-3">
                             <label>Tahun Ajaran</label>
                             <select name="tahun_ajaran_id" id="ekstra_tahun"
-                                class="form-control @error('tahun_ajaran_id') is-invalid @enderror">
+                                class="form-control @error('tahun_ajaran_id') is-invalid @enderror" required>
                                 <option value="">Pilih Tahun Ajaran</option>
                                 @foreach ($tahunAjaran as $ta)
                                     <option value="{{ $ta->tahun_ajaran_id }}"
@@ -198,7 +200,7 @@
                         <div class="mb-3">
                             <label>Guru Pengampu</label>
                             <select name="pengampu_user_id" id="ekstra_guru"
-                                class="form-control @error('pengampu_user_id') is-invalid @enderror">
+                                class="form-control @error('pengampu_user_id') is-invalid @enderror" required>
                                 <option value="">Pilih Guru</option>
                                 @foreach ($guru as $g)
                                     <option value="{{ $g->id }}"

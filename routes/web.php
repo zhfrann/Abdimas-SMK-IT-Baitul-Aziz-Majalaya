@@ -98,8 +98,6 @@ Route::middleware(['auth'])->group(function () {
                 ->name('assesment-formatif.detail');
             Route::post('assesment-formatif/{riwayatKelas}/save-detail', [AssesmentFormatifController::class, 'saveDetail'])
                 ->name('assesment-formatif.save-detail');
-
-            Route::resource('penilaian_ekstrakurikuler', PenilaianEkstrakurikulerController::class);
         });
 
     Route::resource('ekstrakurikuler', EkstrakurikulerController::class)->middleware('role:Guru Mapel|Bagian Akademik');
@@ -116,6 +114,8 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('ajax/search-siswa', [EkstrakurikulerSiswaController::class, 'ajaxSearchSiswa'])
             ->name('ekstrakurikuler.ajax.search-siswa');
+
+        Route::resource('penilaian_ekstrakurikuler', PenilaianEkstrakurikulerController::class);
     })->middleware('role:Guru Mapel|Bagian Akademik');
 
     Route::get('absensi/daily', [AbsensiController::class, 'absensiHarian'])->name('absensi.harian');

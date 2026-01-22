@@ -14,7 +14,7 @@ class EkstrakurikulerController extends Controller
     {
         $tahunAjaran = TahunAjaran::query()->orderByDesc('tahun_ajaran_id')->get();
         $guru = User::query()->role('Guru Mapel')->orderBy('name')->get();
-        $ekstrakurikuler = Ekstrakurikuler::query()->with(['tahunAjaran', 'pembina'])->orderByDesc('ekstrakurikuler_id')->get();
+        $ekstrakurikuler = Ekstrakurikuler::query()->with(['tahunAjaran', 'pembina'])->withCount('peserta')->orderByDesc('ekstrakurikuler_id')->get();
 
         return view('ekstrakurikuler.table_ekstrakurikuler', compact('tahunAjaran', 'guru', 'ekstrakurikuler'));
     }

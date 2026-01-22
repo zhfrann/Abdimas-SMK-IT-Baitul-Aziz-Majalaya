@@ -405,18 +405,30 @@ return new class extends Migration
 
             $table->foreign('siswa_id')
                 ->references('siswa_id')->on('siswa')
-                ->cascadeOnUpdate()->cascadeOnDelete();
+                ->cascadeOnUpdate()->restrictOnDelete();
 
             $table->foreign('ekstrakurikuler_id')
                 ->references('ekstrakurikuler_id')->on('ekstrakurikuler')
-                ->cascadeOnUpdate()->cascadeOnDelete();
+                ->cascadeOnUpdate()->restrictOnDelete();
 
             $table->unique(['siswa_id', 'ekstrakurikuler_id'], 'uniq_siswa_ekskul');
+        });
+
+        Schema::create('penilaian_ekstrakurikuler', function (Blueprint $table) {
+            $table->increments('penilaian_ekstrakurikuler_id');
+            $table->unsignedInteger('siswa_ekstrakurikuler_id');
+            $table->text('deskripsi');
+            $table->timestamps();
+
+            $table->foreign('siswa_ekstrakurikuler_id')
+                ->references('siswa_ekstrakurikuler_id')->on('siswa_ekstrakurikuler')
+                ->cascadeOnUpdate()->restrictOnDelete();
         });
     }
 
     public function down(): void
     {
+        Schema::dropIfExists('penilaian_ekstrakurikuler');
         Schema::dropIfExists('siswa_ekstrakurikuler');
         Schema::dropIfExists('kehadiran_ekstrakurikuler');
         Schema::dropIfExists('ekstrakurikuler');

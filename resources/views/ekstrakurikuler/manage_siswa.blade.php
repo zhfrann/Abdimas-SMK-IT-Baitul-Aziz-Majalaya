@@ -124,7 +124,7 @@
                     <div class="text-danger">{{ $message }}</div>
                 @enderror
             </div>
-            <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+            <a href="{{ route('ekstrakurikuler.index') }}" class="btn btn-secondary">Kembali</a>
         </div>
     </div>
 

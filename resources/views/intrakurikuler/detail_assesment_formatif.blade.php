@@ -22,6 +22,15 @@
                     </span>
                 </div>
                 <div class="card-body">
+                    @if (session('success'))
+                        <div class="alert alert-success">{{ session('success') }}</div>
+                    @endif
+                    @if (session('warning'))
+                        <div class="alert alert-warning">{{ session('warning') }}</div>
+                    @endif
+                    @if (session('error'))
+                        <div class="alert alert-danger">{{ session('error') }}</div>
+                    @endif
                     <form method="POST"
                         action="{{ route('assesment-formatif.save-detail', [$intrakurikuler->intrakurikuler_id, $riwayatKelas->riwayat_kelas_id]) }}">
                         @csrf
@@ -47,7 +56,8 @@
                                 @endphp
                                 <div class="mb-4 col-md-6">
                                     <label class="form-label fs-5 f-w-600">TP {{ $tpIndex }}</label>
-                                    <p class="tp-deskripsi" data-tp="{{ $tp->tujuan_pembelajaran_id }}">{{ $tp->deskripsi }}
+                                    <p class="tp-deskripsi" data-tp="{{ $tp->tujuan_pembelajaran_id }}">
+                                        {{ $tp->deskripsi }}
                                     </p>
                                     <div class="form-check">
                                         <input class="form-check-input tp-tercapai" type="checkbox"
