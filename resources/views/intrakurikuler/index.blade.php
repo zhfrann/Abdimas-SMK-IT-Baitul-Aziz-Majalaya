@@ -155,7 +155,8 @@
                                         <td>
                                             <a href="{{ route('tujuan-pembelajaran.index', $item->intrakurikuler_id) }}"
                                                 class="btn btn-sm btn-light-primary mb-1">Tujuan pembelajaran</a>
-                                            <a href="#" class="btn btn-sm btn-light-primary mb-1">Asesmen Formatif</a>
+                                            <a href="{{ route('assesment-formatif.index', $item->intrakurikuler_id) }}"
+                                                class="btn btn-sm btn-light-primary mb-1">Asesmen Formatif</a>
                                         </td>
                                     </tr>
                                 @empty

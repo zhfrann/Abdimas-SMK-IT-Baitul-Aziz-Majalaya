@@ -273,13 +273,18 @@ return new class extends Migration
         Schema::create('asesmen_formatif', function (Blueprint $table) {
             $table->increments('asesmen_formatif_id');
             $table->unsignedInteger('intrakurikuler_id');
+            $table->unsignedInteger('riwayat_kelas_id');
             $table->text('deskripsi_catatan_tertinggi');
             $table->text('deskripsi_catatan_terendah');
             $table->timestamps();
 
             $table->foreign('intrakurikuler_id')
                 ->references('intrakurikuler_id')->on('intrakurikuler')
-                ->cascadeOnUpdate()->cascadeOnDelete();
+                ->cascadeOnUpdate()->restrictOnDelete();
+
+            $table->foreign('riwayat_kelas_id')
+                ->references('riwayat_kelas_id')->on('riwayat_kelas')
+                ->cascadeOnUpdate()->restrictOnDelete();
         });
 
         Schema::create('asesmen_formatif_detail', function (Blueprint $table) {
@@ -292,11 +297,11 @@ return new class extends Migration
 
             $table->foreign('asesmen_formatif_id')
                 ->references('asesmen_formatif_id')->on('asesmen_formatif')
-                ->cascadeOnUpdate()->cascadeOnDelete();
+                ->cascadeOnUpdate()->restrictOnDelete();
 
             $table->foreign('tujuan_pembelajaran_id')
                 ->references('tujuan_pembelajaran_id')->on('tujuan_pembelajaran')
-                ->cascadeOnUpdate()->cascadeOnDelete();
+                ->cascadeOnUpdate()->restrictOnDelete();
 
             $table->unique(['asesmen_formatif_id', 'tujuan_pembelajaran_id'], 'uniq_formatif_tujuan');
         });

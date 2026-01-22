@@ -92,11 +92,13 @@ Route::middleware(['auth'])->group(function () {
             Route::resource('tujuan-pembelajaran', TujuanPembelajaranController::class)
                 ->except(['show']);
 
+            Route::resource('assesment-formatif', AssesmentFormatifController::class);
 
-            // Route::get('assesment_sumatif/detail', [AssesmentSumatifController::class, 'detailAssesmentSumatif'])->name('assesment_sumatif.detail');
-            // Route::resource('assesment_sumatif', AssesmentSumatifController::class);
-            Route::get('assesment_formatif/detail', [AssesmentFormatifController::class, 'detailAssesmentFormatif'])->name('assesment_formatif.detail');
-            Route::resource('assesment_formatif', AssesmentFormatifController::class);
+            Route::get('assesment-formatif/{riwayatKelas}/detail', [AssesmentFormatifController::class, 'detailAssesmentFormatif'])
+                ->name('assesment-formatif.detail');
+            Route::post('assesment-formatif/{riwayatKelas}/save-detail', [AssesmentFormatifController::class, 'saveDetail'])
+                ->name('assesment-formatif.save-detail');
+
             Route::resource('penilaian_ekstrakurikuler', PenilaianEkstrakurikulerController::class);
         });
 
