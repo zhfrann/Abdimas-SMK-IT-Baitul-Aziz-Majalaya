@@ -3,8 +3,9 @@
     <div class="navbar-wrapper">
         <div class="m-header">
             <a href="/dashboard/index" class="b-brand text-primary d-flex align align-items-center gap-2">
-                <img src="https://www.smkitbaitulaziz.sch.id/images/logo.png" style="height: 50px; width: auto;"
-                    alt="" />
+                {{-- <img src="https://www.smkitbaitulaziz.sch.id/images/logo.png" style="height: 50px; width: auto;"
+                    alt="" /> --}}
+                <img src="{{ asset('build/images/logo.png') }}" style="height: 50px; width: auto;" alt="" />
                 <h5 class="mt-2"> SMK IT Baitul Azis</h5>
             </a>
         </div>

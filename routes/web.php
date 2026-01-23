@@ -7,6 +7,7 @@ use App\Http\Controllers\Akademik\TahunAjaranController;
 use App\Http\Controllers\AssesmentFormatifController;
 use App\Http\Controllers\AssesmentSumatifController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\CetakDokumenController;
 use App\Http\Controllers\DummyExcelController;
 use App\Http\Controllers\EkstrakurikulerController;
 use App\Http\Controllers\EkstrakurikulerSiswaController;
@@ -124,6 +125,13 @@ Route::middleware(['auth'])->group(function () {
     // Define a GET route with dynamic placeholders for route parameters
     Route::get('/template-assesmen-formatif-excel', [DummyExcelController::class, 'downloadFormatif']);
     Route::get('/template-assesmen-sumatif-excel', [DummyExcelController::class, 'downloadSumatif']);
+
+    Route::prefix('dokumen')->name('dokumen.')->group(function () {
+        Route::get('kelas', [CetakDokumenController::class, 'kelas'])->name('kelas');
+        Route::get('kelas/{kelas_ajar}/pilih', [CetakDokumenController::class, 'pilihCetak'])->name('kelas.pilih');
+        Route::post('preview', [CetakDokumenController::class, 'preview'])->name('preview');
+        Route::post('cetak', [CetakDokumenController::class, 'cetak'])->name('cetak');
+    });
 
     // Route::get('{routeName}/{name?}', [HomeController::class, 'pageView']);
 });
