@@ -3,66 +3,12 @@
         $siswa = $rk->siswa;
         $user = $siswa->user ?? null;
 
-        $logoPath = public_path('build/images/logo.png'); // sesuaikan
+        $logoPath = public_path('build/images/logo.png');
     @endphp
 
-    <div class="cover page">
-
-        <div class="content">
-            {{-- Judul --}}
-            <div class="judul">
-                <div>LAPORAN HASIL BELAJAR PESERTA DIDIK</div>
-                <div>SEKOLAH MENENGAH KEJURUAN (SMK)</div>
-                <div>ISLAM TERPADU BAITUL AZIZ</div>
-            </div>
-
-            {{-- Logo --}}
-            <div class="logo-wrap">
-                <img class="logo" src="{{ $logoPath }}" alt="Logo">
-            </div>
-
-            {{-- Bidang / Program / Konsentrasi --}}
-            <table class="info-program">
-                <tr>
-                    <td class="kiri">Bidang Keahlian</td>
-                    <td class="titik">:</td>
-                    <td class="kanan">Teknologi Informasi</td>
-                </tr>
-                <tr>
-                    <td class="kiri">Program Keahlian</td>
-                    <td class="titik">:</td>
-                    <td class="kanan">Pengembangan Perangkat Lunak dan Gim</td>
-                </tr>
-                <tr>
-                    <td class="kiri">Konsentrasi Keahlian</td>
-                    <td class="titik">:</td>
-                    <td class="kanan">Rekayasa Perangkat Lunak</td>
-                </tr>
-            </table>
-
-            {{-- Nama --}}
-            <div class="label-center label-nama">Nama Peserta Didik :</div>
-            <div class="box-nama">
-                {{ strtoupper($user->name ?? $siswa->nama) }}
-            </div>
-            <div class="sp-1"></div>
-
-            {{-- NIS/NISN --}}
-            <div class="label-center label-nis">NIS / NISN</div>
-            <div class="box-nis">
-                {{ $siswa->nis }} / {{ $siswa->nisn }}
-            </div>
-        </div>
-
-        {{-- Footer --}}
-        <div class="footer">
-            <div class="yayasan">YAYASAN BAITUL AZIZ</div>
-            <div>Jl. Pesantren Baitul Aziz - Kp. Sukahaji No.44 RT/RW 01/08</div>
-            <div>Desa Neglasari Kec. Majalaya Kab. Bandung 40382</div>
-            <div>Telp.022-5950175 - website: www.smkbaitulaziz.sch.id - email: smkbaitulaziz@gmail.com</div>
-        </div>
-
-    </div>
+    @include('dokumen.sampul._sampul', ['siswa' => $siswa, 'user' => $user, 'logoPath' => $logoPath])
+    @include('dokumen.sampul._data_sekolah', ['siswa' => $siswa, 'user' => $user, 'sekolah' => $sekolah])
+    @include('dokumen.sampul._identitas_siswa', ['siswa' => $siswa, 'user' => $user])
 @endforeach
 
 <style>
@@ -75,11 +21,37 @@
     /* ====== A4 ====== */
     @page {
         size: A4;
-        margin: 20mm 18mm 18mm 18mm;
+        margin: 18mm 18mm 18mm 18mm;
     }
 
     .page {
         page-break-after: always;
+        position: relative;
+    }
+
+    .foto-box {
+        position: absolute;
+        /* atur posisi kotak */
+        right: 80mm;
+        /* geser kanan/kiri */
+        bottom: -25mm;
+        /* geser naik/turun */
+        /* ukuran pas foto (contoh 3x4 cm) */
+        width: 30mm;
+        height: 40mm;
+
+        border: 1px solid #000;
+    }
+
+    /* opsional: kalau mau ada tulisan "Pas Foto" di tengah */
+    .foto-box::after {
+        content: "Pas Foto";
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10pt;
     }
 
     /* .page:last-child {
@@ -90,6 +62,20 @@
         font-family: "Times New Roman", Times, serif;
         font-size: 12pt;
         color: #000;
+    }
+
+    table {
+        width: 95%;
+        /* margin-left: 20%; */
+    }
+
+    td {
+        padding: 2px 6px;
+        vertical-align: top;
+    }
+
+    .judul-table-identitas {
+        width: 33%;
     }
 
     .cover {
@@ -110,6 +96,22 @@
 
     .sp-2 {
         height: 10mm;
+    }
+
+    .sp-3 {
+        height: 8mm;
+    }
+
+    .sp-4 {
+        height: 6mm;
+    }
+
+    .sp-5 {
+        height: 4mm;
+    }
+
+    .sp-6 {
+        height: 2mm;
     }
 
     /* ====== Judul (bold, center) ====== */
@@ -215,5 +217,32 @@
     .footer .yayasan {
         font-size: 12pt;
         margin-bottom: 2mm;
+    }
+
+    /* ===== Halaman Data Sekolah ===== */
+    .data-sekolah>div:first-child {
+        margin-top: 0mm !important;
+    }
+
+    /* ===== Halaman Identitas Siswa ===== */
+    .identitas-siswa>div:first-child {
+        margin-top: 0mm !important;
+    }
+
+    .ttd-wrap {
+        margin-top: 20px;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .ttd-box {
+        width: 70mm;
+        text-align: left;
+        font-size: 13pt;
+    }
+
+    .ttd-nama {
+        font-weight: 700;
+        text-decoration: underline;
     }
 </style>

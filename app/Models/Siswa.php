@@ -82,4 +82,27 @@ class Siswa extends Model
         return $this->hasOne(RiwayatKelas::class, 'siswa_id', 'siswa_id')
             ->latest('riwayat_kelas_id');
     }
+
+    public function getAlamatLengkapAttribute()
+    {
+        $alamat = trim((string) ($this->alamat ?? ''));
+
+        $kelurahan = $this->kelurahan;
+        $kecamatan = $kelurahan?->kecamatan;
+        $kabupaten = $kecamatan?->kabupaten;
+
+        if ($kelurahan?->nama) {
+            $alamat .= ' Kel. ' . $kelurahan->nama;
+        }
+
+        if ($kecamatan?->nama) {
+            $alamat .= ' Kec. ' . $kecamatan->nama;
+        }
+
+        if ($kabupaten) {
+            $alamat .= ' ' . $kabupaten->nama;
+        }
+
+        return trim($alamat);
+    }
 }

@@ -68,6 +68,7 @@
                         <th>Tahun Ajaran</th>
                         <th>Semester</th>
                         <th>Wali Kelas</th>
+                        <th>Jumlah Siswa</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -78,6 +79,7 @@
                             <td>{{ $kelas->tahunAjaran->tahun }}</td>
                             <td>{{ $kelas->tahunAjaran->semester }}</td>
                             <td>{{ $kelas->waliKelas->name ?? '-' }}</td>
+                            <td>{{ 0 }}</td>
                             <td>
                                 <a href="{{ route('dokumen.kelas.pilih', $kelas->kelas_ajar_id) }}"
                                     class="btn btn-primary btn-sm">Cetak</a>

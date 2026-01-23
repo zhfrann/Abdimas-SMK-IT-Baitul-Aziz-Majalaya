@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\KelasAjar;
+use App\Models\Sekolah;
 use Illuminate\Http\Request;
 use Spatie\LaravelPdf\Facades\Pdf;
 
@@ -14,6 +15,7 @@ class CetakDokumenController extends Controller
         $kelasList = KelasAjar::query()
             ->join('tahun_ajaran', 'kelas_ajar.tahun_ajaran_id', '=', 'tahun_ajaran.tahun_ajaran_id')
             ->with('kelas', 'tahunAjaran', 'waliKelas')
+            ->withCount('riwayatKelas')
             ->orderBy('tahun_ajaran.tahun', 'desc')
             ->select('kelas_ajar.*')
             ->get();
@@ -34,9 +36,10 @@ class CetakDokumenController extends Controller
                 'nis' => $siswa->nis,
                 'nisn' => $siswa->nisn,
                 'jenis_kelamin' => $siswa->jenis_kelamin,
-                'alamat' => $siswa->alamat,
+                'alamat' => $siswa->alamat . ' Kel. ' . $siswa->kelurahan->nama . ' Kec. ' . $siswa->kelurahan->kecamatan->nama . $siswa->kelurahan->kecamatan->kabupaten->nama,
             ];
         });
+
         return view('dokumen.pilih_cetak', compact('kelasAjar', 'siswaList'));
     }
 
@@ -50,7 +53,9 @@ class CetakDokumenController extends Controller
             'siswa.*' => 'exists:riwayat_kelas,riwayat_kelas_id',
         ]);
 
-        $kelasAjar = KelasAjar::with(['kelas', 'tahunAjaran', 'waliKelas', 'riwayatKelas.siswa.user'])->findOrFail($request->kelas_ajar_id);
+        $sekolah = Sekolah::first();
+
+        $kelasAjar = KelasAjar::with(['kelas', 'tahunAjaran', 'waliKelas', 'riwayatKelas.siswa.user', 'riwayatKelas.siswa.kelurahan.kecamatan.kabupaten'])->findOrFail($request->kelas_ajar_id);
 
         $jenis = $request->jenis;
         $siswaIds = $request->siswa ?? $kelasAjar->riwayatKelas->pluck('riwayat_kelas_id')->toArray();
@@ -67,7 +72,9 @@ class CetakDokumenController extends Controller
         $pdf = Pdf::view($view, [
             'kelasAjar' => $kelasAjar,
             'siswaList' => $siswaList,
+            'sekolah' => $sekolah,
         ])->format('A4')->download('dokumen-' . $jenis . '-' . $namaKelas . ' ' . $tahunAjaran . ' ' . $semester . '.pdf');
+        // ])->format('A4');
 
         return $pdf;
     }
