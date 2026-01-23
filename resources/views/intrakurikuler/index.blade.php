@@ -52,7 +52,9 @@
                                     <th>Kelas</th>
                                     <th>Guru</th>
                                     <th>Jumlah Siswa</th>
-                                    <th>Actions</th>
+                                    @role('Bagian Akademik|Super Admin')
+                                        <th>Actions</th>
+                                    @endrole
                                     <th>Lingkup materi</th>
                                     <th>Tujuan pembelajaran</th>
                                 </tr>
@@ -71,8 +73,8 @@
                                         <td>{{ $item->pengampu?->staff?->nama ?? ($item->pengampu?->name ?? 'N/A') }}</td>
                                         <td>{{ $item->kelasAjar?->riwayat_kelas_count ?? 0 }}</td>
 
+                                        @role('Bagian Akademik|Super Admin')
                                         <td>
-                                            @role('Bagian Akademik|Super Admin')
                                                 <button type="button" class="btn btn-sm btn-light-warning mb-1"
                                                     data-bs-toggle="modal" data-bs-target="#modalIntra" data-mode="edit"
                                                     data-id="{{ $item->intrakurikuler_id }}"
@@ -93,8 +95,8 @@
                                                 </form>
 
                                                 
+                                            </td>
                                             @endrole
-                                        </td>
 
                                         <td>
                                             <a href="{{ route('lingkup-materi.index', $item->intrakurikuler_id) }}"

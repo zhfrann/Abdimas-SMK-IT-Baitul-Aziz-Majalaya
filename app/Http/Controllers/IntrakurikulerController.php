@@ -6,6 +6,7 @@ use App\Models\Intrakurikuler;
 use App\Models\KelasAjar;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
@@ -29,29 +30,61 @@ class IntrakurikulerController extends Controller
 
     //     return view('intrakurikuler.index', compact('intrakurikuler'));
     // }
+
     public function index()
     {
-        $intrakurikuler = Intrakurikuler::query()
-            ->with([
-                'kelasAjar' => function ($q) {
-                    $q->with(['kelas', 'tahunAjaran'])
-                        ->withCount('riwayatKelas');
-                },
-                'pengampu.staff',
-            ])
-            ->orderByDesc('intrakurikuler_id')
-            ->get();
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $id = $user->id;
+        $role = $user?->getRoleNames()->first();
 
-        // buat modal create
-        $kelasAjar = KelasAjar::with(['kelas', 'tahunAjaran'])
-            ->orderByDesc('tahun_ajaran_id')
-            ->orderByDesc('kelas_ajar_id')
-            ->get();
+        if ($role === 'Guru Mapel') {
+            $intrakurikuler = Intrakurikuler::query()
+                ->with([
+                    'kelasAjar' => function ($q) {
+                        $q->with(['kelas', 'tahunAjaran'])
+                            ->withCount('riwayatKelas');
+                    },
+                    'pengampu.staff',
+                ])
+                ->where('pengampu_user_id', $id)
+                ->orderByDesc('intrakurikuler_id')
+                ->get();
 
-        $guru = User::role('Guru Mapel')
-            ->with('staff')
-            ->orderBy('name')
-            ->get();
+            // buat modal create
+            $kelasAjar = KelasAjar::with(['kelas', 'tahunAjaran'])
+                ->orderByDesc('tahun_ajaran_id')
+                ->orderByDesc('kelas_ajar_id')
+                ->get();
+
+            $guru = User::role('Guru Mapel')
+                ->with('staff')
+                ->orderBy('name')
+                ->get();
+        }
+        if ($role == 'Bagian Akademik') {
+            $intrakurikuler = Intrakurikuler::query()
+                ->with([
+                    'kelasAjar' => function ($q) {
+                        $q->with(['kelas', 'tahunAjaran'])
+                            ->withCount('riwayatKelas');
+                    },
+                    'pengampu.staff',
+                ])
+                ->orderByDesc('intrakurikuler_id')
+                ->get();
+
+            // buat modal create
+            $kelasAjar = KelasAjar::with(['kelas', 'tahunAjaran'])
+                ->orderByDesc('tahun_ajaran_id')
+                ->orderByDesc('kelas_ajar_id')
+                ->get();
+
+            $guru = User::role('Guru Mapel')
+                ->with('staff')
+                ->orderBy('name')
+                ->get();
+        }
 
         return view('intrakurikuler.index', compact('intrakurikuler', 'kelasAjar', 'guru'));
     }

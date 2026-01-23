@@ -14,7 +14,6 @@ class LingkupMateriController extends Controller
     public function index(Intrakurikuler $intrakurikuler)
     {
         $lingkupMateri = LingkupMateri::where('intrakurikuler_id', $intrakurikuler->intrakurikuler_id)
-            ->orderByDesc('lingkup_materi_id')
             ->get();
 
         return view('intrakurikuler.lingkup_materi.index', compact('intrakurikuler', 'lingkupMateri'));

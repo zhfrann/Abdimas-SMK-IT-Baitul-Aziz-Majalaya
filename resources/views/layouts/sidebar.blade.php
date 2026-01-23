@@ -59,9 +59,9 @@
                         </a>
                     </li>
                 @endrole
-                @role('Super Admin')
-                    @include('layouts.menu-list-superadmin')
-                @endrole
+                    @role('Super Admin')
+                        @include('layouts.menu-list-superadmin')
+                    @endrole
 
                 @role('Guru Mapel')
                     @include('layouts.menu-list-mapel')
