@@ -67,8 +67,8 @@ class CetakDokumenController extends Controller
             'kelasAjar' => $kelasAjar,
             'siswaList' => $siswaList,
             'sekolah' => $sekolah,
-        ])->format('A4')->download('Sampul Rapor ' . $namaKelas . ' ' . $tahunAjaran . ' ' . $semester . '.pdf');
-        // ])->format('A4');
+            // ])->format('A4')->download('Sampul Rapor ' . $namaKelas . ' ' . $tahunAjaran . ' ' . $semester . '.pdf');
+        ])->format('A4');
 
         return $pdf;
     }

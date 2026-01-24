@@ -30,7 +30,9 @@ PK  npsn         INT NOT NULL
 FK  kelurahan_id
     website
     email
+    telp
     nama_kepala_sekolah
+    nip_kepala_sekolah
 
 
 Staff
@@ -181,5 +183,9 @@ PK  siswa_ekstrakurikuler_id INT NOT NULL
 FK  siswa_id                 INT NOT NULL
 FK  ekstrakurikuler_id       INT NOT NULL
 
+Penilaian_Ekstrakurikuler
+PK  penilaian_ekstrakurikuler_id INT NOT NULL
+FK  siswa_ekstrakurikuler_id     INT NOT NULL
+    deskripsi                    TEXT NOT NULL
 
 

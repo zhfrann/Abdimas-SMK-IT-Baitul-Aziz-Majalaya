@@ -159,24 +159,26 @@
             </table>
 
             {{-- Tanda Tangan --}}
-            <div style="text-align: right; margin: 0 5mm;">Bandung, {{ now()->translatedFormat('d F Y') }}</div>
-            <div style="width:100%; display:flex; justify-content:space-between; margin-top: 2mm;">
-                {{-- Orang Tua --}}
-                <div style="width: 30%; text-align: center;">
-                    Orang Tua,<br><br><br><br>
-                    .................................................
-                </div>
+            <div style="page-break-inside: avoid;">
+                <div style="text-align: right; margin: 0 5mm;">Bandung, {{ now()->translatedFormat('d F Y') }}</div>
+                <div style="width:100%; display:flex; justify-content:space-between; margin-top: 2mm;">
+                    {{-- Orang Tua --}}
+                    <div style="width: 30%; text-align: center;">
+                        Orang Tua,<br><br><br><br>
+                        .................................................
+                    </div>
 
-                {{-- Wali Kelas --}}
-                <div style="width: 30%; text-align: center;">
-                    Wali Kelas,<br><br><br><br>
-                    {{ $waliKelas->name ?? 'Wali Kelas' }}
+                    {{-- Wali Kelas --}}
+                    <div style="width: 30%; text-align: center;">
+                        Wali Kelas,<br><br><br><br>
+                        {{ $waliKelas->name ?? 'Wali Kelas' }}
+                    </div>
                 </div>
-            </div>
-            <div style="width:50%; margin: 5mm auto 0; text-align:center;">
-                Mengetahui,<br>
-                Kepala Sekolah<br><br><br><br>
-                <span style="font-weight:bold;">{{ $sekolah->nama_kepala_sekolah ?? '' }}</span><br>
+                <div style="width:50%; margin: 5mm auto 0; text-align:center;">
+                    Mengetahui,<br>
+                    Kepala Sekolah<br><br><br><br>
+                    <span style="font-weight:bold;">{{ $sekolah->nama_kepala_sekolah ?? '' }}</span><br>
+                </div>
             </div>
     </div>
 @endforeach
