@@ -11,15 +11,16 @@
 
     <div class="card">
         <div class="card-body">
-            <form method="POST" action="{{ route('dokumen.cetak') }}">
+            <form method="POST" action="{{ route('dokumen.cetak.sampul') }}" id="formCetakDokumen">
                 @csrf
                 <input type="hidden" name="kelas_ajar_id" value="{{ $kelasAjar->kelas_ajar_id }}">
 
                 <div class="mb-3">
                     <label>Jenis Dokumen</label>
-                    <select name="jenis" class="form-control" required>
+                    <select name="jenis" class="form-select" id="jenisDokumen" required>
                         <option value="sampul">Sampul Rapor</option>
                         <option value="rapor">Rapor</option>
+                        <option value="buku_induk">Buku Induk</option>
                     </select>
                 </div>
 
@@ -81,6 +82,22 @@
                     });
                 });
             }
+
+            // Mapping value ke action
+            const actionMap = {
+                'sampul': "{{ route('dokumen.cetak.sampul') }}",
+                'rapor': "{{ route('dokumen.cetak.rapor') }}",
+                'buku_induk': "{{ route('dokumen.cetak.buku_induk') }}"
+            };
+
+            // Ganti action form sesuai jenis dokumen
+            const jenisSelect = document.getElementById('jenisDokumen');
+            const form = document.getElementById('formCetakDokumen');
+            jenisSelect.addEventListener('change', function() {
+                form.action = actionMap[jenisSelect.value];
+            });
+            // Set action awal
+            form.action = actionMap[jenisSelect.value];;
         });
     </script>
 @endsection

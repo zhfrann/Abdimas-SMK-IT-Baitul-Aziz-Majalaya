@@ -129,8 +129,9 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('dokumen')->name('dokumen.')->group(function () {
         Route::get('kelas', [CetakDokumenController::class, 'kelas'])->name('kelas');
         Route::get('kelas/{kelas_ajar}/pilih', [CetakDokumenController::class, 'pilihCetak'])->name('kelas.pilih');
-        Route::post('preview', [CetakDokumenController::class, 'preview'])->name('preview');
-        Route::post('cetak', [CetakDokumenController::class, 'cetak'])->name('cetak');
+        Route::post('cetak-sampul', [CetakDokumenController::class, 'cetakSampul'])->name('cetak.sampul');
+        Route::post('cetak-rapor', [CetakDokumenController::class, 'cetakRapor'])->name('cetak.rapor');
+        Route::post('cetak-buku-induk', [CetakDokumenController::class, 'cetakBukuInduk'])->name('cetak.buku_induk');
     });
 
     // Route::get('{routeName}/{name?}', [HomeController::class, 'pageView']);
