@@ -105,4 +105,30 @@ class Siswa extends Model
 
         return trim($alamat);
     }
+
+    public function asesmenFormatif()
+    {
+        // Mengambil semua asesmen formatif dari seluruh riwayat kelas siswa
+        return $this->hasManyThrough(
+            \App\Models\AsesmenFormatif::class,
+            \App\Models\RiwayatKelas::class,
+            'siswa_id', // Foreign key di RiwayatKelas
+            'riwayat_kelas_id', // Foreign key di AsesmenFormatif
+            'siswa_id', // Local key di Siswa
+            'riwayat_kelas_id' // Local key di RiwayatKelas
+        );
+    }
+
+    public function skorAsesmenSumatif()
+    {
+        // Mengambil semua skor sumatif dari seluruh riwayat kelas siswa
+        return $this->hasManyThrough(
+            \App\Models\SkorAsesmenSiswa::class,
+            \App\Models\RiwayatKelas::class,
+            'siswa_id', // Foreign key di RiwayatKelas
+            'riwayat_kelas_id', // Foreign key di SkorAsesmenSiswa
+            'siswa_id', // Local key di Siswa
+            'riwayat_kelas_id' // Local key di RiwayatKelas
+        );
+    }
 }

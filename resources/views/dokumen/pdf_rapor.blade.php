@@ -8,16 +8,13 @@
         $waliKelas = $kelasAjar->waliKelas;
         $sekolah = $sekolah ?? null;
         $intrakurikulerList = $kelasAjar->intrakurikuler ?? [];
-        // Ambil semua ekskul yang diambil siswa pada tahun ajaran & semester ini
         $ekskulList = $siswa->siswaEkstrakurikuler
             ->where('ekstrakurikuler.tahun_ajaran_id', $tahunAjaran->tahun_ajaran_id)
             ->values();
-        // Index skor sumatif siswa (riwayat_kelas_id + intrakurikuler_id)
-        $skorSumatifMap = collect($rk->skorAsesmen)->keyBy(function ($skor) {
-            return $skor->asesmenSumatif->intrakurikuler_id ?? null;
-        });
-        // Index asesmen formatif siswa (intrakurikuler_id)
-        $formatifMap = collect($rk->siswa->asesmenFormatif ?? [])->keyBy('intrakurikuler_id');
+
+        // Koleksi formatif & sumatif siswa
+        $asesmenFormatifList = $siswa->asesmenFormatif ?? collect();
+        $skorSumatifList = $siswa->skorAsesmenSumatif ?? collect();
     @endphp
 
     <div class="page">
@@ -76,109 +73,111 @@
                 @php $no=1; @endphp
                 @foreach ($intrakurikulerList as $mapel)
                     @php
-                        // Ambil skor sumatif siswa pada mapel ini
-                        $skor = $skorSumatifMap[$mapel->intrakurikuler_id] ?? null;
+                        // Skor sumatif siswa pada mapel & riwayat kelas ini
+                        $skor = $skorSumatifList
+                            ->where('riwayat_kelas_id', $riwayatKelas->riwayat_kelas_id)
+                            ->where('asesmenSumatif.intrakurikuler_id', $mapel->intrakurikuler_id)
+                            ->sortByDesc('skor_asesmen_siswa_id')
+                            ->first();
                         $nilaiAkhir = $skor->nilai ?? '-';
 
-                        // Ambil capaian kompetensi dari asesmen formatif
-                        $formatif = $formatifMap[$mapel->intrakurikuler_id] ?? null;
+                        // Formatif siswa pada mapel & riwayat kelas ini
+                        $formatif = $asesmenFormatifList
+                            ->where('riwayat_kelas_id', $riwayatKelas->riwayat_kelas_id)
+                            ->where('intrakurikuler_id', $mapel->intrakurikuler_id)
+                            ->first();
                         $capaianTertinggi = $formatif->deskripsi_catatan_tertinggi ?? '-';
                         $capaianTerendah = $formatif->deskripsi_catatan_terendah ?? '-';
+                        $rowspan = $capaianTerendah && $capaianTerendah !== '-' ? 2 : 1;
                     @endphp
                     <tr>
-                        <td style="text-align:center;">{{ $no++ }}</td>
-                        <td>{{ $mapel->nama_pelajaran }}</td>
-                        <td style="text-align:center;">{{ $nilaiAkhir }}</td>
-                        <td>
-                            <div>
-                                {{ $capaianTertinggi }}
-                            </div>
-                            @if ($capaianTerendah && $capaianTerendah !== '-')
-                                <div style="margin-top:2px;">
-                                    <span style="font-style:italic;">{{ $capaianTerendah }}</span>
-                                </div>
-                            @endif
-                        </td>
+                        <td style="text-align:center;" rowspan="{{ $rowspan }}">{{ $no++ }}</td>
+                        <td rowspan="{{ $rowspan }}">{{ $mapel->nama_pelajaran }}</td>
+                        <td style="text-align:center;" rowspan="{{ $rowspan }}">{{ $nilaiAkhir }}</td>
+                        <td>{{ $capaianTertinggi }}</td>
                     </tr>
+                    @if ($capaianTerendah && $capaianTerendah !== '-')
+                        <tr>
+                            <td>{{ $capaianTerendah }}</td>
+                        </tr>
+                    @endif
                 @endforeach
             </tbody>
-        </table>
 
-        {{-- Tabel Ekstrakurikuler --}}
-        <table border="1" cellpadding="4" cellspacing="0"
-            style="width:100%; font-size:11pt; border-collapse:collapse; margin-bottom: 8mm;">
-            <thead>
-                <tr>
-                    <th style="width:5%;">No</th>
-                    <th style="width:40%;">Ekstrakurikuler</th>
-                    <th>Keterangan</th>
-                </tr>
-            </thead>
-            <tbody>
-                @php $noEks=1; @endphp
-                @forelse ($ekskulList as $ekskul)
-                    @php
-                        $penilaian = $ekskul->penilaians->first();
-                        $deskripsi = $penilaian->deskripsi ?? '-';
-                    @endphp
+            {{-- Tabel Ekstrakurikuler --}}
+            <table border="1" cellpadding="4" cellspacing="0"
+                style="width:100%; font-size:11pt; border-collapse:collapse; margin-bottom: 8mm;">
+                <thead>
                     <tr>
-                        <td style="text-align:center;">{{ $noEks++ }}</td>
-                        <td>{{ $ekskul->ekstrakurikuler->nama_pelajaran ?? '-' }}</td>
-                        <td>{{ $deskripsi }}</td>
+                        <th style="width:5%;">No</th>
+                        <th style="width:40%;">Ekstrakurikuler</th>
+                        <th>Keterangan</th>
                     </tr>
-                @empty
+                </thead>
+                <tbody>
+                    @php $noEks=1; @endphp
+                    @forelse ($ekskulList as $ekskul)
+                        @php
+                            $penilaian = $ekskul->penilaians->first();
+                            $deskripsi = $penilaian->deskripsi ?? '-';
+                        @endphp
+                        <tr>
+                            <td style="text-align:center;">{{ $noEks++ }}</td>
+                            <td>{{ $ekskul->ekstrakurikuler->nama_pelajaran ?? '-' }}</td>
+                            <td>{{ $deskripsi }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" style="text-align:center;">-</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+
+            {{-- Tabel Ketidakhadiran --}}
+            <table border="1" cellpadding="4" cellspacing="0"
+                style="width:45%; font-size:11pt; border-collapse:collapse; margin-left: 8mm; margin-bottom:18px;">
+                <thead>
                     <tr>
-                        <td colspan="3" style="text-align:center;">-</td>
+                        <th colspan="2" style="text-align:center;">Ketidakhadiran</th>
                     </tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Sakit</td>
+                        <td>0 hari</td>
+                    </tr>
+                    <tr>
+                        <td>Izin</td>
+                        <td>0 hari</td>
+                    </tr>
+                    <tr>
+                        <td>Tanpa Keterangan</td>
+                        <td>0 hari</td>
+                    </tr>
+                </tbody>
+            </table>
 
-        {{-- Tabel Ketidakhadiran --}}
-        <table border="1" cellpadding="4" cellspacing="0"
-            style="width:45%; font-size:11pt; border-collapse:collapse; margin-left: 8mm; margin-bottom:18px;">
-            <thead>
-                <tr>
-                    <th colspan="2" style="text-align:center;">Ketidakhadiran</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Sakit</td>
-                    <td>0 hari</td>
-                </tr>
-                <tr>
-                    <td>Izin</td>
-                    <td>0 hari</td>
-                </tr>
-                <tr>
-                    <td>Tanpa Keterangan</td>
-                    <td>0 hari</td>
-                </tr>
-            </tbody>
-        </table>
+            {{-- Tanda Tangan --}}
+            <div style="text-align: right; margin: 0 5mm;">Bandung, {{ now()->translatedFormat('d F Y') }}</div>
+            <div style="width:100%; display:flex; justify-content:space-between; margin-top: 2mm;">
+                {{-- Orang Tua --}}
+                <div style="width: 30%; text-align: center;">
+                    Orang Tua,<br><br><br><br>
+                    .................................................
+                </div>
 
-        {{-- Tanda Tangan --}}
-        <div style="text-align: right; margin: 0 5mm;">Bandung, {{ now()->translatedFormat('d F Y') }}</div>
-        <div style="width:100%; display:flex; justify-content:space-between; margin-top: 2mm;">
-            {{-- Orang Tua --}}
-            <div style="width: 30%; text-align: center;">
-                Orang Tua,<br><br><br><br>
-                .................................................
+                {{-- Wali Kelas --}}
+                <div style="width: 30%; text-align: center;">
+                    Wali Kelas,<br><br><br><br>
+                    {{ $waliKelas->name ?? 'Wali Kelas' }}
+                </div>
             </div>
-
-            {{-- Wali Kelas --}}
-            <div style="width: 30%; text-align: center;">
-                Wali Kelas,<br><br><br><br>
-                {{ $waliKelas->name ?? 'Wali Kelas' }}
+            <div style="width:50%; margin: 5mm auto 0; text-align:center;">
+                Mengetahui,<br>
+                Kepala Sekolah<br><br><br><br>
+                <span style="font-weight:bold;">{{ $sekolah->nama_kepala_sekolah ?? '' }}</span><br>
             </div>
-        </div>
-        <div style="width:50%; margin: 5mm auto 0; text-align:center;">
-            Mengetahui,<br>
-            Kepala Sekolah<br><br><br><br>
-            <span style="font-weight:bold;">{{ $sekolah->nama_kepala_sekolah ?? '' }}</span><br>
-            NIP.
-        </div>
     </div>
 @endforeach
 
