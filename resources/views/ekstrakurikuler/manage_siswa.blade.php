@@ -5,7 +5,51 @@
 @section('css')
     <link rel="stylesheet" href="/build/css/plugins/style.css" />
     <style>
-        /* ...dark mode css... */
+        /* ===== Choices DARK MODE FIX (Able Pro uses body[data-pc-theme="dark"]) ===== */
+        body[data-pc-theme="dark"] .choices__inner {
+            background-color: rgba(255, 255, 255, .06) !important;
+            border-color: rgba(255, 255, 255, .18) !important;
+            color: rgba(255, 255, 255, .90) !important;
+        }
+
+        body[data-pc-theme="dark"] .choices__input {
+            background-color: transparent !important;
+            color: rgba(255, 255, 255, .92) !important;
+        }
+
+        body[data-pc-theme="dark"] .choices__input::placeholder {
+            color: rgba(255, 255, 255, .55) !important;
+        }
+
+        body[data-pc-theme="dark"] .choices__list--dropdown,
+        body[data-pc-theme="dark"] .choices__list[aria-expanded] {
+            background-color: #1b1f24 !important;
+            border-color: rgba(255, 255, 255, .14) !important;
+            color: rgba(255, 255, 255, .92) !important;
+        }
+
+        body[data-pc-theme="dark"] .choices__list--dropdown .choices__item {
+            color: rgba(255, 255, 255, .92) !important;
+        }
+
+        body[data-pc-theme="dark"] .choices__list--dropdown .choices__item--selectable.is-highlighted {
+            background-color: rgba(255, 255, 255, .08) !important;
+        }
+
+        body[data-pc-theme="dark"] .choices__item--selectable {
+            color: rgba(255, 255, 255, .92) !important;
+        }
+
+        /* selected item chip (kalau single select, ini text yang tampil) */
+        body[data-pc-theme="dark"] .choices__item--selectable,
+        body[data-pc-theme="dark"] .choices__list--single .choices__item {
+            color: rgba(255, 255, 255, .92) !important;
+        }
+
+        /* kalau invalid, tetap merah */
+        body[data-pc-theme="dark"] select.is-invalid+.choices .choices__inner {
+            border-color: #dc3545 !important;
+        }
     </style>
 @endsection
 
@@ -80,7 +124,7 @@
                     <div class="text-danger">{{ $message }}</div>
                 @enderror
             </div>
-            <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+            <a href="{{ route('ekstrakurikuler.index') }}" class="btn btn-secondary">Kembali</a>
         </div>
     </div>
 

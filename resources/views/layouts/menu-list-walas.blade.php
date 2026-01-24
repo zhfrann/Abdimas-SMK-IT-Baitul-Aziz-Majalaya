@@ -3,10 +3,10 @@
 </li>
 
 <li class="pc-item pc-hasmenu">
-  <a href="{{ route('absensi.index') }}" class="pc-link">
+  <!-- <a href="{{ route('absensi.index') }}" class="pc-link">
     <span class="pc-micon"><i class="bi bi-clipboard-check"></i></span>
     <span class="pc-mtext">Absensi</span>
-  </a>
+  </a> -->
 </li>
 <!-- tambah sini mas -->
 

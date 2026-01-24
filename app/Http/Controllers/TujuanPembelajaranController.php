@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Intrakurikuler;
+use App\Models\TujuanPembelajaran;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TujuanPembelajaranController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index($intrakurikuler_id)
     {
-        return view('intrakurikuler.table_tujuan_pembelajaran');
+        $intrakurikuler = Intrakurikuler::with('kelasAjar.kelas')->findOrFail($intrakurikuler_id);
+        $tujuanPembelajaran = TujuanPembelajaran::where('intrakurikuler_id', $intrakurikuler_id)->get();
+
+        return view('intrakurikuler.table_tujuan_pembelajaran', compact('intrakurikuler', 'tujuanPembelajaran'));
     }
 
     /**
@@ -22,12 +25,24 @@ class TujuanPembelajaranController extends Controller
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(Request $request, $intrakurikuler_id)
     {
-        //
+        $request->validate([
+            'deskripsi' => 'required|string|max:255',
+        ]);
+
+        try {
+            DB::beginTransaction();
+            TujuanPembelajaran::create([
+                'intrakurikuler_id' => $intrakurikuler_id,
+                'deskripsi' => $request->deskripsi,
+            ]);
+            DB::commit();
+            return back()->with('success', 'Tujuan pembelajaran berhasil ditambahkan.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal menambah tujuan pembelajaran.');
+        }
     }
 
     /**
@@ -46,19 +61,35 @@ class TujuanPembelajaranController extends Controller
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $intrakurikuler_id, $id)
     {
-        //
+        $request->validate([
+            'deskripsi' => 'required|string|max:255',
+        ]);
+
+        try {
+            DB::beginTransaction();
+            $tujuan = TujuanPembelajaran::where('intrakurikuler_id', $intrakurikuler_id)->findOrFail($id);
+            $tujuan->update(['deskripsi' => $request->deskripsi]);
+            DB::commit();
+            return back()->with('success', 'Tujuan pembelajaran berhasil diupdate.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal mengupdate tujuan pembelajaran.');
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy($intrakurikuler_id, $id)
     {
-        //
+        try {
+            DB::beginTransaction();
+            $tujuan = TujuanPembelajaran::where('intrakurikuler_id', $intrakurikuler_id)->findOrFail($id);
+            $tujuan->delete();
+            DB::commit();
+            return back()->with('success', 'Tujuan pembelajaran berhasil dihapus.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal menghapus tujuan pembelajaran. Silakan coba lagi.');
+        }
     }
 }

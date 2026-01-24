@@ -3,279 +3,173 @@
 @section('title', 'Asesmen Formatif')
 
 @section('css')
-<link rel="stylesheet" href="/build/css/plugins/style.css" />
+    <link rel="stylesheet" href="/build/css/plugins/style.css" />
 @endsection
 
 @section('content')
 
-<x-breadcrumb item="Intrakurikuler" active="Detail Asesmen Formatif" />
+    <x-breadcrumb item="Intrakurikuler" active="Detail Asesmen Formatif" />
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="fs-4">ADITYA RIZKI ARIFIN</h5>
-                <span class="d-block m-t-5"></span>
-            </div>
-            <div class="card-body">
-                <form>
-                    <div class="row">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="fs-4">{{ $riwayatKelas->siswa->user->name ?? $riwayatKelas->siswa->nama }}</h5>
+                    <span class="d-block m-t-5">
+                        {{ $riwayatKelas->kelasAjar->kelas->nama_kelas }} •
+                        {{ $riwayatKelas->kelasAjar->tahunAjaran->tahun }}
+                        {{ $riwayatKelas->kelasAjar->tahunAjaran->semester }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    @if (session('success'))
+                        <div class="alert alert-success">{{ session('success') }}</div>
+                    @endif
+                    @if (session('warning'))
+                        <div class="alert alert-warning">{{ session('warning') }}</div>
+                    @endif
+                    @if (session('error'))
+                        <div class="alert alert-danger">{{ session('error') }}</div>
+                    @endif
+                    <form method="POST"
+                        action="{{ route('assesment-formatif.save-detail', [$intrakurikuler->intrakurikuler_id, $riwayatKelas->riwayat_kelas_id]) }}">
+                        @csrf
+                        <div class="row">
+                            <div class="mb-4 col-md-6">
+                                <label class="form-label fs-5 f-w-600">Deskripsi Capaian Tertinggi dalam Rapor</label>
+                                <textarea class="form-control" id="capaianTertinggi" name="capaian_tertinggi" rows="4">{{ old('capaian_tertinggi') }}</textarea>
+                            </div>
+                            <div class="mb-4 col-md-6">
+                                <label class="form-label fs-5 f-w-600">Deskripsi Capaian Terendah dalam Rapor</label>
+                                <textarea class="form-control" id="capaianTerendah" name="capaian_terendah" rows="4">{{ old('capaian_terendah') }}</textarea>
+                            </div>
 
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label fs-5 f-w-600">Deskripsi Capaian Tertinggi dalam Rapor</label>
-                            <textarea class="form-control" id="capaianTertinggi" rows="4">Aditya Rizki Arifin menunjukkan pemahaman dalam membaca Al-Qur’an dengan meyakini bahwa kontrol diri (Mujahadah An-Nafs) adalah perintah agama, menunjukan perilaku control diri (Mujahadah An-Nafs), sebagai implementasi dari perintah Q.S. Al-Anfal /8:72 serta Hadits terkait., 
-                        </textarea>
+                            @foreach ($intrakurikuler->tujuanPembelajaran as $tp)
+                                @php
+                                    $detail = $details
+                                        ->where('tujuan_pembelajaran_id', $tp->tujuan_pembelajaran_id)
+                                        ->first();
+                                    $tercapai = $detail && $detail->kktp ? true : false;
+                                    // $tampil_rapor = $detail && isset($detail->tampil) ? (bool) $detail->tampil : false;
+                                    $tampil_rapor = $detail ? (bool) $detail->tampil : false;
+                                    $tpIndex = $loop->iteration;
+                                @endphp
+                                <div class="mb-4 col-md-6">
+                                    <label class="form-label fs-5 f-w-600">TP {{ $tpIndex }}</label>
+                                    <p class="tp-deskripsi" data-tp="{{ $tp->tujuan_pembelajaran_id }}">
+                                        {{ $tp->deskripsi }}
+                                    </p>
+                                    <div class="form-check">
+                                        <input class="form-check-input tp-tercapai" type="checkbox"
+                                            name="tp[{{ $tp->tujuan_pembelajaran_id }}][tercapai]" value="1"
+                                            id="tp{{ $tpIndex }}_tercapai" {{ $tercapai ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="tp{{ $tpIndex }}_tercapai">
+                                            TP tercapai
+                                        </label>
+                                    </div>
+                                    <div class="form-check mt-1">
+                                        <input class="form-check-input tp-tampil-rapor" type="checkbox"
+                                            name="tp[{{ $tp->tujuan_pembelajaran_id }}][tampil_rapor]" value="1"
+                                            id="tp{{ $tpIndex }}_rapor" {{ $tampil_rapor ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="tp{{ $tpIndex }}_rapor">
+                                            Tampilkan di rapor
+                                        </label>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
-
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label fs-5 f-w-600">Deskripsi Capaian Terendah dalam Rapor</label>
-                            <textarea class="form-control" id="capaianTertinggi"
-                                rows="4">Aditya Rizki Arifin membutuhkan bimbingan dalam menganalisisQ.S. Al-Hujurat/49:12, serta Hadits prasangka baik (husnuzzan)., membaca Q.S. Al-Hujurat/49:12, sesuai dengan kaidah tajwid dan makharijul huruf, </textarea>
-                        </div>
-
-                        {{-- TP 1 --}}
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label fs-5 f-w-600">TP 1</label>
-                            <p>Membaca Al-Qur’an dengan meyakini bahwa kontrol diri adalah perintah agama.</p>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="tp[1][tercapai]" value="1"
-                                    id="tp1_tercapai">
-                                <label class="form-check-label" for="tp1_tercapai">
-                                    TP tercapai
-                                </label>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <button type="submit" class="btn btn-primary">Simpan</button>
+                                <a href="{{ route('assesment-formatif.index', $intrakurikuler->intrakurikuler_id) }}"
+                                    class="btn btn-light-secondary">Kembali</a>
                             </div>
+                            <div class="d-flex gap-5">
+                                @if ($prevSiswa)
+                                    <a href="{{ route('assesment-formatif.detail', [
+                                        'intrakurikuler' => $intrakurikuler->intrakurikuler_id,
+                                        'riwayatKelas' => $prevSiswa->riwayat_kelas_id,
+                                    ]) }}"
+                                        class="link-primary">
+                                        <i class="bi bi-chevron-left"></i>
+                                        {{ $prevSiswa->siswa->user->name ?? $prevSiswa->siswa->nama }}
+                                    </a>
+                                @else
+                                    <span class="text-muted"><i class="bi bi-chevron-left"></i> (Siswa pertama)</span>
+                                @endif
 
-                            <div class="form-check mt-1">
-                                <input class="form-check-input" type="checkbox" name="tp[1][tampil_rapor]" value="1"
-                                    id="tp1_rapor" checked>
-                                <label class="form-check-label" for="tp1_rapor">
-                                    Tampilkan di rapor
-                                </label>
-                            </div>
-                        </div>
-
-                        {{-- TP 2 --}}
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label fs-5 f-w-600">TP 2</label>
-                            <p>Menunjukan perilaku control diri (Mujahadah An-Nafs), sebagai implementasi dari perintah Q.S. Al-Anfal /8:72 serta Hadits terkait.</p>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="tp[2][tercapai]" value="1"
-                                    id="tp2_tercapai" checked>
-                                <label class="form-check-label" for="tp2_tercapai">
-                                    TP tercapai
-                                </label>
-                            </div>
-
-                            <div class="form-check mt-1">
-                                <input class="form-check-input" type="checkbox" name="tp[2][tampil_rapor]" value="1"
-                                    id="tp2_rapor" checked>
-                                <label class="form-check-label" for="tp2_rapor">
-                                    Tampilkan di rapor
-                                </label>
-                            </div>
-                        </div>
-
-                        {{-- TP 3 --}}
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label fs-5 f-w-600">TP 3</label>
-                            <p>Menganalisis Q.S. Al-Anfal/8:72, serta hadits tentang control diri (Mujahadah An-Nafs).</p>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="tp[3][tercapai]" value="1"
-                                    id="tp3_tercapai" checked>
-                                <label class="form-check-label" for="tp3_tercapai">
-                                    TP tercapai
-                                </label>
-                            </div>
-
-                            <div class="form-check mt-1">
-                                <input class="form-check-input" type="checkbox" name="tp[3][tampil_rapor]" value="1"
-                                    id="tp3_rapor" checked>
-                                <label class="form-check-label" for="tp3_rapor">
-                                    Tampilkan di rapor
-                                </label>
-                            </div>
-                        </div>
-
-                        {{-- TP 4 --}}
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label fs-5 f-w-600">TP 4</label>
-                            <p>Membaca Q.S. Al-Anfal/8:72, sesuai dengan kaidah tajwid dan Makharijul Huruf.</p>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="tp[4][tercapai]" value="1"
-                                    id="tp4_tercapai" checked>
-                                <label class="form-check-label" for="tp4_tercapai">
-                                    TP tercapai
-                                </label>
-                            </div>
-
-                            <div class="form-check mt-1">
-                                <input class="form-check-input" type="checkbox" name="tp[4][tampil_rapor]" value="1"
-                                    id="tp4_rapor">
-                                <label class="form-check-label" for="tp4_rapor">
-                                    Tampilkan di rapor
-                                </label>
+                                @if ($nextSiswa)
+                                    <a href="{{ route('assesment-formatif.detail', [
+                                        'intrakurikuler' => $intrakurikuler->intrakurikuler_id,
+                                        'riwayatKelas' => $nextSiswa->riwayat_kelas_id,
+                                    ]) }}"
+                                        class="link-primary">
+                                        {{ $nextSiswa->siswa->user->name ?? $nextSiswa->siswa->nama }} <i
+                                            class="bi bi-chevron-right"></i>
+                                    </a>
+                                @else
+                                    <span class="text-muted">(Siswa terakhir) <i class="bi bi-chevron-right"></i></span>
+                                @endif
                             </div>
                         </div>
-
-                        {{-- TP 5 --}}
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label fs-5 f-w-600">TP 5</label>
-                            <p>Menghafal Q.S. Al-Anfal/8:72, dengan fasih dan lancar.</p>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="tp[5][tercapai]" value="1"
-                                    id="tp5_tercapai">
-                                <label class="form-check-label" for="tp5_tercapai">
-                                    TP tercapai
-                                </label>
-                            </div>
-
-                            <div class="form-check mt-1">
-                                <input class="form-check-input" type="checkbox" name="tp[5][tampil_rapor]" value="1"
-                                    id="tp5_rapor" checked>
-                                <label class="form-check-label" for="tp5_rapor">
-                                    Tampilkan di rapor
-                                </label>
-                            </div>
-                        </div>
-
-                        {{-- TP 6 --}}
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label fs-5 f-w-600">TP 6</label>
-                            <p>Menyajikan hubungan antara kualitas keimanan dengan control diri (Mujahadah An-Nafs), sesuai dengan pesan Q.S. Al-Anfal /8:72, serta hadits.</p>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="tp[6][tercapai]" value="1"
-                                    id="tp6_tercapai" checked>
-                                <label class="form-check-label" for="tp6_tercapai">
-                                    TP tercapai
-                                </label>
-                            </div>
-
-                            <div class="form-check mt-1">
-                                <input class="form-check-input" type="checkbox" name="tp[6][tampil_rapor]" value="1"
-                                    id="tp6_rapor" checked>
-                                <label class="form-check-label" for="tp6_rapor">
-                                    Tampilkan di rapor
-                                </label>
-                            </div>
-                        </div>
-
-                        {{-- TP 7 --}}
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label fs-5 f-w-600">TP 7</label>
-                            <p>Membaca Al-Qur’an dengan meyakini bahwa prasangka baik (husnuzzan), adalah perintah agama.</p>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="tp[7][tercapai]" value="1"
-                                    id="tp7_tercapai" checked>
-                                <label class="form-check-label" for="tp7_tercapai">
-                                    TP tercapai
-                                </label>
-                            </div>
-
-                            <div class="form-check mt-1">
-                                <input class="form-check-input" type="checkbox" name="tp[7][tampil_rapor]" value="1"
-                                    id="tp7_rapor" checked>
-                                <label class="form-check-label" for="tp7_rapor">
-                                    Tampilkan di rapor
-                                </label>
-                            </div>
-                        </div>
-
-                        {{-- TP 8 --}}
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label fs-5 f-w-600">TP 8</label>
-                            <p>MenganalisisQ.S. Al-Hujurat/49:12, serta Hadits prasangka baik (husnuzzan).</p>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="tp[8][tercapai]" value="1"
-                                    id="tp8_tercapai" checked>
-                                <label class="form-check-label" for="tp8_tercapai">
-                                    TP tercapai
-                                </label>
-                            </div>
-
-                            <div class="form-check mt-1">
-                                <input class="form-check-input" type="checkbox" name="tp[8][tampil_rapor]" value="1"
-                                    id="tp8_rapor" checked>
-                                <label class="form-check-label" for="tp8_rapor">
-                                    Tampilkan di rapor
-                                </label>
-                            </div>
-                        </div>
-
-                        {{-- TP 9 --}}
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label fs-5 f-w-600">TP 9</label>
-                            <p>Membaca Q.S. Al-Hujurat/49:12, sesuai dengan kaidah tajwid dan makharijul huruf</p>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="tp[9][tercapai]" value="1"
-                                    id="tp9_tercapai" checked>
-                                <label class="form-check-label" for="tp9_tercapai">
-                                    TP tercapai
-                                </label>
-                            </div>
-
-                            <div class="form-check mt-1">
-                                <input class="form-check-input" type="checkbox" name="tp[9][tampil_rapor]" value="1"
-                                    id="tp9_rapor" checked>
-                                <label class="form-check-label" for="tp9_rapor">
-                                    Tampilkan di rapor
-                                </label>
-                            </div>
-                        </div>
-
-                        {{-- TP 10 --}}
-                        <div class="mb-4 col-md-6">
-                            <label class="form-label fs-5 f-w-600">TP 10</label>
-                            <p>Menghafal Q.S. Al-Hujurat/49:12 dengan fasih dan lancar.</p>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="tp[10][tercapai]" value="1"
-                                    id="tp10_tercapai" checked>
-                                <label class="form-check-label" for="tp10_tercapai">
-                                    TP tercapai
-                                </label>
-                            </div>
-
-                            <div class="form-check mt-1">
-                                <input class="form-check-input" type="checkbox" name="tp[10][tampil_rapor]" value="1"
-                                    id="tp10_rapor" checked>
-                                <label class="form-check-label" for="tp10_rapor">
-                                    Tampilkan di rapor
-                                </label>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <button type="submit" class="btn btn-primary">Simpan</button>
-                            <a href="{{ route('assesment_formatif.index') }}" class="btn btn-light-secondary">Kembali</a>
-                        </div>
-                        <div class="d-flex gap-5">
-                            <a href="#" class="link-primary"><i class="bi bi-chevron-left"> BABY CANTIKA CAHAYA PERMATA</i></a>
-                            <a href="#" class="link-primary">ALYA NUR ZAHRA <i class="bi bi-chevron-right"></i></a>
-                        </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 @endsection
 
 @section('scripts')
-<!-- [Page Specific JS] start -->
-<script type="module">
-    import { DataTable } from '/build/js/plugins/module.js';
-    window.dt = new DataTable('#pc-dt-simple');
-</script>
-<!-- [Page Specific JS] end -->
+    <!-- [Page Specific JS] start -->
+    <script type="module">
+        import {
+            DataTable
+        } from '/build/js/plugins/module.js';
+        window.dt = new DataTable('#pc-dt-simple');
+    </script>
+    <!-- [Page Specific JS] end -->
+
+    <script>
+        function updateCapaianTextareas() {
+            let namaSiswa = @json($riwayatKelas->siswa->user->name ?? $riwayatKelas->siswa->nama);
+            let tpTercapai = [];
+            let tpTidakTercapai = [];
+
+            // Loop semua TP yang ada di form
+            document.querySelectorAll('.tp-deskripsi').forEach(function(descEl) {
+                let tpId = descEl.getAttribute('data-tp');
+                let deskripsi = descEl.textContent.trim();
+
+                let tercapai = document.querySelector('input[name="tp[' + tpId + '][tercapai]"]')?.checked;
+                let tampilRapor = document.querySelector('input[name="tp[' + tpId + '][tampil_rapor]"]')?.checked;
+
+                if (tampilRapor) {
+                    if (tercapai) {
+                        tpTercapai.push(deskripsi);
+                    } else {
+                        tpTidakTercapai.push(deskripsi);
+                    }
+                }
+            });
+
+            let tertinggi = namaSiswa + (tpTercapai.length > 0 ? ' menunjukkan pemahaman dalam ' + tpTercapai.join(', ') :
+                '');
+            let terendah = namaSiswa + (tpTidakTercapai.length > 0 ? ' membutuhkan bimbingan dalam ' + tpTidakTercapai.join(
+                ', ') : '');
+
+            document.getElementById('capaianTertinggi').value = tertinggi;
+            document.getElementById('capaianTerendah').value = terendah;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCapaianTextareas();
+            document.querySelectorAll('.tp-tercapai, .tp-tampil-rapor').forEach(function(el) {
+                el.addEventListener('change', updateCapaianTextareas);
+            });
+            // Pastikan update sebelum submit juga
+            document.querySelector('form').addEventListener('submit', function() {
+                updateCapaianTextareas();
+            });
+        });
+    </script>
 @endsection

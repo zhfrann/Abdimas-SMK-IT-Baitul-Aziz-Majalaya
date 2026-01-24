@@ -4,6 +4,54 @@
 
 @section('css')
     <link rel="stylesheet" href="/build/css/plugins/style.css" />
+
+    <style>
+        /* ===== Choices DARK MODE FIX (Able Pro uses body[data-pc-theme="dark"]) ===== */
+        body[data-pc-theme="dark"] .choices__inner {
+            background-color: rgba(255, 255, 255, .06) !important;
+            border-color: rgba(255, 255, 255, .18) !important;
+            color: rgba(255, 255, 255, .90) !important;
+        }
+
+        body[data-pc-theme="dark"] .choices__input {
+            background-color: transparent !important;
+            color: rgba(255, 255, 255, .92) !important;
+        }
+
+        body[data-pc-theme="dark"] .choices__input::placeholder {
+            color: rgba(255, 255, 255, .55) !important;
+        }
+
+        body[data-pc-theme="dark"] .choices__list--dropdown,
+        body[data-pc-theme="dark"] .choices__list[aria-expanded] {
+            background-color: #1b1f24 !important;
+            border-color: rgba(255, 255, 255, .14) !important;
+            color: rgba(255, 255, 255, .92) !important;
+        }
+
+        body[data-pc-theme="dark"] .choices__list--dropdown .choices__item {
+            color: rgba(255, 255, 255, .92) !important;
+        }
+
+        body[data-pc-theme="dark"] .choices__list--dropdown .choices__item--selectable.is-highlighted {
+            background-color: rgba(255, 255, 255, .08) !important;
+        }
+
+        body[data-pc-theme="dark"] .choices__item--selectable {
+            color: rgba(255, 255, 255, .92) !important;
+        }
+
+        /* selected item chip (kalau single select, ini text yang tampil) */
+        body[data-pc-theme="dark"] .choices__item--selectable,
+        body[data-pc-theme="dark"] .choices__list--single .choices__item {
+            color: rgba(255, 255, 255, .92) !important;
+        }
+
+        /* kalau invalid, tetap merah */
+        body[data-pc-theme="dark"] select.is-invalid+.choices .choices__inner {
+            border-color: #dc3545 !important;
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -46,6 +94,7 @@
                                     <th>Ekstrakurikuler</th>
                                     <th>Tahun Ajaran</th>
                                     <th>Guru</th>
+                                    <th>Jumlah Siswa</th>
                                     <th>Action</th>
                                     <th>Akademik</th>
                                 </tr>
@@ -60,6 +109,7 @@
                                             {{ $item->tahunAjaran?->semester ?? '' }}
                                         </td>
                                         <td>{{ $item->pembina?->name ?? '-' }}</td>
+                                        <td>{{ $item->peserta_count ?? '-' }}</td>
                                         <td>
                                             <button type="button" class="btn btn-sm btn-light-warning mb-1"
                                                 data-bs-toggle="modal" data-bs-target="#modalEkstra" data-mode="edit"
@@ -82,7 +132,7 @@
                                         <td>
                                             <a href="{{ route('ekstrakurikuler.manage-siswa.index', $item->ekstrakurikuler_id) }}"
                                                 class="btn btn-sm btn-light-primary mb-1">Manage Siswa</a>
-                                            <a href="{{ route('penilaian_ekstrakurikuler.index') }}"
+                                            <a href="{{ route('penilaian_ekstrakurikuler.index', $item->ekstrakurikuler_id) }}"
                                                 class="btn btn-sm btn-light-primary mb-1">Penilaian</a>
                                         </td>
                                     </tr>
@@ -124,7 +174,7 @@
                             <label>Nama Ekstrakurikuler</label>
                             <input type="text" name="nama_pelajaran" id="ekstra_nama"
                                 value="{{ old('nama_pelajaran') }}"
-                                class="form-control @error('nama_pelajaran') is-invalid @enderror">
+                                class="form-control @error('nama_pelajaran') is-invalid @enderror" required>
                             @error('nama_pelajaran')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
@@ -133,7 +183,7 @@
                         <div class="mb-3">
                             <label>Tahun Ajaran</label>
                             <select name="tahun_ajaran_id" id="ekstra_tahun"
-                                class="form-control @error('tahun_ajaran_id') is-invalid @enderror">
+                                class="form-control @error('tahun_ajaran_id') is-invalid @enderror" required>
                                 <option value="">Pilih Tahun Ajaran</option>
                                 @foreach ($tahunAjaran as $ta)
                                     <option value="{{ $ta->tahun_ajaran_id }}"
@@ -150,7 +200,7 @@
                         <div class="mb-3">
                             <label>Guru Pengampu</label>
                             <select name="pengampu_user_id" id="ekstra_guru"
-                                class="form-control @error('pengampu_user_id') is-invalid @enderror">
+                                class="form-control @error('pengampu_user_id') is-invalid @enderror" required>
                                 <option value="">Pilih Guru</option>
                                 @foreach ($guru as $g)
                                     <option value="{{ $g->id }}"
@@ -264,5 +314,27 @@
                 setCreateMode();
             @endif
         @endif
+    </script>
+
+    <script src="/build/js/plugins/choices.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            new Choices('#ekstra_tahun', {
+                searchEnabled: true,
+                placeholder: true,
+                itemSelectText: '',
+                shouldSort: false,
+                searchResultLimit: 15,
+                renderChoiceLimit: 15
+            });
+            new Choices('#ekstra_guru', {
+                searchEnabled: true,
+                placeholder: true,
+                itemSelectText: '',
+                shouldSort: false,
+                searchResultLimit: 15,
+                renderChoiceLimit: 15
+            });
+        });
     </script>
 @endsection

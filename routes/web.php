@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\AbsensiControllerIntrakurikuler;
 use App\Http\Controllers\Akademik\KelasController;
 use App\Http\Controllers\Akademik\StaffController;
 use App\Http\Controllers\Akademik\TahunAjaranController;
@@ -50,6 +50,7 @@ Route::middleware(['auth', 'role:Bagian Akademik'])->prefix('akademik')->name('a
         Route::post('load-siswa', [SiswaController::class, 'loadSiswaFromKelas'])->name('kelas.load-siswa');
         // Route::get('ajax/kelas/search', [SiswaController::class, 'ajaxSearchKelas'])->name('ajax.kelas.search');
     });
+
     Route::get('kelas/ajax/kelas/search', [SiswaController::class, 'ajaxSearchKelas'])->name('ajax.kelas.search');
     Route::resource('staff', StaffController::class);
 });
@@ -87,7 +88,19 @@ Route::middleware(['auth'])->group(function () {
             // ✅ UPDATE (PUT kalau sudah ada skor)
             Route::put('assesment-sumatif/{riwayatKelas}/detail', [AssesmentSumatifController::class, 'updateDetailAssesmentSumatif'])
                 ->name('assesment_sumatif.detail.update');
+
+
+            Route::resource('tujuan-pembelajaran', TujuanPembelajaranController::class)
+                ->except(['show']);
+
+            Route::resource('assesment-formatif', AssesmentFormatifController::class);
+
+            Route::get('assesment-formatif/{riwayatKelas}/detail', [AssesmentFormatifController::class, 'detailAssesmentFormatif'])
+                ->name('assesment-formatif.detail');
+            Route::post('assesment-formatif/{riwayatKelas}/save-detail', [AssesmentFormatifController::class, 'saveDetail'])
+                ->name('assesment-formatif.save-detail');
         });
+
 
     Route::resource('ekstrakurikuler', EkstrakurikulerController::class)->middleware('role:Guru Mapel|Bagian Akademik');
     Route::prefix('ekstrakurikuler/{ekstrakurikuler}')->group(function () {
@@ -103,17 +116,24 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('ajax/search-siswa', [EkstrakurikulerSiswaController::class, 'ajaxSearchSiswa'])
             ->name('ekstrakurikuler.ajax.search-siswa');
+
+        Route::resource('penilaian_ekstrakurikuler', PenilaianEkstrakurikulerController::class);
     })->middleware('role:Guru Mapel|Bagian Akademik');
 
-    Route::resource('tujuan_pembelajaran', TujuanPembelajaranController::class);
-    // Route::get('assesment_sumatif/detail', [AssesmentSumatifController::class, 'detailAssesmentSumatif'])->name('assesment_sumatif.detail');
-    // Route::resource('assesment_sumatif', AssesmentSumatifController::class);
-    Route::get('assesment_formatif/detail', [AssesmentFormatifController::class, 'detailAssesmentFormatif'])->name('assesment_formatif.detail');
-    Route::resource('assesment_formatif', AssesmentFormatifController::class);
-    Route::resource('penilaian_ekstrakurikuler', PenilaianEkstrakurikulerController::class);
+    Route::prefix('absensi')->name('absensi.')->group(function () {
+        Route::get('intrakurikuler', [AbsensiControllerIntrakurikuler::class, 'listIntrakurikuler'])
+            ->name('intrakurikuler.list')
+            ->middleware('role:Guru Mapel|Bagian Akademik|Super Admin');
 
-    Route::get('absensi/daily', [AbsensiController::class, 'absensiHarian'])->name('absensi.harian');
-    Route::resource('absensi', AbsensiController::class);
+        Route::get('intrakurikuler/{intrakurikuler}/harian', [AbsensiControllerIntrakurikuler::class, 'harian'])
+            ->name('intrakurikuler.harian');
+
+        Route::post('intrakurikuler/{intrakurikuler}/harian', [AbsensiControllerIntrakurikuler::class, 'storeHarian'])
+            ->name('intrakurikuler.harian.store');
+
+        Route::get('intrakurikuler/{intrakurikuler}/rekap', [AbsensiControllerIntrakurikuler::class, 'rekap'])
+            ->name('intrakurikuler.rekap');
+    });
 
     // Define a GET route with dynamic placeholders for route parameters
     Route::get('/template-assesmen-formatif-excel', [DummyExcelController::class, 'downloadFormatif']);

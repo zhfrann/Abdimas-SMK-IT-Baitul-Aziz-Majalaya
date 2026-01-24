@@ -329,16 +329,37 @@ class SiswaController extends Controller
     }
 
 
-
     public function destroy(KelasAjar $kelas_ajar, Siswa $siswa)
     {
-        // // hapus siswa dari kelas ajar ini (hapus riwayat_kelas saja)
-        // RiwayatKelas::where('kelas_ajar_id', $kelas_ajar->kelas_ajar_id)
-        //     ->where('siswa_id', $siswa->siswa_id)
-        //     ->delete();
+        try {
+            DB::beginTransaction();
 
-        // return redirect()->route('akademik.siswa.index', $kelas_ajar->kelas_ajar_id)
-        //     ->with('success', 'Siswa berhasil dikeluarkan dari kelas ini.');
+            // Cek apakah siswa masih punya riwayat kelas lain (opsional, jika ingin tiap siswa minimal 1 riwayat)
+            // $riwayatCount = RiwayatKelas::where('siswa_id', $siswa->siswa_id)->count();
+            // if ($riwayatCount <= 1) {
+            //     return redirect()->route('akademik.siswa.index', $kelas_ajar->kelas_ajar_id)
+            //         ->with('error', 'Siswa minimal harus memiliki satu riwayat kelas.');
+            // }
+
+            $deleted = RiwayatKelas::where('kelas_ajar_id', $kelas_ajar->kelas_ajar_id)
+                ->where('siswa_id', $siswa->siswa_id)
+                ->delete();
+
+            DB::commit();
+
+            if ($deleted) {
+                return redirect()->route('akademik.siswa.index', $kelas_ajar->kelas_ajar_id)
+                    ->with('success', 'Siswa berhasil dikeluarkan dari kelas ini.');
+            } else {
+                return redirect()->route('akademik.siswa.index', $kelas_ajar->kelas_ajar_id)
+                    ->with('error', 'Gagal mengeluarkan siswa dari kelas.');
+            }
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return redirect()->route('akademik.siswa.index', $kelas_ajar->kelas_ajar_id)
+                // ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+                ->with('error', 'Terjadi kesalahan. Gagal menghapus siswa');
+        }
     }
 
     public function ajaxSearchSiswa(Request $request, KelasAjar $kelas_ajar)

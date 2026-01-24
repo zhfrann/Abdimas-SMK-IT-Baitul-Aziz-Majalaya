@@ -241,11 +241,26 @@ return new class extends Migration
 
         Schema::create('kehadiran_intrakurikuler', function (Blueprint $table) {
             $table->increments('kehadiran_intrakurikuler_id');
+
             $table->unsignedInteger('intrakurikuler_id');
             $table->unsignedInteger('riwayat_kelas_id');
-            $table->unsignedInteger('sakit')->default(0);
-            $table->unsignedInteger('izin')->default(0);
-            $table->unsignedInteger('absen')->default(0);
+
+            // absensi harian
+            $table->date('tanggal');
+
+            // status (enum)
+            $table->enum('status', ['hadir', 'alpha', 'sakit', 'izin']);
+
+            // note optional (wajib kalau sakit/izin via validasi di controller)
+            $table->text('note')->nullable();
+
+            // optional audit (siapa input)
+            $table->foreignId('created_by')->nullable()
+                ->constrained('users')->nullOnDelete()->cascadeOnUpdate();
+
+            $table->foreignId('updated_by')->nullable()
+                ->constrained('users')->nullOnDelete()->cascadeOnUpdate();
+
             $table->timestamps();
 
             $table->foreign('intrakurikuler_id')
@@ -256,7 +271,11 @@ return new class extends Migration
                 ->references('riwayat_kelas_id')->on('riwayat_kelas')
                 ->cascadeOnUpdate()->cascadeOnDelete();
 
-            $table->unique(['intrakurikuler_id', 'riwayat_kelas_id'], 'uniq_kehadiran_intra');
+            // 1 siswa (riwayat) hanya 1 absensi per tanggal per mapel
+            $table->unique(
+                ['intrakurikuler_id', 'riwayat_kelas_id', 'tanggal'],
+                'uniq_kehadiran_intra_harian'
+            );
         });
 
         Schema::create('tujuan_pembelajaran', function (Blueprint $table) {
@@ -273,13 +292,18 @@ return new class extends Migration
         Schema::create('asesmen_formatif', function (Blueprint $table) {
             $table->increments('asesmen_formatif_id');
             $table->unsignedInteger('intrakurikuler_id');
+            $table->unsignedInteger('riwayat_kelas_id');
             $table->text('deskripsi_catatan_tertinggi');
             $table->text('deskripsi_catatan_terendah');
             $table->timestamps();
 
             $table->foreign('intrakurikuler_id')
                 ->references('intrakurikuler_id')->on('intrakurikuler')
-                ->cascadeOnUpdate()->cascadeOnDelete();
+                ->cascadeOnUpdate()->restrictOnDelete();
+
+            $table->foreign('riwayat_kelas_id')
+                ->references('riwayat_kelas_id')->on('riwayat_kelas')
+                ->cascadeOnUpdate()->restrictOnDelete();
         });
 
         Schema::create('asesmen_formatif_detail', function (Blueprint $table) {
@@ -292,11 +316,11 @@ return new class extends Migration
 
             $table->foreign('asesmen_formatif_id')
                 ->references('asesmen_formatif_id')->on('asesmen_formatif')
-                ->cascadeOnUpdate()->cascadeOnDelete();
+                ->cascadeOnUpdate()->restrictOnDelete();
 
             $table->foreign('tujuan_pembelajaran_id')
                 ->references('tujuan_pembelajaran_id')->on('tujuan_pembelajaran')
-                ->cascadeOnUpdate()->cascadeOnDelete();
+                ->cascadeOnUpdate()->restrictOnDelete();
 
             $table->unique(['asesmen_formatif_id', 'tujuan_pembelajaran_id'], 'uniq_formatif_tujuan');
         });
@@ -378,18 +402,8 @@ return new class extends Migration
                 ->cascadeOnUpdate()->restrictOnDelete();
         });
 
-        Schema::create('kehadiran_ekstrakurikuler', function (Blueprint $table) {
-            $table->increments('kehadiran_ekstrakurikuler_id');
-            $table->unsignedInteger('ekstrakurikuler_id');
-            $table->unsignedInteger('sakit')->default(0);
-            $table->unsignedInteger('izin')->default(0);
-            $table->unsignedInteger('absen')->default(0);
-            $table->timestamps();
 
-            $table->foreign('ekstrakurikuler_id')
-                ->references('ekstrakurikuler_id')->on('ekstrakurikuler')
-                ->cascadeOnUpdate()->cascadeOnDelete();
-        });
+
 
         Schema::create('siswa_ekstrakurikuler', function (Blueprint $table) {
             $table->increments('siswa_ekstrakurikuler_id');
@@ -400,18 +414,68 @@ return new class extends Migration
 
             $table->foreign('siswa_id')
                 ->references('siswa_id')->on('siswa')
-                ->cascadeOnUpdate()->cascadeOnDelete();
+                ->cascadeOnUpdate()->restrictOnDelete();
+
+            $table->foreign('ekstrakurikuler_id')
+                ->references('ekstrakurikuler_id')->on('ekstrakurikuler')
+                ->cascadeOnUpdate()->restrictOnDelete();
+
+            $table->unique(['siswa_id', 'ekstrakurikuler_id'], 'uniq_siswa_ekskul');
+        });
+
+        Schema::create('kehadiran_ekstrakurikuler', function (Blueprint $table) {
+            $table->increments('kehadiran_ekstrakurikuler_id');
+
+            $table->unsignedInteger('ekstrakurikuler_id');
+            $table->unsignedInteger('siswa_ekstrakurikuler_id');
+
+            // absensi harian
+            $table->date('tanggal');
+
+            // status
+            $table->enum('status', ['hadir', 'alpha', 'sakit', 'izin']);
+
+            $table->text('note')->nullable();
+
+            // optional audit
+            $table->foreignId('created_by')->nullable()
+                ->constrained('users')->nullOnDelete()->cascadeOnUpdate();
+
+            $table->foreignId('updated_by')->nullable()
+                ->constrained('users')->nullOnDelete()->cascadeOnUpdate();
+
+            $table->timestamps();
 
             $table->foreign('ekstrakurikuler_id')
                 ->references('ekstrakurikuler_id')->on('ekstrakurikuler')
                 ->cascadeOnUpdate()->cascadeOnDelete();
 
-            $table->unique(['siswa_id', 'ekstrakurikuler_id'], 'uniq_siswa_ekskul');
+            $table->foreign('siswa_ekstrakurikuler_id')
+                ->references('siswa_ekstrakurikuler_id')->on('siswa_ekstrakurikuler')
+                ->cascadeOnUpdate()->cascadeOnDelete();
+
+            // 1 member ekskul hanya 1 absensi per tanggal per ekskul tsb
+            $table->unique(
+                ['ekstrakurikuler_id', 'siswa_ekstrakurikuler_id', 'tanggal'],
+                'uniq_kehadiran_ekskul_harian'
+            );
+        });
+
+        Schema::create('penilaian_ekstrakurikuler', function (Blueprint $table) {
+            $table->increments('penilaian_ekstrakurikuler_id');
+            $table->unsignedInteger('siswa_ekstrakurikuler_id');
+            $table->text('deskripsi');
+            $table->timestamps();
+
+            $table->foreign('siswa_ekstrakurikuler_id')
+                ->references('siswa_ekstrakurikuler_id')->on('siswa_ekstrakurikuler')
+                ->cascadeOnUpdate()->restrictOnDelete();
         });
     }
 
     public function down(): void
     {
+        Schema::dropIfExists('penilaian_ekstrakurikuler');
         Schema::dropIfExists('siswa_ekstrakurikuler');
         Schema::dropIfExists('kehadiran_ekstrakurikuler');
         Schema::dropIfExists('ekstrakurikuler');

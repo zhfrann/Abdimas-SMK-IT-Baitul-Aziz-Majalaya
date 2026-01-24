@@ -15,6 +15,7 @@ class AsesmenFormatif extends Model
 
     protected $fillable = [
         'intrakurikuler_id',
+        'riwayat_kelas_id',
         'deskripsi_catatan_tertinggi',
         'deskripsi_catatan_terendah',
     ];
@@ -27,5 +28,10 @@ class AsesmenFormatif extends Model
     public function details(): HasMany
     {
         return $this->hasMany(AsesmenFormatifDetail::class, 'asesmen_formatif_id', 'asesmen_formatif_id');
+    }
+
+    public function riwayatKelas(): BelongsTo
+    {
+        return $this->belongsTo(RiwayatKelas::class, 'riwayat_kelas_id', 'riwayat_kelas_id');
     }
 }

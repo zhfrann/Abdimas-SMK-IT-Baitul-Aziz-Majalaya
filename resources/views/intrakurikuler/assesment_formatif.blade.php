@@ -18,8 +18,12 @@
                 {{-- Header --}}
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <div>
-                        <h5 class="mb-0">Pendidikan Agama Islam dan Budi Pekerti</h5>
-                        <span class="d-block m-t-5">Kelas 12</span>
+                        <h5 class="mb-0">{{ $intrakurikuler->nama_pelajaran }}</h5>
+                        <span class="d-block m-t-5">
+                            {{ $intrakurikuler->kelasAjar->kelas->nama_kelas ?? '-' }}
+                            • {{ $intrakurikuler->kelasAjar->tahunAjaran->tahun ?? '-' }}
+                            {{ $intrakurikuler->kelasAjar->tahunAjaran->semester ?? '' }}
+                        </span>
                     </div>
 
                     <div class="d-flex align-items-center gap-2 flex-wrap">
@@ -43,6 +47,12 @@
 
                 {{-- Body --}}
                 <div class="card-body table-border-style">
+                    @if (session('success'))
+                        <div class="alert alert-success mb-3">{{ session('success') }}</div>
+                    @endif
+                    @if (session('error'))
+                        <div class="alert alert-danger mb-3">{{ session('error') }}</div>
+                    @endif
                     <div class="table-responsive">
                         <table class="table" id="pc-dt-simple">
                             <thead>
@@ -57,82 +67,44 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>ADITYA RIZKI ARIFIN</td>
-                                    <td>8 dari 10</td>
-                                    <td>2 dari 10</td>
-                                    <td class="text-wrap">Aditya Rizki Arifin menunjukkan pemahaman dalam membaca Al-Qur’an
-                                        dengan meyakini bahwa kontrol diri (Mujahadah An-Nafs) adalah perintah agama,
-                                        menunjukan perilaku control diri (Mujahadah An-Nafs), sebagai implementasi dari
-                                        perintah Q.S. Al-Anfal /8:72 serta Hadits terkait.,</td>
-                                    <td class="text-wrap">Aditya Rizki Arifin membutuhkan bimbingan dalam menganalisisQ.S.
-                                        Al-Hujurat/49:12, serta Hadits prasangka baik (husnuzzan)., membaca Q.S.
-                                        Al-Hujurat/49:12, sesuai dengan kaidah tajwid dan makharijul huruf,</td>
-                                    <td>
-                                        <a href="{{ route('assesment_formatif.detail') }}">
-                                            <button type="button" class="btn btn-sm btn-light-primary">Detail
-                                                Nilai</button>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>ALYA NUR ZAHRA</td>
-                                    <td>8 dari 10</td>
-                                    <td>2 dari 10</td>
-                                    <td class="text-wrap">Alya Nur Zahra menunjukkan pemahaman dalam menunjukan perilaku
-                                        control diri (Mujahadah An-Nafs), sebagai implementasi dari perintah Q.S. Al-Anfal
-                                        /8:72 serta Hadits terkait., menganalisisQ.S. Al-Hujurat/49:12, serta Hadits
-                                        prasangka baik (husnuzzan)., membaca Q.S. Al-Hujurat/49:12, sesuai dengan kaidah
-                                        tajwid dan makharijul huruf, </td>
-                                    <td class="text-wrap">Alya Nur Zahra membutuhkan bimbingan dalam menghafal Q.S.
-                                        Al-Hujurat/49:12 dengan fasih dan lancar., </td>
-                                    <td>
-                                        <a href="{{ route('assesment_formatif.detail') }}">
-                                            <button type="button" class="btn btn-sm btn-light-primary">Detail
-                                                Nilai</button>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>ARSYAD FATHI MAWARDI</td>
-                                    <td>8 dari 10</td>
-                                    <td>2 dari 10</td>
-                                    <td class="text-wrap">Arsyad Fathi Mawardi menunjukkan pemahaman dalam menunjukan
-                                        perilaku control diri (Mujahadah An-Nafs), sebagai implementasi dari perintah Q.S.
-                                        Al-Anfal /8:72 serta Hadits terkait., menganalisisQ.S. Al-Hujurat/49:12, serta
-                                        Hadits prasangka baik (husnuzzan)., membaca Q.S. Al-Hujurat/49:12, sesuai dengan
-                                        kaidah tajwid dan makharijul huruf, </td>
-                                    <td class="text-wrap">Arsyad Fathi Mawardi membutuhkan bimbingan dalam menghafal Q.S.
-                                        Al-Hujurat/49:12 dengan fasih dan lancar., </td>
-                                    <td>
-                                        <a href="{{ route('assesment_formatif.detail') }}">
-                                            <button type="button" class="btn btn-sm btn-light-primary">Detail
-                                                Nilai</button>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>4</td>
-                                    <td>BABY CANTIKA CAHAYA PERMATA</td>
-                                    <td>8 dari 10</td>
-                                    <td>2 dari 10</td>
-                                    <td class="text-wrap">Baby Cantika Cahaya Permata menunjukkan pemahaman dalam menunjukan
-                                        perilaku control diri (Mujahadah An-Nafs), sebagai implementasi dari perintah Q.S.
-                                        Al-Anfal /8:72 serta Hadits terkait., menganalisisQ.S. Al-Hujurat/49:12, serta
-                                        Hadits prasangka baik (husnuzzan)., membaca Q.S. Al-Hujurat/49:12, sesuai dengan
-                                        kaidah tajwid dan makharijul huruf, </td>
-                                    <td class="text-wrap">Baby Cantika Cahaya Permata membutuhkan bimbingan dalam menghafal
-                                        Q.S. Al-Hujurat/49:12 dengan fasih dan lancar., </td>
-                                    <td>
-                                        <a href="{{ route('assesment_formatif.detail') }}">
-                                            <button type="button" class="btn btn-sm btn-light-primary">Detail
-                                                Nilai</button>
-                                        </a>
-                                    </td>
-                                </tr>
+                                @forelse ($rows as $r)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $r['nama'] }}</td>
+                                        <td>
+                                            <span class="badge f-12 bg-success">{{ $r['tp_tercapai'] }} dari
+                                                {{ $r['tp_total'] }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge f-12 bg-danger">{{ $r['tp_tidak_tercapai'] }} dari
+                                                {{ $r['tp_total'] }}</span>
+                                        </td>
+                                        <td class="text-wrap">
+                                            <span title="{{ $r['capaian_tertinggi'] }}">
+                                                {{ \Illuminate\Support\Str::limit($r['capaian_tertinggi'], 150) }}
+                                            </span>
+                                        </td>
+                                        <td class="text-wrap">
+                                            <span title="{{ $r['capaian_terendah'] }}">
+                                                {{ \Illuminate\Support\Str::limit($r['capaian_terendah'], 150) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a
+                                                href="{{ route('assesment-formatif.detail', [
+                                                    'intrakurikuler' => $intrakurikuler->intrakurikuler_id,
+                                                    'riwayatKelas' => $r['riwayat_kelas_id'],
+                                                ]) }}">
+                                                <button type="button" class="btn btn-sm btn-light-primary">Detail
+                                                    Nilai</button>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="7" class="text-center">Belum ada siswa di kelas ini.</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>

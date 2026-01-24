@@ -3,30 +3,36 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class KehadiranIntrakurikuler extends Model
 {
     protected $table = 'kehadiran_intrakurikuler';
     protected $primaryKey = 'kehadiran_intrakurikuler_id';
-    public $incrementing = true;
-    protected $keyType = 'int';
 
     protected $fillable = [
         'intrakurikuler_id',
         'riwayat_kelas_id',
-        'sakit',
-        'izin',
-        'absen',
+        'tanggal',
+        'status',
+        'note',
+        'created_by',
+        'updated_by',
     ];
 
-    public function intrakurikuler(): BelongsTo
+    protected $casts = [
+        'tanggal' => 'date:Y-m-d',
+    ];
+
+    // ===== RELATIONS =====
+
+    public function intrakurikuler()
     {
         return $this->belongsTo(Intrakurikuler::class, 'intrakurikuler_id', 'intrakurikuler_id');
     }
 
-    public function riwayatKelas(): BelongsTo
+    public function riwayatKelas()
     {
         return $this->belongsTo(RiwayatKelas::class, 'riwayat_kelas_id', 'riwayat_kelas_id');
     }
+
 }

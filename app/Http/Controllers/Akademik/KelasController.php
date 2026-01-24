@@ -121,6 +121,14 @@ class KelasController extends Controller
         DB::beginTransaction();
         try {
             $kelasAjar = KelasAjar::findOrFail($id);
+
+            // Cek apakah ada siswa di kelas ajar ini
+            $adaSiswa = $kelasAjar->riwayatKelas()->exists();
+            if ($adaSiswa) {
+                DB::rollBack();
+                return back()->with('error', 'Tidak dapat menghapus kelas ajar karena masih ada siswa di kelas ini.');
+            }
+
             $kelas_id = $kelasAjar->kelas_id;
 
             // Hapus kelas ajar
