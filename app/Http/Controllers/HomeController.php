@@ -29,7 +29,7 @@ class HomeController extends Controller
     public function pageView($routeName, $page = null)
     {
         // Construct the view name based on the provided routeName and optional page parameter
-        $viewName = ($page) ? $routeName.'.'.$page : $routeName;
+        $viewName = ($page) ? $routeName . '.' . $page : $routeName;
         // Check if the constructed view exists
         if (\View::exists($viewName)) {
             // If the view exists, return the view
@@ -39,5 +39,4 @@ class HomeController extends Controller
             abort(404);
         }
     }
-
 }

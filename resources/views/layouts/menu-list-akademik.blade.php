@@ -101,14 +101,14 @@
     </svg>
 </li>
 <li class="pc-item pc-hasmenu">
-    <a href="{{ route('intrakurikuler.index') }}" class="pc-link">
+    <a href="{{ route('dokumen.kelas') }}" class="pc-link">
         <span class="pc-micon">
             {{-- <svg class="pc-icon">
         <use xlink:href="#custom-status-up"></use>
       </svg> --}}
             <i class="bi bi-journal-bookmark"></i>
         </span>
-        <span class="pc-mtext">document</span></a>
+        <span class="pc-mtext">Dokumen</span></a>
 </li>
 
 

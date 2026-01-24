@@ -82,4 +82,53 @@ class Siswa extends Model
         return $this->hasOne(RiwayatKelas::class, 'siswa_id', 'siswa_id')
             ->latest('riwayat_kelas_id');
     }
+
+    public function getAlamatLengkapAttribute()
+    {
+        $alamat = trim((string) ($this->alamat ?? ''));
+
+        $kelurahan = $this->kelurahan;
+        $kecamatan = $kelurahan?->kecamatan;
+        $kabupaten = $kecamatan?->kabupaten;
+
+        if ($kelurahan?->nama) {
+            $alamat .= ' Kel. ' . $kelurahan->nama;
+        }
+
+        if ($kecamatan?->nama) {
+            $alamat .= ' Kec. ' . $kecamatan->nama;
+        }
+
+        if ($kabupaten) {
+            $alamat .= ' ' . $kabupaten->nama;
+        }
+
+        return trim($alamat);
+    }
+
+    public function asesmenFormatif()
+    {
+        // Mengambil semua asesmen formatif dari seluruh riwayat kelas siswa
+        return $this->hasManyThrough(
+            \App\Models\AsesmenFormatif::class,
+            \App\Models\RiwayatKelas::class,
+            'siswa_id', // Foreign key di RiwayatKelas
+            'riwayat_kelas_id', // Foreign key di AsesmenFormatif
+            'siswa_id', // Local key di Siswa
+            'riwayat_kelas_id' // Local key di RiwayatKelas
+        );
+    }
+
+    public function skorAsesmenSumatif()
+    {
+        // Mengambil semua skor sumatif dari seluruh riwayat kelas siswa
+        return $this->hasManyThrough(
+            \App\Models\SkorAsesmenSiswa::class,
+            \App\Models\RiwayatKelas::class,
+            'siswa_id', // Foreign key di RiwayatKelas
+            'riwayat_kelas_id', // Foreign key di SkorAsesmenSiswa
+            'siswa_id', // Local key di Siswa
+            'riwayat_kelas_id' // Local key di RiwayatKelas
+        );
+    }
 }
