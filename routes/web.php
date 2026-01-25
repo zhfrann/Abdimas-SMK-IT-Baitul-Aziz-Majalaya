@@ -44,6 +44,10 @@ Route::middleware('auth')->group(function () {
             Route::get('/akademik', [DashboardController::class, 'dashboardAkademik'])->name('akademik');
         });
 
+        Route::middleware('role:Kepala Sekolah')->group(function () {
+            Route::get('/kepala-sekolah', [DashboardController::class, 'dashboardKepalaSekolah'])->name('kepalaSekolah');
+        });
+
         // Route::middleware('role:Guru Mapel')->group(function () {
         //     Route::get('/guru', [DashboardController::class, ''])
         //         ->name('guru');

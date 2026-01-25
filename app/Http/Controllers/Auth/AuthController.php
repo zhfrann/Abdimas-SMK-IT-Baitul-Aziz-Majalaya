@@ -27,7 +27,7 @@ class AuthController extends Controller
             if (Auth::user()->hasRole('Super Admin')) {
                 return redirect()->intended('/superadmin/users');
             }
-            return redirect()->intended('/');
+            return redirect()->intended('/dashboard');
         }
 
         return back()->withErrors([
