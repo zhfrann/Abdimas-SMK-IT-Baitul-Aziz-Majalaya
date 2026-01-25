@@ -6,6 +6,7 @@ use App\Models\Intrakurikuler;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Excel as ExcelFormat;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -149,13 +150,22 @@ class DummyExcelController extends Controller
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Hitung kolom TP
-        $startTPCol = 'C';
-        $lastTPCol = chr(ord($startTPCol) + ($tpCount * 2) - 1);
+        // // Hitung kolom TP
+        // $startTPCol = 'C';
+        // $lastTPCol = chr(ord($startTPCol) + ($tpCount * 2) - 1);
 
-        // Kolom deskripsi
-        $colTertinggi = chr(ord($lastTPCol) + 1);
-        $colTerendah  = chr(ord($lastTPCol) + 2);
+        // // Kolom deskripsi
+        // $colTertinggi = chr(ord($lastTPCol) + 1);
+        // $colTerendah  = chr(ord($lastTPCol) + 2);
+
+        $startTPColIndex = 3; // C = 3 (1-based)
+        $lastTPColIndex  = $startTPColIndex + ($tpCount * 2) - 1;
+
+        $startTPCol = Coordinate::stringFromColumnIndex($startTPColIndex); // "C"
+        $lastTPCol  = Coordinate::stringFromColumnIndex($lastTPColIndex);
+
+        $colTertinggi = Coordinate::stringFromColumnIndex($lastTPColIndex + 1);
+        $colTerendah  = Coordinate::stringFromColumnIndex($lastTPColIndex + 2);
 
         // Merge header
         $sheet->mergeCells('A1:A3');
@@ -184,8 +194,8 @@ class DummyExcelController extends Controller
         $sheet->setCellValue('A2', '');
         $sheet->setCellValue('B2', '');
         for ($i = 0; $i < $tpCount; $i++) {
-            $colKKTP = chr(ord($startTPCol) + ($i * 2));
-            $colTampil = chr(ord($startTPCol) + ($i * 2) + 1);
+            $colKKTP  = Coordinate::stringFromColumnIndex($startTPColIndex + ($i * 2));
+            $colTampil = Coordinate::stringFromColumnIndex($startTPColIndex + ($i * 2) + 1);
             $sheet->setCellValue($colKKTP . '2', 'TP ' . ($i + 1) . ' KKTP');
             $sheet->setCellValue($colTampil . '2', 'TP ' . ($i + 1) . ' Tampil/Tidak');
             $sheet->getColumnDimension($colTampil)->setWidth(15);
@@ -195,8 +205,8 @@ class DummyExcelController extends Controller
         $sheet->setCellValue('A3', '');
         $sheet->setCellValue('B3', '');
         for ($i = 0; $i < $tpCount; $i++) {
-            $colKKTP = chr(ord($startTPCol) + ($i * 2));
-            $colTampil = chr(ord($startTPCol) + ($i * 2) + 1);
+            $colKKTP  = Coordinate::stringFromColumnIndex($startTPColIndex + ($i * 2));
+            $colTampil = Coordinate::stringFromColumnIndex($startTPColIndex + ($i * 2) + 1);
             $desc = $tpList[$i]->deskripsi;
             $sheet->setCellValue($colKKTP . '3', $desc);
             $sheet->mergeCells($colKKTP . '3:' . $colTampil . '3');
@@ -223,8 +233,8 @@ class DummyExcelController extends Controller
             // Kolom KKTP & Tampil/Tidak, isi default dari database jika ada
             for ($i = 0; $i < $tpCount; $i++) {
                 $tp = $tpList[$i];
-                $colKKTP = chr(ord($startTPCol) + ($i * 2));
-                $colTampil = chr(ord($startTPCol) + ($i * 2) + 1);
+                $colKKTP  = Coordinate::stringFromColumnIndex($startTPColIndex + ($i * 2));
+                $colTampil = Coordinate::stringFromColumnIndex($startTPColIndex + ($i * 2) + 1);
 
                 $kktpVal = '';
                 $tampilVal = '';
@@ -271,8 +281,8 @@ class DummyExcelController extends Controller
             $tpKKTPCols = [];
             $tpTampilCols = [];
             for ($i = 0; $i < $tpCount; $i++) {
-                $colKKTP = chr(ord($startTPCol) + ($i * 2));
-                $colTampil = chr(ord($startTPCol) + ($i * 2) + 1);
+                $colKKTP  = Coordinate::stringFromColumnIndex($startTPColIndex + ($i * 2));
+                $colTampil = Coordinate::stringFromColumnIndex($startTPColIndex + ($i * 2) + 1);
                 $tpDeskripsi[] = $tpList[$i]->deskripsi;
                 $tpKKTPCols[] = $colKKTP . $row;
                 $tpTampilCols[] = $colTampil . $row;
@@ -318,8 +328,12 @@ class DummyExcelController extends Controller
         // Auto size kolom Nama Siswa (B)
         $sheet->getColumnDimension('B')->setAutoSize(true);
 
+        $namaKelas = $intrakurikuler->kelasAjar->kelas->nama_kelas;
+        $tahunAjaran = $intrakurikuler->kelasAjar->tahunAjaran->tahun;
+        $semester = $intrakurikuler->kelasAjar->tahunAjaran->semester;
+
         // Download
-        $filename = 'template_asesmen_formatif_' . $intrakurikuler->nama_pelajaran . '.xlsx';
+        $filename = 'template asesmen formatif ' . " $namaKelas $tahunAjaran $semester" . '.xlsx';
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"$filename\"");
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);

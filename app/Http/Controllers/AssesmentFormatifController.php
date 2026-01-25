@@ -8,6 +8,8 @@ use App\Models\Intrakurikuler;
 use App\Models\RiwayatKelas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class AssesmentFormatifController extends Controller
 {
@@ -191,6 +193,98 @@ class AssesmentFormatifController extends Controller
         } catch (\Throwable $th) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan asesmen formatif.');
+        }
+    }
+
+    public function importExcel(Request $request, $intrakurikuler_id)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls',
+        ]);
+
+        $intrakurikuler = Intrakurikuler::with('tujuanPembelajaran', 'kelasAjar.riwayatKelas.siswa.user')->findOrFail($intrakurikuler_id);
+        $tpList = $intrakurikuler->tujuanPembelajaran;
+        $tpCount = $tpList->count();
+
+        $file = $request->file('file');
+        $spreadsheet = IOFactory::load($file->getPathname());
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Map nama siswa ke riwayat_kelas_id
+        $namaToRiwayatKelas = [];
+        foreach ($intrakurikuler->kelasAjar->riwayatKelas as $rk) {
+            $nama = $rk->siswa->user->name ?? $rk->siswa->nama;
+            $namaToRiwayatKelas[trim(strtolower($nama))] = $rk->riwayat_kelas_id;
+        }
+
+        DB::beginTransaction();
+        try {
+            $row = 4;
+            while (true) {
+                $no = $sheet->getCell("A{$row}")->getValue();
+                $namaSiswa = trim((string) $sheet->getCell("B{$row}")->getValue());
+                if (!$namaSiswa) break; // stop jika baris kosong
+
+                $riwayat_kelas_id = $namaToRiwayatKelas[strtolower($namaSiswa)] ?? null;
+                if (!$riwayat_kelas_id) {
+                    $row++;
+                    continue; // skip jika tidak ditemukan
+                }
+
+                // // Ambil/insert AsesmenFormatif
+                // $formatif = AsesmenFormatif::firstOrCreate([
+                //     'intrakurikuler_id' => $intrakurikuler_id,
+                //     'riwayat_kelas_id' => $riwayat_kelas_id,
+                // ]);
+
+                // // Ambil nilai capaian tertinggi/terendah
+                // $colTertinggi = chr(67 + ($tpCount * 2));
+                // $colTerendah  = chr(67 + ($tpCount * 2) + 1);
+                // $formatif->deskripsi_catatan_tertinggi = $sheet->getCell($colTertinggi . $row)->getCalculatedValue();
+                // $formatif->deskripsi_catatan_terendah  = $sheet->getCell($colTerendah . $row)->getCalculatedValue();
+                // $formatif->save();
+
+                $colTertinggiIndex = 3 + ($tpCount * 2); // C = 3
+                $colTerendahIndex  = $colTertinggiIndex + 1;
+                $colTertinggi = Coordinate::stringFromColumnIndex($colTertinggiIndex);
+                $colTerendah  = Coordinate::stringFromColumnIndex($colTerendahIndex);
+
+                $formatif = AsesmenFormatif::firstOrCreate([
+                    'intrakurikuler_id' => $intrakurikuler_id,
+                    'riwayat_kelas_id' => $riwayat_kelas_id,
+                ], [
+                    'deskripsi_catatan_tertinggi' => $sheet->getCell($colTertinggi . $row)->getCalculatedValue(),
+                    'deskripsi_catatan_terendah' => $sheet->getCell($colTerendah . $row)->getCalculatedValue(),
+                ]);
+
+                // Simpan detail TP
+                for ($i = 0; $i < $tpCount; $i++) {
+                    $tp = $tpList[$i];
+                    $colKKTP = chr(67 + ($i * 2));
+                    $colTampil = chr(67 + ($i * 2) + 1);
+
+                    $kktp = $sheet->getCell($colKKTP . $row)->getValue();
+                    $tampil = $sheet->getCell($colTampil . $row)->getValue();
+
+                    AsesmenFormatifDetail::updateOrCreate(
+                        [
+                            'asesmen_formatif_id' => $formatif->asesmen_formatif_id,
+                            'tujuan_pembelajaran_id' => $tp->tujuan_pembelajaran_id,
+                        ],
+                        [
+                            'kktp' => $kktp == 1,
+                            'tampil' => $tampil == 1,
+                        ]
+                    );
+                }
+
+                $row++;
+            }
+            DB::commit();
+            return redirect()->back()->with('success', 'Data asesmen formatif berhasil diimport dari Excel.');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat import: ' . $th->getMessage());
         }
     }
 }
