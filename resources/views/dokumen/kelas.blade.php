@@ -64,6 +64,7 @@
             <table class="table" id="pc-dt-simple">
                 <thead>
                     <tr>
+                        <th>No</th>
                         <th>Nama Kelas</th>
                         <th>Tahun Ajaran</th>
                         <th>Semester</th>
@@ -75,11 +76,12 @@
                 <tbody>
                     @foreach ($kelasList as $kelas)
                         <tr>
+                            <td>{{ $loop->iteration }}</td>
                             <td>{{ $kelas->kelas->nama_kelas }}</td>
                             <td>{{ $kelas->tahunAjaran->tahun }}</td>
                             <td>{{ $kelas->tahunAjaran->semester }}</td>
                             <td>{{ $kelas->waliKelas->name ?? '-' }}</td>
-                            <td>{{ 0 }}</td>
+                            <td>{{ $kelas->riwayat_kelas_count ?? 0 }}</td>
                             <td>
                                 <a href="{{ route('dokumen.kelas.pilih', $kelas->kelas_ajar_id) }}"
                                     class="btn btn-primary btn-sm">Cetak</a>

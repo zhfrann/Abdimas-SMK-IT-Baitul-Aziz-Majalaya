@@ -71,7 +71,7 @@
             </thead>
             <tbody>
                 @php $no=1; @endphp
-                @foreach ($intrakurikulerList as $mapel)
+                @forelse ($intrakurikulerList as $mapel)
                     @php
                         // Skor sumatif siswa pada mapel & riwayat kelas ini
                         $skor = $skorSumatifList
@@ -101,7 +101,11 @@
                             <td>{{ $capaianTerendah }}</td>
                         </tr>
                     @endif
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="4" style="text-align:center;">-</td>
+                    </tr>
+                @endforelse
             </tbody>
 
             {{-- Tabel Ekstrakurikuler --}}

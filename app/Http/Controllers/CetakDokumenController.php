@@ -53,7 +53,7 @@ class CetakDokumenController extends Controller
             'siswa.*' => 'exists:riwayat_kelas,riwayat_kelas_id',
         ]);
 
-        $sekolah = Sekolah::first();
+        $sekolah = Sekolah::firstOrFail();
         $kelasAjar = KelasAjar::with(['kelas', 'tahunAjaran', 'waliKelas', 'riwayatKelas.siswa.user', 'riwayatKelas.siswa.kelurahan.kecamatan.kabupaten'])->findOrFail($request->kelas_ajar_id);
 
         $siswaIds = $request->siswa ?? $kelasAjar->riwayatKelas->pluck('riwayat_kelas_id')->toArray();
@@ -112,6 +112,7 @@ class CetakDokumenController extends Controller
         return $pdf;
     }
 
+    // Cetak Buku Induk
     public function cetakBukuInduk(Request $request)
     {
         $request->validate([
@@ -120,13 +121,21 @@ class CetakDokumenController extends Controller
             'siswa.*' => 'exists:riwayat_kelas,riwayat_kelas_id',
         ]);
 
-        $sekolah = Sekolah::first();
+        $sekolah = Sekolah::with('kelurahan.kecamatan.kabupaten')->first();
         $kelasAjar = KelasAjar::with([
             'kelas',
             'tahunAjaran',
             'waliKelas',
+            'intrakurikuler.pengampu',
+            'intrakurikuler.tujuanPembelajaran',
+            'intrakurikuler.asesmenFormatif.details.tujuanPembelajaran',
+            'intrakurikuler.asesmenSumatif.skorSiswa',
             'riwayatKelas.siswa.user',
-            // Tambahkan relasi lain yang diperlukan untuk buku induk
+            'riwayatKelas.siswa.siswaEkstrakurikuler.ekstrakurikuler.pembina',
+            'riwayatKelas.siswa.siswaEkstrakurikuler.penilaians',
+            'riwayatKelas.kehadiranIntrakurikuler',
+            'riwayatKelas.skorAsesmen.asesmenSumatif',
+            'riwayatKelas.siswa',
         ])->findOrFail($request->kelas_ajar_id);
 
         $siswaIds = $request->siswa ?? $kelasAjar->riwayatKelas->pluck('riwayat_kelas_id')->toArray();
@@ -136,7 +145,7 @@ class CetakDokumenController extends Controller
             'kelasAjar' => $kelasAjar,
             'siswaList' => $siswaList,
             'sekolah' => $sekolah,
-        ])->format('A4')->download('buku-induk-' . $kelasAjar->kelas->nama_kelas . '.pdf');
+        ])->format('A4');
 
         return $pdf;
     }
