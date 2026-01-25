@@ -30,11 +30,13 @@ class DashboardController extends Controller
             return redirect()->route('dashboard.kepalaSekolah');
         }
 
-        if($user->hasRole('Guru Mapel')){
+        if ($user->hasRole('Guru Mapel')) {
             return redirect()->route('dashboard.guruMapel');
         }
 
-        //role lain...
+        if ($user->hasRole('Siswa')) {
+            return redirect()->route('dashboard.siswa');
+        }
     }
 
     public function dashboardAkademik(Request $request)
@@ -239,6 +241,71 @@ class DashboardController extends Controller
         ));
     }
 
+    public function dashboardSiswa(Request $request)
+    {
+        $user = Auth::user();
+        $siswa = Siswa::where('user_id', $user->id)->first();
+
+        // List tahun ajaran (urut terbaru)
+        $tahunAjaranList = TahunAjaran::orderBy('tahun_ajaran_id', 'desc')->get();
+
+        // Tahun ajaran aktif (default: terbaru)
+        $tahunAjaranId = $request->get('tahun_ajaran_id');
+        $tahunAjaranAktif = $tahunAjaranId
+            ? TahunAjaran::find($tahunAjaranId)
+            : TahunAjaran::orderBy('tahun_ajaran_id', 'desc')->first();
+
+        // Ambil riwayat kelas siswa pada tahun ajaran aktif
+        $riwayatKelasAktif = $siswa->riwayatKelas()->where('kelas_ajar_id', function ($q) use ($tahunAjaranAktif) {
+            $q->select('kelas_ajar_id')
+                ->from('kelas_ajar')
+                ->where('tahun_ajaran_id', $tahunAjaranAktif?->tahun_ajaran_id)
+                ->limit(1);
+        })->first();
+
+        // --- 1. Distribusi nilai per semester (per mapel) ---
+        $nilaiDistribusi = [];
+        if ($riwayatKelasAktif) {
+            $skorList = SkorAsesmenSiswa::where('riwayat_kelas_id', $riwayatKelasAktif->riwayat_kelas_id)
+                ->with('asesmenSumatif.intrakurikuler')
+                ->get();
+
+            // Group by mapel
+            $mapelNilai = [];
+            foreach ($skorList as $skor) {
+                $mapel = $skor->asesmenSumatif->intrakurikuler->nama_pelajaran ?? 'Mapel';
+                $mapelNilai[$mapel][] = $skor->nilai;
+            }
+            foreach ($mapelNilai as $mapel => $nilaiArr) {
+                $nilaiDistribusi[] = [
+                    'mapel' => $mapel,
+                    'rerata' => round(array_sum($nilaiArr) / count($nilaiArr), 2),
+                    'nilai' => $nilaiArr,
+                ];
+            }
+        }
+
+        // --- 2. Perkembangan nilai keseluruhan siswa (dari semester ke semester) ---
+        $riwayatKelasAll = $siswa->riwayatKelas()->with('kelasAjar.tahunAjaran')->get();
+        $perkembanganNilai = [];
+        foreach ($riwayatKelasAll as $rk) {
+            $tahunAjaran = $rk->kelasAjar->tahunAjaran->tahun ?? '';
+            $semester = $rk->kelasAjar->tahunAjaran->semester ?? '';
+            $label = $tahunAjaran . ' S' . $semester;
+            $rerata = SkorAsesmenSiswa::where('riwayat_kelas_id', $rk->riwayat_kelas_id)->avg('nilai');
+            $perkembanganNilai[] = [
+                'label' => $label,
+                'rerata' => $rerata ? round($rerata, 2) : 0,
+            ];
+        }
+
+        return view('dashboard.siswa', compact(
+            'tahunAjaranList',
+            'tahunAjaranAktif',
+            'nilaiDistribusi',
+            'perkembanganNilai'
+        ));
+    }
 
     public function guruMapel(Request $request)
     {

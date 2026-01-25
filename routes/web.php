@@ -52,7 +52,9 @@ Route::middleware('auth')->group(function () {
                 ->name('guruMapel');
         });
 
-
+        Route::middleware('role:Siswa')->group(function () {
+            Route::get('/siswa', [DashboardController::class, 'dashboardSiswa'])->name('siswa');
+        });
 
 
 

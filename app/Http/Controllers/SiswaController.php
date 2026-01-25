@@ -430,6 +430,44 @@ class SiswaController extends Controller
             return back()->withErrors(['siswa_id' => 'Siswa sudah terdaftar di kelas lain pada tahun ajaran & semester ini.']);
         }
 
+        // Tambahan: Cek tidak bisa memindahkan ke tahun ajaran/semester yang sama atau lebih rendah
+        $kelasTujuan = $kelas_ajar->load('tahunAjaran');
+        $tahunTujuan = $kelasTujuan->tahunAjaran->tahun;
+        $semesterTujuan = $kelasTujuan->tahunAjaran->semester;
+
+        // Ambil riwayat kelas terakhir siswa
+        $riwayatTerakhir = RiwayatKelas::where('siswa_id', $request->siswa_id)
+            ->with('kelasAjar.tahunAjaran')
+            ->orderByDesc('riwayat_kelas_id')
+            ->first();
+
+        if ($riwayatTerakhir) {
+            $tahunAsal = $riwayatTerakhir->kelasAjar->tahunAjaran->tahun;
+            $semesterAsal = $riwayatTerakhir->kelasAjar->tahunAjaran->semester;
+
+            // Fungsi bantu untuk dapatkan tahun awal (misal: "2025/2026" -> 2025)
+            $getTahunAwal = function ($tahunStr) {
+                return (int)explode('/', $tahunStr)[0];
+            };
+
+            $tahunTujuanInt = $getTahunAwal($tahunTujuan);
+            $tahunAsalInt = $getTahunAwal($tahunAsal);
+
+            $semesterMap = [
+                'Ganjil' => 1,
+                'Genap' => 2,
+            ];
+            $semTujuan = $semesterMap[$semesterTujuan] ?? 0;
+            $semAsal = $semesterMap[$semesterAsal] ?? 0;
+
+            if (
+                $tahunTujuanInt < $tahunAsalInt ||
+                ($tahunTujuanInt == $tahunAsalInt && $semTujuan <= $semAsal)
+            ) {
+                return back()->withErrors(['siswa_id' => 'Tidak bisa memindahkan ke tahun ajaran/semester yang sama atau lebih rendah dari riwayat terakhir siswa.']);
+            }
+        }
+
         // Tambahkan ke kelas_ajar (naik kelas)
         RiwayatKelas::create([
             'siswa_id' => $request->siswa_id,
