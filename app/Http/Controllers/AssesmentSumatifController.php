@@ -97,10 +97,14 @@ class AssesmentSumatifController extends Controller
             ->where('kelas_ajar_id', $intrakurikuler->kelas_ajar_id)
             ->with(['siswa.user'])
             ->get()
-            ->sortBy(fn ($rk) => strtolower($rk->siswa?->user?->name ?? $rk->siswa?->nama ?? ''))
+            ->sortBy(
+                fn($rk) => trim($rk->siswa?->user?->name ?? $rk->siswa?->nama ?? ''),
+                SORT_NATURAL | SORT_FLAG_CASE
+            )
             ->values();
 
-        $currentIndex = $all->search(fn ($rk) => $rk->riwayat_kelas_id === $riwayatKelas->riwayat_kelas_id);
+
+        $currentIndex = $all->search(fn($rk) => $rk->riwayat_kelas_id === $riwayatKelas->riwayat_kelas_id);
         $prevRiwayat  = ($currentIndex !== false && $currentIndex > 0) ? $all[$currentIndex - 1] : null;
         $nextRiwayat  = ($currentIndex !== false && $currentIndex < $all->count() - 1) ? $all[$currentIndex + 1] : null;
 
@@ -170,7 +174,7 @@ class AssesmentSumatifController extends Controller
             ->values();
 
         $asesmenSemester = $asesmen->whereIn('asesmen_type', ['non_test', 'test'])
-            ->sortBy(fn ($a) => $a->asesmen_type === 'non_test' ? 1 : 2)
+            ->sortBy(fn($a) => $a->asesmen_type === 'non_test' ? 1 : 2)
             ->values();
 
         // skor siswa
@@ -184,7 +188,7 @@ class AssesmentSumatifController extends Controller
 
         // hitung total lingkup
         $lingkupVals = $asesmenLingkup
-            ->map(fn ($a) => isset($skor[$a->asesmen_sumatif_id]) ? $this->toIntOrNull($skor[$a->asesmen_sumatif_id]->nilai) : null)
+            ->map(fn($a) => isset($skor[$a->asesmen_sumatif_id]) ? $this->toIntOrNull($skor[$a->asesmen_sumatif_id]->nilai) : null)
             ->all();
 
         $totalLingkup = $this->avg($lingkupVals);
@@ -248,7 +252,7 @@ class AssesmentSumatifController extends Controller
             ->where('intrakurikuler_id', $intrakurikuler->intrakurikuler_id)
             ->where('tahun_ajaran_id', $tahunAjaranId)
             ->pluck('asesmen_sumatif_id')
-            ->map(fn ($x) => (int) $x)
+            ->map(fn($x) => (int) $x)
             ->all();
 
         $allowedSet = array_flip($allowedAsesmenIds);
@@ -274,7 +278,7 @@ class AssesmentSumatifController extends Controller
                     ],
                     [
                         'nilai'          => (int) $nilai,
-                        'tahun_ajaran_id'=> $tahunAjaranId,
+                        'tahun_ajaran_id' => $tahunAjaranId,
                     ]
                 );
             }
@@ -291,7 +295,7 @@ class AssesmentSumatifController extends Controller
      */
     private function avg(array $vals): ?int
     {
-        $vals = array_values(array_filter($vals, fn ($v) => $v !== null));
+        $vals = array_values(array_filter($vals, fn($v) => $v !== null));
         if (count($vals) === 0) return null;
         return (int) round(array_sum($vals) / count($vals));
     }
@@ -315,7 +319,7 @@ class AssesmentSumatifController extends Controller
      */
     private function semesterTotalFromTestNonTest(?int $testVal, ?int $nonTestVal): ?int
     {
-        $vals = array_filter([$testVal, $nonTestVal], fn ($v) => $v !== null);
+        $vals = array_filter([$testVal, $nonTestVal], fn($v) => $v !== null);
 
         if (count($vals) === 2) {
             return (int) round(array_sum($vals) / 2);

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AbsensiControllerEkstrakurikuler;
 use App\Http\Controllers\AbsensiControllerIntrakurikuler;
 use App\Http\Controllers\Akademik\KelasController;
 use App\Http\Controllers\Akademik\StaffController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\AssesmentFormatifController;
 use App\Http\Controllers\AssesmentSumatifController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CetakDokumenController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DummyExcelController;
 use App\Http\Controllers\EkstrakurikulerController;
 use App\Http\Controllers\EkstrakurikulerSiswaController;
@@ -60,10 +62,7 @@ Route::middleware(['auth', 'role:Bagian Akademik'])->prefix('akademik')->name('a
 // Define a group of routes with 'auth' middleware applied
 Route::middleware(['auth'])->group(function () {
     // Define a GET route for the root URL ('/')
-    Route::get('/', function () {
-        // Return a view named 'index' when accessing the root URL
-        return view('dashboard.index');
-    });
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('intrakurikuler', IntrakurikulerController::class)
         ->middleware('role:Guru Mapel|Bagian Akademik');
@@ -134,7 +133,22 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('intrakurikuler/{intrakurikuler}/rekap', [AbsensiControllerIntrakurikuler::class, 'rekap'])
             ->name('intrakurikuler.rekap');
-    });
+
+        // list ekstra
+        Route::get('list-ekstrakurikuler', [AbsensiControllerEkstrakurikuler::class, 'listEkstrakurikuler'])
+            ->name('ekstrakurikuler.list');
+
+        // harian
+        Route::get('ekstrakurikuler/{ekstrakurikuler}/harian', [AbsensiControllerEkstrakurikuler::class, 'harian'])
+            ->name('ekstrakurikuler.harian');
+
+        Route::post('ekstrakurikuler/{ekstrakurikuler}/harian', [AbsensiControllerEkstrakurikuler::class, 'storeHarian'])
+            ->name('ekstrakurikuler.harian.store');
+
+        // rekap
+        Route::get('ekstrakurikuler/{ekstrakurikuler}/rekap', [AbsensiControllerEkstrakurikuler::class, 'rekap'])
+            ->name('ekstrakurikuler.rekap');
+    })->middleware('role:Guru Mapel|Bagian Akademik|Super Admin');
 
     // Define a GET route with dynamic placeholders for route parameters
     Route::get('/template-assesmen-formatif-excel', [DummyExcelController::class, 'downloadFormatif']);

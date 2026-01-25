@@ -84,7 +84,7 @@
         <span class="pc-mtext">Absensi Intrakurikuler</span></a>
 </li>
 <li class="pc-item pc-hasmenu">
-    <a href="{{ route('ekstrakurikuler.index') }}" class="pc-link">
+    <a href="{{ route('absensi.ekstrakurikuler.list') }}" class="pc-link">
         <span class="pc-micon">
             {{-- <svg class="pc-icon">
         <use xlink:href="#custom-shield"></use>

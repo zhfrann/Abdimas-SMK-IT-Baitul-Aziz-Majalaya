@@ -113,7 +113,7 @@
                                 <td>{{ $item->pengampu?->staff?->nama ?? ($item->pengampu?->name ?? 'N/A') }}</td>
                                 <td>{{ $item->kelasAjar?->riwayat_kelas_count ?? 0 }}</td>
 
-                                @role('Bagian Akademik|Super Admin')
+                                @role('Bagian Akademik|Guru Mapel')
                                 <td>
                                     <a href="{{ route('absensi.intrakurikuler.harian', $item->intrakurikuler_id) }}">
                                         <button type="button" class="btn btn-sm btn-light-warning mb-1">
