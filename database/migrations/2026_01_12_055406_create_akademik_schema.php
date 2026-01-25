@@ -62,7 +62,9 @@ return new class extends Migration
             $table->string('kelurahan_id')->nullable();
             $table->string('website')->nullable();
             $table->string('email')->nullable();
+            $table->string('telp')->nullable();
             $table->string('nama_kepala_sekolah')->nullable();
+            $table->string('nip_kepala_sekolah')->nullable();
             $table->timestamps();
 
             $table->foreign('kelurahan_id')
@@ -401,9 +403,6 @@ return new class extends Migration
                 ->references('tahun_ajaran_id')->on('tahun_ajaran')
                 ->cascadeOnUpdate()->restrictOnDelete();
         });
-
-
-
 
         Schema::create('siswa_ekstrakurikuler', function (Blueprint $table) {
             $table->increments('siswa_ekstrakurikuler_id');

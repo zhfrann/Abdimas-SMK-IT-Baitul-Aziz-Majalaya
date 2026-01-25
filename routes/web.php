@@ -35,6 +35,34 @@ Route::get('login', [AuthController::class, 'showLoginForm'])->name('login')->mi
 Route::post('login', [AuthController::class, 'login'])->middleware('guest');
 Route::post('logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
+// Dashboard
+Route::middleware('auth')->group(function () {
+    Route::prefix('dashboard')->name('dashboard.')->group(function () {
+
+        Route::middleware('role:Bagian Akademik')->group(function () {
+            Route::get('/akademik', [DashboardController::class, 'dashboardAkademik'])->name('akademik');
+        });
+
+        Route::middleware('role:Kepala Sekolah')->group(function () {
+            Route::get('/kepala-sekolah', [DashboardController::class, 'dashboardKepalaSekolah'])->name('kepalaSekolah');
+        });
+
+        Route::middleware('role:Guru Mapel')->group(function () {
+            Route::get('/guru-mapel', [DashboardController::class, 'guruMapel'])
+                ->name('guruMapel');
+        });
+
+
+
+
+
+        // Route::middleware('role:Wali Kelas')->group(function () {
+        //     Route::get('/wali-kelas', [DashboardController::class, ''])
+        //         ->name('wali_kelas');
+        // });
+    });
+});
+
 // Route untuk manajemen user oleh super admin
 Route::prefix('superadmin')->middleware(['auth', 'role:Super Admin'])->name('superadmin.')->group(function () {
     Route::resource('users', UserController::class);
@@ -160,6 +188,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('cetak-sampul', [CetakDokumenController::class, 'cetakSampul'])->name('cetak.sampul');
         Route::post('cetak-rapor', [CetakDokumenController::class, 'cetakRapor'])->name('cetak.rapor');
         Route::post('cetak-buku-induk', [CetakDokumenController::class, 'cetakBukuInduk'])->name('cetak.buku_induk');
+        Route::get('mutasi', [CetakDokumenController::class, 'mutasi'])->name('mutasi');
+        Route::post('cetak-mutasi', [CetakDokumenController::class, 'cetakMutasi'])->name('cetak.mutasi');
     });
 
     // Route::get('{routeName}/{name?}', [HomeController::class, 'pageView']);

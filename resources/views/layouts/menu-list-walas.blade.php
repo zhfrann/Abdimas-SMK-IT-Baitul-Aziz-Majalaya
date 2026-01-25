@@ -1,16 +1,26 @@
-<li class="pc-item pc-caption">
-  <label>Wali Kelas</label>
-</li>
+                <li class="pc-item pc-caption">
+                  <label>Beranda</label>
+                </li>
+                <li class="pc-item pc-hasmenu">
+                  <a href="{{ route('dashboard') }}" class="pc-link">
+                    <span class="pc-micon"><i class="bi bi-columns-gap"></i></span>
+                    <span class="pc-mtext">Dashboard</span>
+                  </a>
+                </li>
 
-<li class="pc-item pc-hasmenu">
-  <!-- <a href="{{ route('absensi.index') }}" class="pc-link">
+                <li class="pc-item pc-caption">
+                  <label>Wali Kelas</label>
+                </li>
+
+                <li class="pc-item pc-hasmenu">
+                  <!-- <a href="{{ route('absensi.index') }}" class="pc-link">
     <span class="pc-micon"><i class="bi bi-clipboard-check"></i></span>
     <span class="pc-mtext">Absensi</span>
   </a> -->
-</li>
-<!-- tambah sini mas -->
+                </li>
+                <!-- tambah sini mas -->
 
-{{-- <li class="pc-item pc-caption">
+                {{-- <li class="pc-item pc-caption">
   <label>Other</label>
   <svg class="pc-icon">
     <use xlink:href="#custom-notification-status"></use>

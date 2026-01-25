@@ -76,6 +76,7 @@
                             @enderror
                         </div>
                         <button class="btn btn-success">Simpan</button>
+                        <a class="btn btn-secondary" href="{{ route('akademik.staff.index') }}">Kembali</a>
                     </form>
                 </div>
             </div>

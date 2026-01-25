@@ -25,9 +25,21 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             if (Auth::user()->hasRole('Super Admin')) {
-                return redirect()->intended('/superadmin/users');
+                return redirect()->intended('/dashboard');
             }
-            return redirect()->intended('/');
+            if (Auth::user()->hasRole('Bagain Akademik')) {
+                return redirect()->intended('/dashboard/akademik');
+            }
+            if (Auth::user()->hasRole('Guru Mapel')) {
+                return redirect()->intended('/dashboard/guru-mapel');
+            }
+            // if (Auth::user()->hasRole('Wali Kelas')) {
+            //     return redirect()->intended('/superadmin/users');
+            // }
+            if (Auth::user()->hasRole('Kepala Sekolah')) {
+                return redirect()->intended('/dashboard/kepala-sekolah');
+            }
+            
         }
 
         return back()->withErrors([

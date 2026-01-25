@@ -233,6 +233,7 @@
         margin-top: 20px;
         display: flex;
         justify-content: flex-end;
+        page-break-inside: avoid;
     }
 
     .ttd-box {

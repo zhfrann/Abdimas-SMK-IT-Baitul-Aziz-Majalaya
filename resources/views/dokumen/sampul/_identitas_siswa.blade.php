@@ -139,7 +139,7 @@
         <div class="ttd-box">
             Bandung, {{ now()->translatedFormat('d F Y') }}<br>
             Kepala Sekolah,<br><br><br><br><br>
-            <span class="ttd-nama">Feny Irfany Muhammad,ST.,M.AP.</span><br>
+            <span class="ttd-nama">{{ $sekolah->nama_kepala_sekolah }}</span><br>
             NIP.
         </div>
     </div>

@@ -71,7 +71,7 @@
             </thead>
             <tbody>
                 @php $no=1; @endphp
-                @foreach ($intrakurikulerList as $mapel)
+                @forelse ($intrakurikulerList as $mapel)
                     @php
                         // Skor sumatif siswa pada mapel & riwayat kelas ini
                         $skor = $skorSumatifList
@@ -101,7 +101,11 @@
                             <td>{{ $capaianTerendah }}</td>
                         </tr>
                     @endif
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="4" style="text-align:center;">-</td>
+                    </tr>
+                @endforelse
             </tbody>
 
             {{-- Tabel Ekstrakurikuler --}}
@@ -145,38 +149,40 @@
                 <tbody>
                     <tr>
                         <td>Sakit</td>
-                        <td>0 hari</td>
+                        <td>{{ $rk->rekap_kehadiran['sakit'] }} hari</td>
                     </tr>
                     <tr>
                         <td>Izin</td>
-                        <td>0 hari</td>
+                        <td>{{ $rk->rekap_kehadiran['izin'] }} hari</td>
                     </tr>
                     <tr>
                         <td>Tanpa Keterangan</td>
-                        <td>0 hari</td>
+                        <td>{{ $rk->rekap_kehadiran['alpha'] }} hari</td>
                     </tr>
                 </tbody>
             </table>
 
             {{-- Tanda Tangan --}}
-            <div style="text-align: right; margin: 0 5mm;">Bandung, {{ now()->translatedFormat('d F Y') }}</div>
-            <div style="width:100%; display:flex; justify-content:space-between; margin-top: 2mm;">
-                {{-- Orang Tua --}}
-                <div style="width: 30%; text-align: center;">
-                    Orang Tua,<br><br><br><br>
-                    .................................................
-                </div>
+            <div style="page-break-inside: avoid;">
+                <div style="text-align: right; margin: 0 5mm;">Bandung, {{ now()->translatedFormat('d F Y') }}</div>
+                <div style="width:100%; display:flex; justify-content:space-between; margin-top: 2mm;">
+                    {{-- Orang Tua --}}
+                    <div style="width: 30%; text-align: center;">
+                        Orang Tua,<br><br><br><br>
+                        .................................................
+                    </div>
 
-                {{-- Wali Kelas --}}
-                <div style="width: 30%; text-align: center;">
-                    Wali Kelas,<br><br><br><br>
-                    {{ $waliKelas->name ?? 'Wali Kelas' }}
+                    {{-- Wali Kelas --}}
+                    <div style="width: 30%; text-align: center;">
+                        Wali Kelas,<br><br><br><br>
+                        {{ $waliKelas->name ?? 'Wali Kelas' }}
+                    </div>
                 </div>
-            </div>
-            <div style="width:50%; margin: 5mm auto 0; text-align:center;">
-                Mengetahui,<br>
-                Kepala Sekolah<br><br><br><br>
-                <span style="font-weight:bold;">{{ $sekolah->nama_kepala_sekolah ?? '' }}</span><br>
+                <div style="width:50%; margin: 5mm auto 0; text-align:center;">
+                    Mengetahui,<br>
+                    Kepala Sekolah<br><br><br><br>
+                    <span style="font-weight:bold;">{{ $sekolah->nama_kepala_sekolah ?? '' }}</span><br>
+                </div>
             </div>
     </div>
 @endforeach

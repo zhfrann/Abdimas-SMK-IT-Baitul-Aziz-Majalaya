@@ -1,118 +1,137 @@
-<li class="pc-item pc-caption">
-    <label>Manajement Staff</label>
-    <svg class="pc-icon">
-        <use xlink:href="#custom-flag"></use>
-    </svg>
-</li>
-<li class="pc-item pc-hasmenu">
-    <a href="{{ route('akademik.staff.index') }}" class="pc-link">
-        <span class="pc-micon">
-            {{-- <svg class="pc-icon">
+                <li class="pc-item pc-caption">
+                  <label>Beranda</label>
+                </li>
+                <li class="pc-item pc-hasmenu">
+                  <a href="{{ route('dashboard') }}" class="pc-link">
+                    <span class="pc-micon"><i class="bi bi-columns-gap"></i></span>
+                    <span class="pc-mtext">Dashboard</span>
+                  </a>
+                </li>
+
+                <li class="pc-item pc-caption">
+                  <label>Manajement Staff</label>
+                  <svg class="pc-icon">
+                    <use xlink:href="#custom-flag"></use>
+                  </svg>
+                </li>
+                <li class="pc-item pc-hasmenu">
+                  <a href="{{ route('akademik.staff.index') }}" class="pc-link">
+                    <span class="pc-micon">
+                      {{-- <svg class="pc-icon">
         <use xlink:href="#custom-status-up"></use>
       </svg> --}}
-            <i class="bi bi-people"></i>
-        </span>
-        <span class="pc-mtext">List Staff</span></a>
-</li>
-<li class="pc-item pc-caption">
-    <label>Manajement kelas</label>
-    <svg class="pc-icon">
-        <use xlink:href="#custom-flag"></use>
-    </svg>
-</li>
-<li class="pc-item pc-hasmenu">
-    <a href="{{ route('akademik.tahun_ajaran.index') }}" class="pc-link">
-        <span class="pc-micon">
-            {{-- <svg class="pc-icon">
+                      <i class="bi bi-people"></i>
+                    </span>
+                    <span class="pc-mtext">List Staff</span></a>
+                </li>
+
+                <li class="pc-item pc-caption">
+                  <label>Manajement kelas</label>
+                  <svg class="pc-icon">
+                    <use xlink:href="#custom-flag"></use>
+                  </svg>
+                </li>
+                <li class="pc-item pc-hasmenu">
+                  <a href="{{ route('akademik.tahun_ajaran.index') }}" class="pc-link">
+                    <span class="pc-micon">
+                      {{-- <svg class="pc-icon">
         <use xlink:href="#custom-status-up"></use>
       </svg> --}}
-            <i class="bi bi-calendar-date"></i>
-        </span>
-        <span class="pc-mtext">Tahun Ajaran</span></a>
-</li>
-<li class="pc-item pc-hasmenu">
-    <a href="{{ route('akademik.kelas.index') }}" class="pc-link">
-        <span class="pc-micon">
-            {{-- <svg class="pc-icon">
+                      <i class="bi bi-calendar-date"></i>
+                    </span>
+                    <span class="pc-mtext">Tahun Ajaran</span></a>
+                </li>
+                <li class="pc-item pc-hasmenu">
+                  <a href="{{ route('akademik.kelas.index') }}" class="pc-link">
+                    <span class="pc-micon">
+                      {{-- <svg class="pc-icon">
         <use xlink:href="#custom-status-up"></use>
       </svg> --}}
-            <i class="bi bi-mortarboard"></i>
-        </span>
-        <span class="pc-mtext">List kelas</span></a>
-</li>
-<li class="pc-item pc-caption">
-    <label>Manajement Mapel</label>
-    <svg class="pc-icon">
-        <use xlink:href="#custom-flag"></use>
-    </svg>
-</li>
-<li class="pc-item pc-hasmenu">
-    <a href="{{ route('intrakurikuler.index') }}" class="pc-link">
-        <span class="pc-micon">
-            {{-- <svg class="pc-icon">
+                      <i class="bi bi-mortarboard"></i>
+                    </span>
+                    <span class="pc-mtext">List kelas</span></a>
+                </li>
+                <li class="pc-item pc-caption">
+                  <label>Manajement Mapel</label>
+                  <svg class="pc-icon">
+                    <use xlink:href="#custom-flag"></use>
+                  </svg>
+                </li>
+                <li class="pc-item pc-hasmenu">
+                  <a href="{{ route('intrakurikuler.index') }}" class="pc-link">
+                    <span class="pc-micon">
+                      {{-- <svg class="pc-icon">
         <use xlink:href="#custom-status-up"></use>
       </svg> --}}
-            <i class="bi bi-journal-bookmark"></i>
-        </span>
-        <span class="pc-mtext">Intrakurikuler</span></a>
-</li>
-<li class="pc-item pc-hasmenu">
-    <a href="{{ route('ekstrakurikuler.index') }}" class="pc-link">
-        <span class="pc-micon">
-            {{-- <svg class="pc-icon">
+                      <i class="bi bi-journal-bookmark"></i>
+                    </span>
+                    <span class="pc-mtext">Intrakurikuler</span></a>
+                </li>
+                <li class="pc-item pc-hasmenu">
+                  <a href="{{ route('ekstrakurikuler.index') }}" class="pc-link">
+                    <span class="pc-micon">
+                      {{-- <svg class="pc-icon">
         <use xlink:href="#custom-shield"></use>
       </svg> --}}
-            <i class="bi bi-people"></i>
-        </span>
-        <span class="pc-mtext">Ekstrakurikuler</span></a>
-</li>
+                      <i class="bi bi-people"></i>
+                    </span>
+                    <span class="pc-mtext">Ekstrakurikuler</span></a>
+                </li>
 
-<li class="pc-item pc-caption">
-    <label>Absensi</label>
-    <svg class="pc-icon">
-        <use xlink:href="#custom-flag"></use>
-    </svg>
-</li>
-<li class="pc-item pc-hasmenu">
-    <a href="{{ route('absensi.intrakurikuler.list') }}" class="pc-link">
-        <span class="pc-micon">
-            {{-- <svg class="pc-icon">
+                <li class="pc-item pc-caption">
+                  <label>Absensi</label>
+                  <svg class="pc-icon">
+                    <use xlink:href="#custom-flag"></use>
+                  </svg>
+                </li>
+                <li class="pc-item pc-hasmenu">
+                  <a href="{{ route('absensi.intrakurikuler.list') }}" class="pc-link">
+                    <span class="pc-micon">
+                      {{-- <svg class="pc-icon">
         <use xlink:href="#custom-status-up"></use>
       </svg> --}}
-            <i class="bi bi-journal-bookmark"></i>
-        </span>
-        <span class="pc-mtext">Absensi Intrakurikuler</span></a>
-</li>
-<li class="pc-item pc-hasmenu">
-    <a href="{{ route('absensi.ekstrakurikuler.list') }}" class="pc-link">
-        <span class="pc-micon">
-            {{-- <svg class="pc-icon">
+                      <i class="bi bi-journal-bookmark"></i>
+                    </span>
+                    <span class="pc-mtext">Absensi Intrakurikuler</span></a>
+                </li>
+                <li class="pc-item pc-hasmenu">
+                  <a href="{{ route('absensi.ekstrakurikuler.list') }}" class="pc-link">
+                    <span class="pc-micon">
+                      {{-- <svg class="pc-icon">
         <use xlink:href="#custom-shield"></use>
       </svg> --}}
-            <i class="bi bi-people"></i>
-        </span>
-        <span class="pc-mtext">Absensi Ekstrakurikuler</span></a>
-</li>
+                      <i class="bi bi-people"></i>
+                    </span>
+                    <span class="pc-mtext">Absensi Ekstrakurikuler</span></a>
+                </li>
 
-<li class="pc-item pc-caption">
-    <label>Cetak dokument</label>
-    <svg class="pc-icon">
-        <use xlink:href="#custom-flag"></use>
-    </svg>
-</li>
-<li class="pc-item pc-hasmenu">
-    <a href="{{ route('dokumen.kelas') }}" class="pc-link">
-        <span class="pc-micon">
-            {{-- <svg class="pc-icon">
+                <li class="pc-item pc-caption">
+                  <label>Cetak dokument</label>
+                  <svg class="pc-icon">
+                    <use xlink:href="#custom-flag"></use>
+                  </svg>
+                </li>
+                <li class="pc-item pc-hasmenu">
+                  <a href="{{ route('dokumen.kelas') }}" class="pc-link">
+                    <span class="pc-micon">
+                      {{-- <svg class="pc-icon">
         <use xlink:href="#custom-status-up"></use>
       </svg> --}}
-            <i class="bi bi-journal-bookmark"></i>
-        </span>
-        <span class="pc-mtext">Dokumen</span></a>
-</li>
+                      <i class="bi bi-journal-bookmark"></i>
+                    </span>
+                    <span class="pc-mtext">Rapor</span></a>
+                </li>
+                <li class="pc-item pc-hasmenu">
+                  <a href="{{ route('dokumen.mutasi') }}" class="pc-link">
+                    <span class="pc-micon">
+                      <i class="bi bi-arrow-left-right"></i>
+                    </span>
+                    <span class="pc-mtext">Mutasi</span>
+                  </a>
+                </li>
 
 
-{{-- <li class="pc-item pc-caption">
+                {{-- <li class="pc-item pc-caption">
   <label>Other</label>
   <svg class="pc-icon">
     <use xlink:href="#custom-notification-status"></use>

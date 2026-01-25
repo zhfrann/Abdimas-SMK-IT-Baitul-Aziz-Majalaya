@@ -1,21 +1,32 @@
-<li class="pc-item pc-caption">
-  <label>Manajement user</label>
-  <svg class="pc-icon">
-    <use xlink:href="#custom-flag"></use>
-  </svg>
-</li>
-<li class="pc-item pc-hasmenu">
-  <a href="{{ route('superadmin.users.index') }}" class="pc-link">
-    <span class="pc-micon">
-      {{-- <svg class="pc-icon">
+                <li class="pc-item pc-caption">
+                  <label>Beranda</label>
+                </li>
+                <li class="pc-item pc-hasmenu">
+                  <a href="{{ route('dashboard') }}" class="pc-link">
+                    <span class="pc-micon"><i class="bi bi-columns-gap"></i></span>
+                    <span class="pc-mtext">Dashboard</span>
+                  </a>
+                </li>
+
+
+                <li class="pc-item pc-caption">
+                  <label>Manajement user</label>
+                  <svg class="pc-icon">
+                    <use xlink:href="#custom-flag"></use>
+                  </svg>
+                </li>
+                <li class="pc-item pc-hasmenu">
+                  <a href="{{ route('superadmin.users.index') }}" class="pc-link">
+                    <span class="pc-micon">
+                      {{-- <svg class="pc-icon">
         <use xlink:href="#custom-status-up"></use>
       </svg> --}}
-      <i class="bi bi-journal-bookmark"></i>
-    </span>
-    <span class="pc-mtext">List user</span></a>
-</li>
+                      <i class="bi bi-journal-bookmark"></i>
+                    </span>
+                    <span class="pc-mtext">List user</span></a>
+                </li>
 
-{{-- <li class="pc-item pc-caption">
+                {{-- <li class="pc-item pc-caption">
   <label>Other</label>
   <svg class="pc-icon">
     <use xlink:href="#custom-notification-status"></use>

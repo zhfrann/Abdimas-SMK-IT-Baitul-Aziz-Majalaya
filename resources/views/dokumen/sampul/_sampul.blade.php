@@ -51,8 +51,11 @@
     <div class="footer">
         <div class="yayasan">YAYASAN BAITUL AZIZ</div>
         <div>Jl. Pesantren Baitul Aziz - Kp. Sukahaji No.44 RT/RW 01/08</div>
-        <div>Desa Neglasari Kec. Majalaya Kab. Bandung 40382</div>
-        <div>Telp.022-5950175 - website: www.smkbaitulaziz.sch.id - email: smkbaitulaziz@gmail.com</div>
+        <div>Desa {{ $sekolah->kelurahan->nama }} Kec. {{ $sekolah->kelurahan->kecamatan->nama }} Kab.
+            {{ Str::after($sekolah->kelurahan->kecamatan->kabupaten->nama, 'Kabupaten ') }}
+            {{ $sekolah->kode_pos }}
+        </div>
+        <div>Telp.{{ $sekolah->telp }} - website: {{ $sekolah->website }} - email: {{ $sekolah->email }}</div>
     </div>
 
 </div>

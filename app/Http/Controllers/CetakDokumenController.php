@@ -53,7 +53,7 @@ class CetakDokumenController extends Controller
             'siswa.*' => 'exists:riwayat_kelas,riwayat_kelas_id',
         ]);
 
-        $sekolah = Sekolah::first();
+        $sekolah = Sekolah::firstOrFail();
         $kelasAjar = KelasAjar::with(['kelas', 'tahunAjaran', 'waliKelas', 'riwayatKelas.siswa.user', 'riwayatKelas.siswa.kelurahan.kecamatan.kabupaten'])->findOrFail($request->kelas_ajar_id);
 
         $siswaIds = $request->siswa ?? $kelasAjar->riwayatKelas->pluck('riwayat_kelas_id')->toArray();
@@ -67,8 +67,8 @@ class CetakDokumenController extends Controller
             'kelasAjar' => $kelasAjar,
             'siswaList' => $siswaList,
             'sekolah' => $sekolah,
-        ])->format('A4')->download('Sampul Rapor ' . $namaKelas . ' ' . $tahunAjaran . ' ' . $semester . '.pdf');
-        // ])->format('A4');
+            // ])->format('A4')->download('Sampul Rapor ' . $namaKelas . ' ' . $tahunAjaran . ' ' . $semester . '.pdf');
+        ])->format('A4');
 
         return $pdf;
     }
@@ -103,6 +103,21 @@ class CetakDokumenController extends Controller
         $siswaIds = $request->siswa ?? $kelasAjar->riwayatKelas->pluck('riwayat_kelas_id')->toArray();
         $siswaList = $kelasAjar->riwayatKelas->whereIn('riwayat_kelas_id', $siswaIds);
 
+        // Hitung kehadiran per siswa
+        foreach ($siswaList as $rk) {
+            $kehadiran = [
+                'sakit' => 0,
+                'izin' => 0,
+                'alpha' => 0,
+            ];
+            foreach ($rk->kehadiranIntrakurikuler as $absen) {
+                if ($absen->status === 'sakit') $kehadiran['sakit']++;
+                if ($absen->status === 'izin') $kehadiran['izin']++;
+                if ($absen->status === 'alpha') $kehadiran['alpha']++;
+            }
+            $rk->rekap_kehadiran = $kehadiran;
+        }
+
         $pdf = Pdf::view('dokumen.pdf_rapor', [
             'kelasAjar' => $kelasAjar,
             'siswaList' => $siswaList,
@@ -112,6 +127,7 @@ class CetakDokumenController extends Controller
         return $pdf;
     }
 
+    // Cetak Buku Induk
     public function cetakBukuInduk(Request $request)
     {
         $request->validate([
@@ -120,23 +136,72 @@ class CetakDokumenController extends Controller
             'siswa.*' => 'exists:riwayat_kelas,riwayat_kelas_id',
         ]);
 
-        $sekolah = Sekolah::first();
+        $sekolah = Sekolah::with('kelurahan.kecamatan.kabupaten')->first();
         $kelasAjar = KelasAjar::with([
             'kelas',
             'tahunAjaran',
             'waliKelas',
+            'intrakurikuler.pengampu',
+            'intrakurikuler.tujuanPembelajaran',
+            'intrakurikuler.asesmenFormatif.details.tujuanPembelajaran',
+            'intrakurikuler.asesmenSumatif.skorSiswa',
             'riwayatKelas.siswa.user',
-            // Tambahkan relasi lain yang diperlukan untuk buku induk
+            'riwayatKelas.siswa.siswaEkstrakurikuler.ekstrakurikuler.pembina',
+            'riwayatKelas.siswa.siswaEkstrakurikuler.penilaians',
+            'riwayatKelas.kehadiranIntrakurikuler',
+            'riwayatKelas.skorAsesmen.asesmenSumatif',
+            'riwayatKelas.siswa',
         ])->findOrFail($request->kelas_ajar_id);
 
         $siswaIds = $request->siswa ?? $kelasAjar->riwayatKelas->pluck('riwayat_kelas_id')->toArray();
         $siswaList = $kelasAjar->riwayatKelas->whereIn('riwayat_kelas_id', $siswaIds);
 
+        // Hitung kehadiran per siswa
+        foreach ($siswaList as $rk) {
+            $kehadiran = [
+                'sakit' => 0,
+                'izin' => 0,
+                'alpha' => 0,
+            ];
+            foreach ($rk->kehadiranIntrakurikuler as $absen) {
+                if ($absen->status === 'sakit') $kehadiran['sakit']++;
+                if ($absen->status === 'izin') $kehadiran['izin']++;
+                if ($absen->status === 'alpha') $kehadiran['alpha']++;
+            }
+            $rk->rekap_kehadiran = $kehadiran;
+        }
+
         $pdf = Pdf::view('dokumen.pdf_buku_induk', [
             'kelasAjar' => $kelasAjar,
             'siswaList' => $siswaList,
             'sekolah' => $sekolah,
-        ])->format('A4')->download('buku-induk-' . $kelasAjar->kelas->nama_kelas . '.pdf');
+        ])->format('A4');
+
+        return $pdf;
+    }
+
+    public function mutasi()
+    {
+        return view('dokumen.mutasi');
+    }
+
+    public function cetakMutasi(Request $request)
+    {
+        $request->validate([
+            'jenis' => 'required|in:masuk,keluar',
+            'jumlah' => 'required|integer|min:1|max:50',
+        ]);
+
+        $jenis = $request->jenis;
+        $jumlah = (int) $request->jumlah;
+
+        $view = $jenis === 'keluar'
+            ? 'dokumen.pdf_mutasi_keluar'
+            : 'dokumen.pdf_mutasi_masuk';
+
+        $pdf = \Spatie\LaravelPdf\Facades\Pdf::view($view, [
+            'jumlah' => $jumlah,
+        ])->format('A4');
 
         return $pdf;
     }

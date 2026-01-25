@@ -14,19 +14,19 @@ class StaffController extends Controller
 {
     public function index()
     {
-        $users = User::role(['Guru Mapel', 'Wali Kelas'])->with('roles')->get();
+        $users = User::role(['Kepala Sekolah', 'Guru Mapel', 'Wali Kelas', 'Bagian Akademik'])->with('roles')->get();
         return view('akademik.staff.index', compact('users'));
     }
 
     public function create()
     {
-        $roles = Role::whereIn('name', ['Guru Mapel', 'Wali Kelas'])->get();
+        $roles = Role::whereIn('name', ['Kepala Sekolah', 'Guru Mapel', 'Wali Kelas', 'Bagian Akademik'])->get();
         return view('akademik.staff.create', compact('roles'));
     }
 
     public function store(Request $request)
     {
-        $allowedRoles = Role::whereIn('name', ['Guru Mapel', 'Wali Kelas'])
+        $allowedRoles = Role::whereIn('name', ['Kepala Sekolah', 'Guru Mapel', 'Wali Kelas', 'Bagian Akademik'])
             ->pluck('name')
             ->toArray();
 
