@@ -108,7 +108,15 @@
       </svg> --}}
             <i class="bi bi-journal-bookmark"></i>
         </span>
-        <span class="pc-mtext">Dokumen</span></a>
+        <span class="pc-mtext">Rapor</span></a>
+</li>
+<li class="pc-item pc-hasmenu">
+    <a href="{{ route('dokumen.mutasi') }}" class="pc-link">
+        <span class="pc-micon">
+            <i class="bi bi-arrow-left-right"></i>
+        </span>
+        <span class="pc-mtext">Mutasi</span>
+    </a>
 </li>
 
 

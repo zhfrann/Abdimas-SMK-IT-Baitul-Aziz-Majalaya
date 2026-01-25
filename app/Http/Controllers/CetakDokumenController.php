@@ -149,4 +149,30 @@ class CetakDokumenController extends Controller
 
         return $pdf;
     }
+
+    public function mutasi()
+    {
+        return view('dokumen.mutasi');
+    }
+
+    public function cetakMutasi(Request $request)
+    {
+        $request->validate([
+            'jenis' => 'required|in:masuk,keluar',
+            'jumlah' => 'required|integer|min:1|max:50',
+        ]);
+
+        $jenis = $request->jenis;
+        $jumlah = (int) $request->jumlah;
+
+        $view = $jenis === 'keluar'
+            ? 'dokumen.pdf_mutasi_keluar'
+            : 'dokumen.pdf_mutasi_masuk';
+
+        $pdf = \Spatie\LaravelPdf\Facades\Pdf::view($view, [
+            'jumlah' => $jumlah,
+        ])->format('A4');
+
+        return $pdf;
+    }
 }
