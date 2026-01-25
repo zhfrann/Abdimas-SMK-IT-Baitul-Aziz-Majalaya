@@ -8,6 +8,7 @@ use App\Http\Controllers\AssesmentFormatifController;
 use App\Http\Controllers\AssesmentSumatifController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CetakDokumenController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DummyExcelController;
 use App\Http\Controllers\EkstrakurikulerController;
 use App\Http\Controllers\EkstrakurikulerSiswaController;
@@ -32,6 +33,28 @@ Route::get('/', function () {
 Route::get('login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
 Route::post('login', [AuthController::class, 'login'])->middleware('guest');
 Route::post('logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+
+// Dashboard
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::prefix('dashboard')->name('dashboard.')->group(function () {
+
+        Route::middleware('role:Bagian Akademik')->group(function () {
+            Route::get('/akademik', [DashboardController::class, 'dashboardAkademik'])->name('akademik');
+        });
+
+        // Route::middleware('role:Guru Mapel')->group(function () {
+        //     Route::get('/guru', [DashboardController::class, ''])
+        //         ->name('guru');
+        // });
+
+        // Route::middleware('role:Wali Kelas')->group(function () {
+        //     Route::get('/wali-kelas', [DashboardController::class, ''])
+        //         ->name('wali_kelas');
+        // });
+    });
+});
 
 // Route untuk manajemen user oleh super admin
 Route::prefix('superadmin')->middleware(['auth', 'role:Super Admin'])->name('superadmin.')->group(function () {

@@ -49,7 +49,7 @@
             </div>
 
             <ul class="pc-navbar">
-                @role('Guru Mapel|Wali Kelas|Bagian Akademik')
+                {{-- @role('Guru Mapel|Wali Kelas|Bagian Akademik')
                     <li class="pc-item pc-caption">
                         <label>Navigation</label>
                     </li>
@@ -59,10 +59,11 @@
                             <span class="pc-mtext">Dashboard</span>
                         </a>
                     </li>
+                @endrole --}}
+
+                @role('Super Admin')
+                    @include('layouts.menu-list-superadmin')
                 @endrole
-                    @role('Super Admin')
-                        @include('layouts.menu-list-superadmin')
-                    @endrole
 
                 @role('Guru Mapel')
                     @include('layouts.menu-list-mapel')

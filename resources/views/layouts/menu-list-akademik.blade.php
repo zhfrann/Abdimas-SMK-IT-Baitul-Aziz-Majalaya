@@ -1,4 +1,14 @@
 <li class="pc-item pc-caption">
+    <label>Beranda</label>
+</li>
+<li class="pc-item pc-hasmenu">
+    <a href="{{ route('dashboard') }}" class="pc-link">
+        <span class="pc-micon"><i class="bi bi-columns-gap"></i></span>
+        <span class="pc-mtext">Dashboard</span>
+    </a>
+</li>
+
+<li class="pc-item pc-caption">
     <label>Manajement Staff</label>
     <svg class="pc-icon">
         <use xlink:href="#custom-flag"></use>
@@ -14,6 +24,7 @@
         </span>
         <span class="pc-mtext">List Staff</span></a>
 </li>
+
 <li class="pc-item pc-caption">
     <label>Manajement kelas</label>
     <svg class="pc-icon">
