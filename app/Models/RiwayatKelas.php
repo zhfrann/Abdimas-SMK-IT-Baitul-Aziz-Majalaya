@@ -57,4 +57,9 @@ class RiwayatKelas extends Model
     {
         return $this->hasMany(SiswaEkstrakurikuler::class, 'riwayat_kelas_id', 'riwayat_kelas_id');
     }
+
+    public function asesmenFormatif(): HasMany
+    {
+        return $this->hasMany(AsesmenFormatif::class, 'riwayat_kelas_id', 'riwayat_kelas_id');
+    }
 }

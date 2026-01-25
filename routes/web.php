@@ -125,6 +125,8 @@ Route::middleware(['auth'])->group(function () {
 
             Route::resource('assesment-formatif', AssesmentFormatifController::class);
 
+            Route::get('/template-asesmen-formatif', [DummyExcelController::class, 'downloadFormatif'])->name('templateFormatif');
+
             Route::get('assesment-formatif/{riwayatKelas}/detail', [AssesmentFormatifController::class, 'detailAssesmentFormatif'])
                 ->name('assesment-formatif.detail');
             Route::post('assesment-formatif/{riwayatKelas}/save-detail', [AssesmentFormatifController::class, 'saveDetail'])

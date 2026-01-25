@@ -27,7 +27,8 @@
                     </div>
 
                     <div class="d-flex align-items-center gap-2 flex-wrap">
-                        <a href="/template-assesmen-formatif-excel" class="btn btn-primary">
+                        <a href="{{ route('templateFormatif', $intrakurikuler->intrakurikuler_id) }}"
+                            class="btn btn-primary">
                             <i class="bi bi-download"></i> Unduh Template Excel
                         </a>
                         <form action="" method="" enctype="multipart/form-data"
