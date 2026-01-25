@@ -404,9 +404,6 @@ return new class extends Migration
                 ->cascadeOnUpdate()->restrictOnDelete();
         });
 
-
-
-
         Schema::create('siswa_ekstrakurikuler', function (Blueprint $table) {
             $table->increments('siswa_ekstrakurikuler_id');
             $table->unsignedBigInteger('siswa_id');

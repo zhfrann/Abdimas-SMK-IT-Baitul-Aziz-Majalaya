@@ -103,6 +103,21 @@ class CetakDokumenController extends Controller
         $siswaIds = $request->siswa ?? $kelasAjar->riwayatKelas->pluck('riwayat_kelas_id')->toArray();
         $siswaList = $kelasAjar->riwayatKelas->whereIn('riwayat_kelas_id', $siswaIds);
 
+        // Hitung kehadiran per siswa
+        foreach ($siswaList as $rk) {
+            $kehadiran = [
+                'sakit' => 0,
+                'izin' => 0,
+                'alpha' => 0,
+            ];
+            foreach ($rk->kehadiranIntrakurikuler as $absen) {
+                if ($absen->status === 'sakit') $kehadiran['sakit']++;
+                if ($absen->status === 'izin') $kehadiran['izin']++;
+                if ($absen->status === 'alpha') $kehadiran['alpha']++;
+            }
+            $rk->rekap_kehadiran = $kehadiran;
+        }
+
         $pdf = Pdf::view('dokumen.pdf_rapor', [
             'kelasAjar' => $kelasAjar,
             'siswaList' => $siswaList,
@@ -140,6 +155,21 @@ class CetakDokumenController extends Controller
 
         $siswaIds = $request->siswa ?? $kelasAjar->riwayatKelas->pluck('riwayat_kelas_id')->toArray();
         $siswaList = $kelasAjar->riwayatKelas->whereIn('riwayat_kelas_id', $siswaIds);
+
+        // Hitung kehadiran per siswa
+        foreach ($siswaList as $rk) {
+            $kehadiran = [
+                'sakit' => 0,
+                'izin' => 0,
+                'alpha' => 0,
+            ];
+            foreach ($rk->kehadiranIntrakurikuler as $absen) {
+                if ($absen->status === 'sakit') $kehadiran['sakit']++;
+                if ($absen->status === 'izin') $kehadiran['izin']++;
+                if ($absen->status === 'alpha') $kehadiran['alpha']++;
+            }
+            $rk->rekap_kehadiran = $kehadiran;
+        }
 
         $pdf = Pdf::view('dokumen.pdf_buku_induk', [
             'kelasAjar' => $kelasAjar,

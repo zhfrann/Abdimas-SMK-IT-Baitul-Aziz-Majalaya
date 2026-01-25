@@ -149,15 +149,15 @@
                 <tbody>
                     <tr>
                         <td>Sakit</td>
-                        <td>0 hari</td>
+                        <td>{{ $rk->rekap_kehadiran['sakit'] }} hari</td>
                     </tr>
                     <tr>
                         <td>Izin</td>
-                        <td>0 hari</td>
+                        <td>{{ $rk->rekap_kehadiran['izin'] }} hari</td>
                     </tr>
                     <tr>
                         <td>Tanpa Keterangan</td>
-                        <td>0 hari</td>
+                        <td>{{ $rk->rekap_kehadiran['alpha'] }} hari</td>
                     </tr>
                 </tbody>
             </table>

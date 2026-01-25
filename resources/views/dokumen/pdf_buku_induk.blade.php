@@ -128,17 +128,17 @@
                 <tr>
                     <td style="width:5%;">1</td>
                     <td>Sakit</td>
-                    <td>0 hari</td>
+                    <td>{{ $rk->rekap_kehadiran['sakit'] }} hari</td>
                 </tr>
                 <tr>
                     <td>2</td>
                     <td>Izin</td>
-                    <td>0 hari</td>
+                    <td>{{ $rk->rekap_kehadiran['izin'] }} hari</td>
                 </tr>
                 <tr>
                     <td>3</td>
                     <td>Tanpa Keterangan</td>
-                    <td>0 hari</td>
+                    <td>{{ $rk->rekap_kehadiran['alpha'] }} hari</td>
                 </tr>
             </tbody>
         </table>
