@@ -33,9 +33,9 @@ class AuthController extends Controller
             if (Auth::user()->hasRole('Guru Mapel')) {
                 return redirect()->intended('/dashboard/guru-mapel');
             }
-            // if (Auth::user()->hasRole('Wali Kelas')) {
-            //     return redirect()->intended('/superadmin/users');
-            // }
+            if (Auth::user()->hasRole('Wali Kelas')) {
+                return redirect()->intended('/dashboard/wali-kelas');
+            }
             if (Auth::user()->hasRole('Kepala Sekolah')) {
                 return redirect()->intended('/dashboard/kepala-sekolah');
             }

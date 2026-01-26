@@ -30,8 +30,12 @@ class DashboardController extends Controller
             return redirect()->route('dashboard.kepalaSekolah');
         }
 
-        if($user->hasRole('Guru Mapel')){
+        if ($user->hasRole('Guru Mapel')) {
             return redirect()->route('dashboard.guruMapel');
+        }
+
+        if ($user->hasRole('Wali Kelas')) {
+            return redirect()->route('dashboard.waliKelas');
         }
 
         //role lain...
@@ -240,6 +244,7 @@ class DashboardController extends Controller
     }
 
 
+
     public function guruMapel(Request $request)
     {
         $userId = Auth::id();
@@ -264,39 +269,41 @@ class DashboardController extends Controller
             ]);
 
         // default filter UI
-        $periode       = $request->get('periode', 'month');        // week|month|semester
-        $granularity   = $request->get('granularity', 'week');     // week|day
-        $bucket        = (int) $request->get('bucket', 10);        // 10|5
-        $kkm           = (int) $request->get('kkm', 75);
-        $thresholdRawan = (float) $request->get('rawan_threshold', 0.80); // 0.80
-        $atensiThreshold = (int) $request->get('atensi_threshold', 60);  // FIX: default < 60
+        $periode         = 'semester'; // week|month|semester
+        $granularity     = 'week';     // week|day
+        $bucket          = 10;         // 10|5
+        $kkm             = (int) $request->get('kkm', 75);
+        $thresholdRawan  = (float) $request->get('rawan_threshold', 0.80);   // 0.80
+        $atensiThreshold = (int) $request->get('atensi_threshold', 60);      // default 60
+        $showAll         = $request->boolean('show_all');                    // ?show_all=1
+        $limitList       = $showAll ? 10000 : 6;
 
         // kalau belum punya mapel
         if ($mapels->isEmpty()) {
             return view('dashboard.guru_mapel', [
-                'mapels' => $mapels,
-                'selected' => null,
-                'periode' => $periode,
-                'granularity' => $granularity,
-                'bucket' => $bucket,
-                'kkm' => $kkm,
-                'thresholdRawan' => $thresholdRawan,
+                'mapels'          => $mapels,
+                'selected'        => null,
+                'periode'         => $periode,
+                'granularity'     => $granularity,
+                'bucket'          => $bucket,
+                'kkm'             => $kkm,
+                'thresholdRawan'  => $thresholdRawan,
                 'atensiThreshold' => $atensiThreshold,
 
-                'kpiAbsensi' => $this->emptyKpiAbsensi(),
-                'chartAbsensi' => $this->emptyChartAbsensi(),
+                'kpiAbsensi'      => $this->emptyKpiAbsensi(),
+                'chartAbsensi'    => $this->emptyChartAbsensi(),
                 'rawanAbsensiList' => collect(),
 
-                'kpiNilai' => $this->emptyKpiNilai(),
+                'kpiNilai'             => $this->emptyKpiNilai(),
                 'chartNilaiDistribusi' => $this->emptyChartNilaiDistribusi(),
-                'atensiList' => collect(),
-                'unggulList' => collect(),
+                'atensiList'           => collect(),
+                'unggulList'           => collect(),
             ]);
         }
 
         // ====== Filter pilihan mapel ======
         $selectedId = (int) $request->get('intrakurikuler_id', $mapels->first()->intrakurikuler_id);
-        $selected = $mapels->firstWhere('intrakurikuler_id', $selectedId) ?? $mapels->first();
+        $selected   = $mapels->firstWhere('intrakurikuler_id', $selectedId) ?? $mapels->first();
         $selectedId = (int) $selected->intrakurikuler_id;
 
         // ====== Range tanggal current & prev ======
@@ -304,28 +311,29 @@ class DashboardController extends Controller
         [$prevStart, $prevEnd] = $this->previousRange($start, $end);
 
         // ====== ABSENSI ======
-        $kpiAbsensi = $this->buildKpiAbsensi($selectedId, $start, $end, $prevStart, $prevEnd, $thresholdRawan);
-        $chartAbsensi = $this->buildChartAbsensi($selectedId, $start, $end, $granularity);
+        $kpiAbsensi       = $this->buildKpiAbsensi($selectedId, $start, $end, $prevStart, $prevEnd, $thresholdRawan);
+        $chartAbsensi     = $this->buildChartAbsensi($selectedId, $start, $end, $granularity);
         $rawanAbsensiList = $this->buildRawanAbsensiList($selectedId, $start, $end, $thresholdRawan, 6);
 
-        // ====== NILAI ======
-        $kpiNilai = $this->buildKpiNilai($selectedId, $start, $end, $prevStart, $prevEnd, $kkm);
+        // ====== NILAI (PAKAI NILAI AKHIR: SL + SAS) ======
+        $kpiNilai             = $this->buildKpiNilai($selectedId, $start, $end, $prevStart, $prevEnd, $kkm);
         $chartNilaiDistribusi = $this->buildNilaiDistribusi($selectedId, $start, $end, $bucket);
 
-        // FIX: atensi berdasarkan threshold (<60)
         [$atensiList, $unggulList] = $this->buildAtensiUnggulList(
             $selectedId,
             $start,
             $end,
             $prevStart,
             $prevEnd,
-            6,
-            $atensiThreshold
+            $limitList,
+            $atensiThreshold,   // threshold atensi (bisa diset = KKM kalau mau)
+            85                  // threshold unggul
         );
 
         return view('dashboard.guru_mapel', compact(
             'mapels',
             'selected',
+            'showAll',
             'periode',
             'granularity',
             'bucket',
@@ -354,7 +362,7 @@ class DashboardController extends Controller
         float $thresholdRawan
     ): array {
         $current = $this->absensiAgg($intrakurikulerId, $start, $end);
-        $prev = $this->absensiAgg($intrakurikulerId, $prevStart, $prevEnd);
+        $prev    = $this->absensiAgg($intrakurikulerId, $prevStart, $prevEnd);
 
         $rateCurrent = $current['total'] > 0 ? round(($current['hadir'] / $current['total']) * 100, 1) : 0.0;
         $ratePrev    = $prev['total'] > 0 ? round(($prev['hadir'] / $prev['total']) * 100, 1) : 0.0;
@@ -377,12 +385,12 @@ class DashboardController extends Controller
             ->count();
 
         return [
-            'rate' => $rateCurrent,
-            'rate_prev' => $ratePrev,
-            'rate_delta' => $deltaRate,
+            'rate'        => $rateCurrent,
+            'rate_prev'   => $ratePrev,
+            'rate_delta'  => $deltaRate,
 
-            'alpha' => $alphaCurrent,
-            'alpha_prev' => $alphaPrev,
+            'alpha'       => $alphaCurrent,
+            'alpha_prev'  => $alphaPrev,
             'alpha_delta' => $deltaAlpha,
 
             'rawan_count' => $rawanCount,
@@ -459,7 +467,6 @@ class DashboardController extends Controller
             }
         }
 
-        // pastikan urut
         ksort($labels);
         foreach ($data as $status => $arr) {
             ksort($arr);
@@ -510,97 +517,202 @@ class DashboardController extends Controller
         return $rows->map(function ($r) {
             $pct = $r->total_count > 0 ? round(($r->hadir_count / $r->total_count) * 100, 1) : 0;
             return [
-                'siswa_id' => (int) $r->siswa_id,
-                'nama' => $r->nama_siswa,
+                'siswa_id'  => (int) $r->siswa_id,
+                'nama'      => $r->nama_siswa,
                 'hadir_pct' => $pct,
-                'alpha' => (int) $r->alpha_count,
+                'alpha'     => (int) $r->alpha_count,
             ];
         });
     }
 
     // =========================
+    // NILAI - HELPER UTAMA (SL + TEST + NON_TEST -> SAS -> FINAL)
+    // =========================
+    private function finalScorePerSiswa(
+        int $intrakurikulerId,
+        Carbon $start,
+        Carbon $end
+    ) {
+        $rows = DB::table('skor_asesmen_siswa as sas')
+            ->join('asesmen_sumatif as a', 'a.asesmen_sumatif_id', '=', 'sas.asesmen_sumatif_id')
+            ->where('a.intrakurikuler_id', $intrakurikulerId)
+            ->whereNotNull('sas.nilai')
+            ->whereBetween(DB::raw('DATE(sas.created_at)'), [$start->toDateString(), $end->toDateString()])
+            ->groupBy('sas.riwayat_kelas_id')
+            ->selectRaw('
+                sas.riwayat_kelas_id,
+                AVG(CASE WHEN a.asesmen_type = "sumatif_lingkup" THEN sas.nilai END) as sumatif_lingkup,
+                AVG(CASE WHEN a.asesmen_type = "test"            THEN sas.nilai END) as test_nilai,
+                AVG(CASE WHEN a.asesmen_type = "non_test"        THEN sas.nilai END) as non_test_nilai
+            ')
+            ->get();
+
+        return $rows
+            ->map(function ($r) {
+                $sl      = $r->sumatif_lingkup !== null ? (float) $r->sumatif_lingkup : null;
+                $test    = $r->test_nilai       !== null ? (float) $r->test_nilai       : null;
+                $nonTest = $r->non_test_nilai   !== null ? (float) $r->non_test_nilai   : null;
+
+                // SAS dari test & non_test
+                $sas = null;
+                $components = [];
+                if ($test !== null)    $components[] = $test;
+                if ($nonTest !== null) $components[] = $nonTest;
+
+                if (count($components) === 1) {
+                    $sas = $components[0]; // hanya satu → pakai apa adanya
+                } elseif (count($components) === 2) {
+                    $sas = array_sum($components) / 2; // dua-duanya → rata-rata
+                }
+
+                // Final: (SL + SAS) / 2 kalau dua-duanya ada
+                if ($sl !== null && $sas !== null) {
+                    $final = ($sl + $sas) / 2;
+                } elseif ($sl !== null) {
+                    $final = $sl;
+                } else {
+                    $final = $sas; // bisa null kalau nggak ada apa-apa
+                }
+
+                return [
+                    'riwayat_kelas_id' => (int) $r->riwayat_kelas_id,
+                    'sl'    => $sl,
+                    'sas'   => $sas,
+                    'final' => $final !== null ? round($final, 1) : null,
+                ];
+            })
+            ->filter(fn($x) => $x['final'] !== null)
+            ->values();
+    }
+
+    // =========================
     // NILAI - KPI
     // =========================
-    private function buildKpiNilai(int $intrakurikulerId, Carbon $start, Carbon $end, Carbon $prevStart, Carbon $prevEnd, int $kkm): array
-    {
+    private function buildKpiNilai(
+        int $intrakurikulerId,
+        Carbon $start,
+        Carbon $end,
+        Carbon $prevStart,
+        Carbon $prevEnd,
+        int $kkm
+    ): array {
         $current = $this->nilaiAgg($intrakurikulerId, $start, $end, $kkm);
         $prev    = $this->nilaiAgg($intrakurikulerId, $prevStart, $prevEnd, $kkm);
 
         $avgDelta = round(($current['avg'] ?? 0) - ($prev['avg'] ?? 0), 1);
 
         return [
-            'avg' => $current['avg'],
-            'avg_prev' => $prev['avg'],
-            'avg_delta' => $avgDelta,
+            'avg'            => $current['avg'],
+            'avg_prev'       => $prev['avg'],
+            'avg_delta'      => $avgDelta,
 
-            'below_kkm' => $current['below_kkm'],
+            'below_kkm'      => $current['below_kkm'],
             'below_kkm_prev' => $prev['below_kkm'],
 
-            'unggul' => $current['unggul'],
-            'unggul_prev' => $prev['unggul'],
+            'unggul'         => $current['unggul'],
+            'unggul_prev'    => $prev['unggul'],
         ];
     }
 
-    private function nilaiAgg(int $intrakurikulerId, Carbon $start, Carbon $end, int $kkm): array
-    {
-        // NOTE: periode nilai pakai created_at (karena schema belum punya tanggal asesmen)
-        $row = DB::table('skor_asesmen_siswa as sas')
-            ->join('asesmen_sumatif as a', 'a.asesmen_sumatif_id', '=', 'sas.asesmen_sumatif_id')
-            ->where('a.intrakurikuler_id', $intrakurikulerId)
-            ->whereNotNull('sas.nilai')
-            ->whereBetween(DB::raw('DATE(sas.created_at)'), [$start->toDateString(), $end->toDateString()])
-            ->selectRaw('
-                AVG(sas.nilai) as avg_nilai,
-                SUM(CASE WHEN sas.nilai < ? THEN 1 ELSE 0 END) as below_kkm,
-                SUM(CASE WHEN sas.nilai >= 85 THEN 1 ELSE 0 END) as unggul
-            ', [$kkm])
-            ->first();
+    private function nilaiAgg(
+        int $intrakurikulerId,
+        Carbon $start,
+        Carbon $end,
+        int $kkm
+    ): array {
+        $finals = $this->finalScorePerSiswa($intrakurikulerId, $start, $end);
+
+        if ($finals->isEmpty()) {
+            return [
+                'avg'       => 0.0,
+                'below_kkm' => 0,
+                'unggul'    => 0,
+            ];
+        }
+
+        $avg       = round($finals->avg('final'), 1);
+        $belowKkm  = $finals->filter(fn($x) => $x['final'] < $kkm)->count();
+        $unggul    = $finals->filter(fn($x) => $x['final'] >= 85)->count();
 
         return [
-            'avg' => $row?->avg_nilai ? round((float) $row->avg_nilai, 1) : 0.0,
-            'below_kkm' => (int) ($row->below_kkm ?? 0),
-            'unggul' => (int) ($row->unggul ?? 0),
+            'avg'       => $avg,
+            'below_kkm' => $belowKkm,
+            'unggul'    => $unggul,
         ];
     }
 
-    private function buildNilaiDistribusi(int $intrakurikulerId, Carbon $start, Carbon $end, int $bucket): array
-    {
+    private function buildNilaiDistribusi(
+        int $intrakurikulerId,
+        Carbon $start,
+        Carbon $end,
+        int $bucket
+    ): array {
         $bucket = in_array($bucket, [5, 10]) ? $bucket : 10;
 
-        $nilai = DB::table('skor_asesmen_siswa as sas')
-            ->join('asesmen_sumatif as a', 'a.asesmen_sumatif_id', '=', 'sas.asesmen_sumatif_id')
-            ->where('a.intrakurikuler_id', $intrakurikulerId)
-            ->whereNotNull('sas.nilai')
-            ->whereBetween(DB::raw('DATE(sas.created_at)'), [$start->toDateString(), $end->toDateString()])
-            ->pluck('sas.nilai')
-            ->map(fn($n) => (int) $n)
+        // Ambil nilai akhir per siswa (final score)
+        $finals = $this->finalScorePerSiswa($intrakurikulerId, $start, $end);
+
+        $nilaiPerSiswa = $finals->pluck('final')
+            ->map(fn($n) => (int) round($n))
             ->all();
 
+        // ===== Bikin bucket =====
+        // Contoh:
+        //  bucket 10 -> 0-9,10-19,...,80-89,90-100
+        //  bucket 5  -> 0-4,5-9,...,90-94,95-100
         $ranges = [];
-        for ($from = 0; $from <= 100; $from += $bucket) {
-            $to = min($from + $bucket - 1, 100);
-            $key = "{$from}-{$to}";
-            $ranges[$key] = 0;
+        for ($from = 0; $from < 100; $from += $bucket) {
+            if ($from + $bucket >= 100) {
+                // Paksa bucket terakhir selalu "100 - bucket" s/d 100
+                $from = 100 - $bucket;
+                $to   = 100;
+                $key  = "{$from}-{$to}";
+                $ranges[$key] = 0;
+                break;
+            } else {
+                $to  = $from + $bucket - 1;
+                $key = "{$from}-{$to}";
+                $ranges[$key] = 0;
+            }
         }
 
-        foreach ($nilai as $n) {
-            $n = max(0, min(100, $n));
-            $from = (int) (floor($n / $bucket) * $bucket);
-            $to = min($from + $bucket - 1, 100);
+        // ===== Isi histogram =====
+        foreach ($nilaiPerSiswa as $n) {
+            $n = max(0, min(100, (int) $n));
+
+            // Tentukan awal bucket
+            if ($n === 100) {
+                $from = 100 - $bucket;
+            } else {
+                $from = (int) (floor($n / $bucket) * $bucket);
+
+                // Kalau somehow nyelonong ke atas, paksa ke bucket terakhir
+                if ($from + $bucket > 100) {
+                    $from = 100 - $bucket;
+                }
+            }
+
+            $to = ($from === 100 - $bucket)
+                ? 100
+                : $from + $bucket - 1;
+
             $key = "{$from}-{$to}";
-            if (isset($ranges[$key])) $ranges[$key]++;
+
+            if (isset($ranges[$key])) {
+                $ranges[$key]++;
+            }
+            // kalau nggak ada, berarti ada mismatch definisi range (tapi
+            // dengan logika di atas seharusnya nggak kejadian lagi)
         }
 
         return [
-            'categories' => array_keys($ranges),
-            'data' => array_values($ranges),
+            'categories'  => array_keys($ranges),
+            'data'        => array_values($ranges),
+            'total_siswa' => count($nilaiPerSiswa),
         ];
     }
 
-    /**
-     * FIX: Atensi berdasarkan nilai < $atensiThreshold (default 60)
-     * Unggul: top nilai (>= 85) atau top N (yang kamu minta)
-     */
+
     private function buildAtensiUnggulList(
         int $intrakurikulerId,
         Carbon $start,
@@ -608,62 +720,49 @@ class DashboardController extends Controller
         Carbon $prevStart,
         Carbon $prevEnd,
         int $limit,
-        int $atensiThreshold = 60
+        int $atensiThreshold = 60,
+        int $unggulThreshold = 85
     ): array {
-        // Current AVG per siswa (riwayat_kelas)
-        $current = DB::table('skor_asesmen_siswa as sas')
-            ->join('asesmen_sumatif as a', 'a.asesmen_sumatif_id', '=', 'sas.asesmen_sumatif_id')
-            ->where('a.intrakurikuler_id', $intrakurikulerId)
-            ->whereNotNull('sas.nilai')
-            ->whereBetween(DB::raw('DATE(sas.created_at)'), [$start->toDateString(), $end->toDateString()])
-            ->groupBy('sas.riwayat_kelas_id')
-            ->selectRaw('sas.riwayat_kelas_id, AVG(sas.nilai) as avg_nilai')
-            ->pluck('avg_nilai', 'riwayat_kelas_id');
+        $current = $this->finalScorePerSiswa($intrakurikulerId, $start, $end)
+            ->keyBy('riwayat_kelas_id');
 
-        // Prev AVG per siswa
-        $prev = DB::table('skor_asesmen_siswa as sas')
-            ->join('asesmen_sumatif as a', 'a.asesmen_sumatif_id', '=', 'sas.asesmen_sumatif_id')
-            ->where('a.intrakurikuler_id', $intrakurikulerId)
-            ->whereNotNull('sas.nilai')
-            ->whereBetween(DB::raw('DATE(sas.created_at)'), [$prevStart->toDateString(), $prevEnd->toDateString()])
-            ->groupBy('sas.riwayat_kelas_id')
-            ->selectRaw('sas.riwayat_kelas_id, AVG(sas.nilai) as avg_nilai')
-            ->pluck('avg_nilai', 'riwayat_kelas_id');
+        $prev = $this->finalScorePerSiswa($intrakurikulerId, $prevStart, $prevEnd)
+            ->keyBy('riwayat_kelas_id');
+
+        if ($current->isEmpty()) {
+            return [collect(), collect()];
+        }
 
         $riwayatIds = $current->keys()->all();
-        if (empty($riwayatIds)) return [collect(), collect()];
 
-        // Map nama siswa
         $siswaMap = DB::table('riwayat_kelas as rk')
             ->join('siswa as s', 's.siswa_id', '=', 'rk.siswa_id')
             ->whereIn('rk.riwayat_kelas_id', $riwayatIds)
             ->pluck('s.nama', 'rk.riwayat_kelas_id');
 
-        $rows = collect($riwayatIds)->map(function ($rkId) use ($current, $prev, $siswaMap) {
-            $cur = (float) $current[$rkId];
-            $prv = isset($prev[$rkId]) ? (float) $prev[$rkId] : 0.0;
+        $rows = $current->map(function ($row, $rkId) use ($prev, $siswaMap) {
+            $cur = (float) $row['final'];
+            $prv = $prev[$rkId]['final'] ?? null;
+            $delta = $prv !== null ? round($cur - (float) $prv, 1) : 0.0;
 
             return [
                 'riwayat_kelas_id' => (int) $rkId,
-                'nama' => $siswaMap[$rkId] ?? 'Tanpa Nama',
+                'nama'  => $siswaMap[$rkId] ?? 'Tanpa Nama',
                 'nilai' => round($cur, 1),
-                'delta' => round($cur - $prv, 1),
+                'delta' => $delta,
             ];
-        });
+        })->values();
 
-        // ===== ATENSI (FIX) =====
-        // hanya yang nilai < threshold (default 60)
         $atensi = $rows
-            ->filter(fn($x) => (float)$x['nilai'] < $atensiThreshold)
+            ->filter(fn($x) => $x['nilai'] < $atensiThreshold)
             ->sortBy('nilai')
-            ->take($limit)
+            ->when($limit > 0, fn($q) => $q->take($limit))
             ->values();
 
-        // ===== UNGGUL =====
-        // ambil top N yang nilai tertinggi (atau kamu bisa filter >= 85 dulu)
         $unggul = $rows
+            ->filter(fn($x) => $x['nilai'] >= $unggulThreshold)
             ->sortByDesc('nilai')
-            ->take($limit)
+            ->when($limit > 0, fn($q) => $q->take($limit))
             ->values();
 
         return [$atensi, $unggul];
@@ -676,10 +775,13 @@ class DashboardController extends Controller
     {
         $today = Carbon::today();
 
-        if ($periode === 'week')  return [$today->copy()->startOfWeek(Carbon::MONDAY), $today->copy()->endOfDay()];
-        if ($periode === 'month') return [$today->copy()->startOfMonth(), $today->copy()->endOfDay()];
+        if ($periode === 'week') {
+            return [$today->copy()->startOfWeek(Carbon::MONDAY), $today->copy()->endOfDay()];
+        }
+        if ($periode === 'month') {
+            return [$today->copy()->startOfMonth(), $today->copy()->endOfDay()];
+        }
 
-        // semester (berdasarkan tahun_ajaran terpilih)
         $tahun = (string) $selected->tahun; // contoh "2025/2026"
         $parts = preg_split('/\D+/', $tahun);
         $y1 = isset($parts[0]) ? (int) $parts[0] : (int) $today->year;
@@ -693,15 +795,17 @@ class DashboardController extends Controller
             $end   = Carbon::create($y2, 6, 30)->endOfDay();
         }
 
-        if ($end->greaterThan($today)) $end = $today->copy()->endOfDay();
+        if ($end->greaterThan($today)) {
+            $end = $today->copy()->endOfDay();
+        }
 
         return [$start, $end];
     }
 
     private function previousRange(Carbon $start, Carbon $end): array
     {
-        $days = $start->diffInDays($end) + 1;
-        $prevEnd = $start->copy()->subDay()->endOfDay();
+        $days     = $start->diffInDays($end) + 1;
+        $prevEnd  = $start->copy()->subDay()->endOfDay();
         $prevStart = $prevEnd->copy()->subDays($days - 1)->startOfDay();
         return [$prevStart, $prevEnd];
     }
@@ -712,11 +816,11 @@ class DashboardController extends Controller
     private function emptyKpiAbsensi(): array
     {
         return [
-            'rate' => 0,
-            'rate_prev' => 0,
-            'rate_delta' => 0,
-            'alpha' => 0,
-            'alpha_prev' => 0,
+            'rate'        => 0,
+            'rate_prev'   => 0,
+            'rate_delta'  => 0,
+            'alpha'       => 0,
+            'alpha_prev'  => 0,
             'alpha_delta' => 0,
             'rawan_count' => 0,
         ];
@@ -738,17 +842,390 @@ class DashboardController extends Controller
     private function emptyKpiNilai(): array
     {
         return [
-            'avg' => 0,
-            'avg_prev' => 0,
-            'avg_delta' => 0,
-            'below_kkm' => 0,
+            'avg'            => 0,
+            'avg_prev'       => 0,
+            'avg_delta'      => 0,
+            'below_kkm'      => 0,
             'below_kkm_prev' => 0,
-            'unggul' => 0,
-            'unggul_prev' => 0,
+            'unggul'         => 0,
+            'unggul_prev'    => 0,
         ];
     }
 
     private function emptyChartNilaiDistribusi(): array
+    {
+        return [
+            'categories'  => [],
+            'data'        => [],
+            'total_siswa' => 0,
+        ];
+    }
+
+
+
+    public function waliKelas(Request $request)
+    {
+        $userId = Auth::id();
+
+        // ===== default fixed =====
+        $topN = 10;
+        $atensiThreshold = 60; // < 60 = butuh atensi
+        $kkm = 75;             // avg mapel < 75 dianggap mapel rendah
+        $bucket = 10;          // histogram bucket 10
+
+        // ===== kelas_ajar yang di-wali oleh user ini =====
+        $kelasAjars = DB::table('kelas_ajar as ka')
+            ->join('kelas as k', 'k.kelas_id', '=', 'ka.kelas_id')
+            ->join('tahun_ajaran as ta', 'ta.tahun_ajaran_id', '=', 'ka.tahun_ajaran_id')
+            ->where('ka.wali_user_id', $userId)
+            ->orderBy('ta.tahun_ajaran_id', 'desc')
+            ->orderBy('k.nama_kelas')
+            ->get([
+                'ka.kelas_ajar_id',
+                'ka.tahun_ajaran_id',
+                'k.nama_kelas',
+                'ta.tahun',
+                'ta.semester',
+            ]);
+
+        // kalau belum jadi wali
+        if ($kelasAjars->isEmpty()) {
+            return view('dashboard.wali_kelas', [
+                'kelasAjars' => $kelasAjars,
+                'selectedKelasAjar' => null,
+
+                'mapels' => collect(),
+                'selectedMapel' => null,
+                'topMapel' => null,
+                'mapelDipakai' => null,
+
+                'kpi' => $this->emptyKpiWali(),
+                'chartDistribusi' => $this->emptyChartDistribusi(),
+                'topMapelList' => collect(),
+                'atensiList' => collect(),
+                'attendanceList' => collect(),
+                'lowSubjectCountList' => collect(),
+            ]);
+        }
+
+        // ===== pilih kelas_ajar (dropdown, auto submit) =====
+        $selectedKelasAjarId = (int) $request->get('kelas_ajar_id', $kelasAjars->first()->kelas_ajar_id);
+        $selectedKelasAjar = $kelasAjars->firstWhere('kelas_ajar_id', $selectedKelasAjarId) ?? $kelasAjars->first();
+        $selectedKelasAjarId = (int) $selectedKelasAjar->kelas_ajar_id;
+
+        // ===== range semester berdasarkan tahun_ajaran di kelas terpilih =====
+        [$start, $end] = $this->resolveSemesterRangeFromKelasAjar($selectedKelasAjar);
+
+        // ===== mapel di kelas_ajar ini =====
+        $mapels = DB::table('intrakurikuler as i')
+            ->where('i.kelas_ajar_id', $selectedKelasAjarId)
+            ->orderBy('i.nama_pelajaran')
+            ->get(['i.intrakurikuler_id', 'i.nama_pelajaran']);
+
+        // ===== mapel fokus otomatis (default) =====
+        $topMapel = null;
+        if ($mapels->isNotEmpty()) {
+            $mapelAvgRows = DB::table('skor_asesmen_siswa as sas')
+                ->join('asesmen_sumatif as a', 'a.asesmen_sumatif_id', '=', 'sas.asesmen_sumatif_id')
+                ->join('intrakurikuler as i', 'i.intrakurikuler_id', '=', 'a.intrakurikuler_id')
+                ->where('i.kelas_ajar_id', $selectedKelasAjarId)
+                ->whereNotNull('sas.nilai')
+                ->whereBetween(DB::raw('DATE(sas.created_at)'), [$start->toDateString(), $end->toDateString()])
+                ->groupBy('a.intrakurikuler_id')
+                ->selectRaw('a.intrakurikuler_id, AVG(sas.nilai) as avg_kelas')
+                ->orderByRaw('AVG(sas.nilai) asc')
+                ->get();
+
+            $focusIdDefault = (int) ($mapelAvgRows->first()->intrakurikuler_id ?? $mapels->first()->intrakurikuler_id);
+            $topMapel = $mapels->firstWhere('intrakurikuler_id', $focusIdDefault) ?? $mapels->first();
+        }
+
+        // ===== mapel pilihan user (harus klik tombol Terapkan) =====
+        $selectedMapelId = (int) $request->get('intrakurikuler_id', 0);
+        $selectedMapel = $selectedMapelId
+            ? ($mapels->firstWhere('intrakurikuler_id', $selectedMapelId) ?? null)
+            : null;
+
+        // mapel yang dipakai untuk tabel Top 10
+        $mapelDipakai = $selectedMapel ?? $topMapel;
+
+        // ===== KPI Nilai Kelas (overall semua mapel) =====
+        $kpi = $this->buildKpiWaliKelas($selectedKelasAjarId, $start, $end, $atensiThreshold);
+
+        // ===== Distribusi nilai (histogram avg per siswa, overall semua mapel) =====
+        $chartDistribusi = $this->buildDistribusiAvgSiswaOverall($selectedKelasAjarId, $start, $end, $bucket);
+
+        // ===== Top N siswa untuk mapel dipakai =====
+        $topMapelList = $mapelDipakai
+            ? $this->buildTopMapelList($selectedKelasAjarId, (int) $mapelDipakai->intrakurikuler_id, $start, $end, $topN)
+            : collect();
+
+        // ===== Atensi list: overall avg < threshold =====
+        $atensiList = $this->buildAtensiListOverall($selectedKelasAjarId, $start, $end, $atensiThreshold, $topN);
+
+        // ===== Kehadiran siswa: agregat semua mapel =====
+        $attendanceList = $this->buildAttendanceListOverall($selectedKelasAjarId, $start, $end, $topN);
+
+        // ===== Jumlah mapel rendah per siswa (avg mapel < KKM) =====
+        $lowSubjectCountList = $this->buildLowSubjectCountList($selectedKelasAjarId, $start, $end, $kkm, $topN);
+
+        return view('dashboard.wali_kelas', [
+            'kelasAjars' => $kelasAjars,
+            'selectedKelasAjar' => $selectedKelasAjar,
+
+            'mapels' => $mapels,
+            'selectedMapel' => $selectedMapel,
+            'topMapel' => $topMapel,
+            'mapelDipakai' => $mapelDipakai,
+
+            'kpi' => $kpi,
+            'chartDistribusi' => $chartDistribusi,
+            'topMapelList' => $topMapelList,
+            'atensiList' => $atensiList,
+            'attendanceList' => $attendanceList,
+            'lowSubjectCountList' => $lowSubjectCountList,
+        ]);
+    }
+
+    // =========================
+    // KPI WALI KELAS (nilai + kehadiran)
+    // =========================
+    private function buildKpiWaliKelas(int $kelasAjarId, Carbon $start, Carbon $end, int $atensiThreshold): array
+    {
+        $nilaiRow = DB::table('skor_asesmen_siswa as sas')
+            ->join('asesmen_sumatif as a', 'a.asesmen_sumatif_id', '=', 'sas.asesmen_sumatif_id')
+            ->join('intrakurikuler as i', 'i.intrakurikuler_id', '=', 'a.intrakurikuler_id')
+            ->where('i.kelas_ajar_id', $kelasAjarId)
+            ->whereNotNull('sas.nilai')
+            ->whereBetween(DB::raw('DATE(sas.created_at)'), [$start->toDateString(), $end->toDateString()])
+            ->selectRaw('AVG(sas.nilai) as avg_kelas')
+            ->first();
+
+        $avgKelas = $nilaiRow?->avg_kelas ? round((float) $nilaiRow->avg_kelas, 1) : 0.0;
+
+        $perSiswa = $this->queryAvgOverallPerSiswa($kelasAjarId, $start, $end);
+        $unggulCount = $perSiswa->filter(fn($r) => (float) $r->avg_nilai >= 85)->count();
+        $atensiCount = $perSiswa->filter(fn($r) => (float) $r->avg_nilai < $atensiThreshold)->count();
+
+        $absRow = DB::table('kehadiran_intrakurikuler as ki')
+            ->join('intrakurikuler as i', 'i.intrakurikuler_id', '=', 'ki.intrakurikuler_id')
+            ->where('i.kelas_ajar_id', $kelasAjarId)
+            ->whereBetween('ki.tanggal', [$start->toDateString(), $end->toDateString()])
+            ->selectRaw('
+            COUNT(*) as total,
+            SUM(CASE WHEN ki.status = "hadir" THEN 1 ELSE 0 END) as hadir,
+            SUM(CASE WHEN ki.status = "alpha" THEN 1 ELSE 0 END) as alpha
+        ')
+            ->first();
+
+        $totalAbs = (int) ($absRow->total ?? 0);
+        $hadirAbs = (int) ($absRow->hadir ?? 0);
+        $alphaTotal = (int) ($absRow->alpha ?? 0);
+        $hadirRate = $totalAbs > 0 ? round(($hadirAbs / $totalAbs) * 100, 1) : 0.0;
+
+        return [
+            'avg_nilai_kelas' => $avgKelas,
+            'unggul_count' => $unggulCount,
+            'atensi_count' => $atensiCount,
+            'hadir_rate' => $hadirRate,
+            'alpha_total' => $alphaTotal,
+        ];
+    }
+
+    // =========================
+    // Distribusi AVG Nilai per Siswa (overall semua mapel)
+    // =========================
+    private function buildDistribusiAvgSiswaOverall(int $kelasAjarId, Carbon $start, Carbon $end, int $bucket): array
+    {
+        $perSiswa = $this->queryAvgOverallPerSiswa($kelasAjarId, $start, $end);
+        $nilai = $perSiswa->pluck('avg_nilai')->map(fn($x) => (int) round((float) $x, 0))->all();
+
+        $ranges = [];
+        for ($from = 0; $from <= 100; $from += $bucket) {
+            $to = min($from + $bucket - 1, 100);
+            $key = "{$from}-{$to}";
+            $ranges[$key] = 0;
+        }
+
+        foreach ($nilai as $n) {
+            $n = max(0, min(100, (int) $n));
+            $from = (int) (floor($n / $bucket) * $bucket);
+            $to = min($from + $bucket - 1, 100);
+            $key = "{$from}-{$to}";
+            if (isset($ranges[$key])) $ranges[$key]++;
+        }
+
+        return [
+            'categories' => array_keys($ranges),
+            'data' => array_values($ranges),
+        ];
+    }
+
+    // =========================
+    // Top N siswa (mapel tertentu)
+    // =========================
+    private function buildTopMapelList(int $kelasAjarId, int $intrakurikulerId, Carbon $start, Carbon $end, int $limit)
+    {
+        $rows = DB::table('skor_asesmen_siswa as sas')
+            ->join('asesmen_sumatif as a', 'a.asesmen_sumatif_id', '=', 'sas.asesmen_sumatif_id')
+            ->join('intrakurikuler as i', 'i.intrakurikuler_id', '=', 'a.intrakurikuler_id')
+            ->join('riwayat_kelas as rk', 'rk.riwayat_kelas_id', '=', 'sas.riwayat_kelas_id')
+            ->join('siswa as s', 's.siswa_id', '=', 'rk.siswa_id')
+            ->where('i.kelas_ajar_id', $kelasAjarId)
+            ->where('a.intrakurikuler_id', $intrakurikulerId)
+            ->whereNotNull('sas.nilai')
+            ->whereBetween(DB::raw('DATE(sas.created_at)'), [$start->toDateString(), $end->toDateString()])
+            ->groupBy('sas.riwayat_kelas_id', 's.nama')
+            ->selectRaw('s.nama as nama, AVG(sas.nilai) as avg_nilai')
+            ->orderByRaw('AVG(sas.nilai) desc')
+            ->limit($limit)
+            ->get();
+
+        return $rows->map(fn($r) => [
+            'nama' => $r->nama,
+            'avg_nilai' => round((float) $r->avg_nilai, 1),
+        ]);
+    }
+
+    // =========================
+    // Atensi list (overall semua mapel)
+    // =========================
+    private function buildAtensiListOverall(int $kelasAjarId, Carbon $start, Carbon $end, int $threshold, int $limit)
+    {
+        $perSiswa = $this->queryAvgOverallPerSiswa($kelasAjarId, $start, $end)
+            ->filter(fn($r) => (float) $r->avg_nilai < $threshold)
+            ->sortBy(fn($r) => (float) $r->avg_nilai)
+            ->take($limit)
+            ->values();
+
+        return $perSiswa->map(fn($r) => [
+            'nama' => $r->nama,
+            'avg_nilai' => round((float) $r->avg_nilai, 1),
+        ]);
+    }
+
+    // =========================
+    // Kehadiran siswa (overall semua mapel)
+    // =========================
+    private function buildAttendanceListOverall(int $kelasAjarId, Carbon $start, Carbon $end, int $limit)
+    {
+        $rows = DB::table('kehadiran_intrakurikuler as ki')
+            ->join('intrakurikuler as i', 'i.intrakurikuler_id', '=', 'ki.intrakurikuler_id')
+            ->join('riwayat_kelas as rk', 'rk.riwayat_kelas_id', '=', 'ki.riwayat_kelas_id')
+            ->join('siswa as s', 's.siswa_id', '=', 'rk.siswa_id')
+            ->where('i.kelas_ajar_id', $kelasAjarId)
+            ->whereBetween('ki.tanggal', [$start->toDateString(), $end->toDateString()])
+            ->groupBy('ki.riwayat_kelas_id', 's.nama')
+            ->selectRaw('
+            s.nama as nama,
+            SUM(CASE WHEN ki.status = "hadir" THEN 1 ELSE 0 END) as hadir_count,
+            SUM(CASE WHEN ki.status = "alpha" THEN 1 ELSE 0 END) as alpha_count,
+            COUNT(*) as total_count
+        ')
+            ->orderByRaw('(SUM(CASE WHEN ki.status="hadir" THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0)) asc')
+            ->limit($limit)
+            ->get();
+
+        return $rows->map(function ($r) {
+            $total = (int) ($r->total_count ?? 0);
+            $hadir = (int) ($r->hadir_count ?? 0);
+            $pct = $total > 0 ? round(($hadir / $total) * 100, 1) : 0.0;
+
+            return [
+                'nama' => $r->nama,
+                'hadir_pct' => $pct,
+                'alpha' => (int) ($r->alpha_count ?? 0),
+            ];
+        });
+    }
+
+    // =========================
+    // Jumlah mapel rendah per siswa
+    // =========================
+    private function buildLowSubjectCountList(int $kelasAjarId, Carbon $start, Carbon $end, int $kkm, int $limit)
+    {
+        $lowRows = DB::table('skor_asesmen_siswa as sas')
+            ->join('asesmen_sumatif as a', 'a.asesmen_sumatif_id', '=', 'sas.asesmen_sumatif_id')
+            ->join('intrakurikuler as i', 'i.intrakurikuler_id', '=', 'a.intrakurikuler_id')
+            ->where('i.kelas_ajar_id', $kelasAjarId)
+            ->whereNotNull('sas.nilai')
+            ->whereBetween(DB::raw('DATE(sas.created_at)'), [$start->toDateString(), $end->toDateString()])
+            ->groupBy('sas.riwayat_kelas_id', 'a.intrakurikuler_id')
+            ->havingRaw('AVG(sas.nilai) < ?', [$kkm])
+            ->selectRaw('sas.riwayat_kelas_id, COUNT(*) as low_mapel_count')
+            ->get();
+
+        if ($lowRows->isEmpty()) return collect();
+
+        $counts = $lowRows->groupBy('riwayat_kelas_id')->map(fn($g) => $g->count());
+
+        $siswaMap = DB::table('riwayat_kelas as rk')
+            ->join('siswa as s', 's.siswa_id', '=', 'rk.siswa_id')
+            ->whereIn('rk.riwayat_kelas_id', $counts->keys()->all())
+            ->pluck('s.nama', 'rk.riwayat_kelas_id');
+
+        return $counts->map(function ($cnt, $rkId) use ($siswaMap) {
+            return [
+                'nama' => $siswaMap[$rkId] ?? 'Tanpa Nama',
+                'low_mapel_count' => (int) $cnt,
+            ];
+        })->sortByDesc('low_mapel_count')->take($limit)->values();
+    }
+
+    // =========================
+    // Query helper: avg overall per siswa (semua mapel)
+    // =========================
+    private function queryAvgOverallPerSiswa(int $kelasAjarId, Carbon $start, Carbon $end)
+    {
+        return DB::table('skor_asesmen_siswa as sas')
+            ->join('asesmen_sumatif as a', 'a.asesmen_sumatif_id', '=', 'sas.asesmen_sumatif_id')
+            ->join('intrakurikuler as i', 'i.intrakurikuler_id', '=', 'a.intrakurikuler_id')
+            ->join('riwayat_kelas as rk', 'rk.riwayat_kelas_id', '=', 'sas.riwayat_kelas_id')
+            ->join('siswa as s', 's.siswa_id', '=', 'rk.siswa_id')
+            ->where('i.kelas_ajar_id', $kelasAjarId)
+            ->whereNotNull('sas.nilai')
+            ->whereBetween(DB::raw('DATE(sas.created_at)'), [$start->toDateString(), $end->toDateString()])
+            ->groupBy('sas.riwayat_kelas_id', 's.nama')
+            ->selectRaw('s.nama as nama, AVG(sas.nilai) as avg_nilai')
+            ->get();
+    }
+
+    // =========================
+    // Semester range helper
+    // =========================
+    private function resolveSemesterRangeFromKelasAjar($kelasAjarRow): array
+    {
+        $today = Carbon::today();
+
+        $tahun = (string) ($kelasAjarRow->tahun ?? $today->year);
+        $parts = preg_split('/\D+/', $tahun);
+        $y1 = isset($parts[0]) ? (int) $parts[0] : (int) $today->year;
+        $y2 = isset($parts[1]) ? (int) $parts[1] : $y1 + 1;
+
+        if (($kelasAjarRow->semester ?? 'Ganjil') === 'Ganjil') {
+            $start = Carbon::create($y1, 7, 1)->startOfDay();
+            $end = Carbon::create($y1, 12, 31)->endOfDay();
+        } else {
+            $start = Carbon::create($y2, 1, 1)->startOfDay();
+            $end = Carbon::create($y2, 6, 30)->endOfDay();
+        }
+
+        if ($end->greaterThan($today)) $end = $today->copy()->endOfDay();
+        return [$start, $end];
+    }
+
+    private function emptyKpiWali(): array
+    {
+        return [
+            'avg_nilai_kelas' => 0,
+            'unggul_count' => 0,
+            'atensi_count' => 0,
+            'hadir_rate' => 0,
+            'alpha_total' => 0,
+        ];
+    }
+
+    private function emptyChartDistribusi(): array
     {
         return ['categories' => [], 'data' => []];
     }

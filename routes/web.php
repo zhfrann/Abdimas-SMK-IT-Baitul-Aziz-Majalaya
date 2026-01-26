@@ -52,14 +52,10 @@ Route::middleware('auth')->group(function () {
                 ->name('guruMapel');
         });
 
-
-
-
-
-        // Route::middleware('role:Wali Kelas')->group(function () {
-        //     Route::get('/wali-kelas', [DashboardController::class, ''])
-        //         ->name('wali_kelas');
-        // });
+        Route::middleware('role:Wali Kelas')->group(function () {
+            Route::get('/wali-kelas', [DashboardController::class, 'waliKelas'])
+                ->name('waliKelas');
+        });
     });
 });
 

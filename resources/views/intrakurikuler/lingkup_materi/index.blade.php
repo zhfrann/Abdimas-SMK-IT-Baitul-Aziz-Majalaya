@@ -26,7 +26,7 @@
           </span>
         </div>
 
-        @role('Bagian Akademik|Super Admin')
+        @role('Bagian Akademik|Super Admin|Guru Mapel')
         <button
           type="button"
           class="btn btn-primary"
