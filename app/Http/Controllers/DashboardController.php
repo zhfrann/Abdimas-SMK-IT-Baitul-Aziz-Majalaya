@@ -924,7 +924,6 @@ class DashboardController extends Controller
     }
 
 
-
     public function waliKelas(Request $request)
     {
         $userId = Auth::id();
@@ -950,7 +949,6 @@ class DashboardController extends Controller
                 'ta.semester',
             ]);
 
-        // kalau belum jadi wali
         if ($kelasAjars->isEmpty()) {
             return view('dashboard.wali_kelas', [
                 'kelasAjars' => $kelasAjars,
@@ -1011,10 +1009,10 @@ class DashboardController extends Controller
         // mapel yang dipakai untuk tabel Top 10
         $mapelDipakai = $selectedMapel ?? $topMapel;
 
-        // ===== KPI Nilai Kelas (overall semua mapel) =====
+        // ===== KPI =====
         $kpi = $this->buildKpiWaliKelas($selectedKelasAjarId, $start, $end, $atensiThreshold);
 
-        // ===== Distribusi nilai (histogram avg per siswa, overall semua mapel) =====
+        // ===== Distribusi (FIX bucket: last bin 90-100) =====
         $chartDistribusi = $this->buildDistribusiAvgSiswaOverall($selectedKelasAjarId, $start, $end, $bucket);
 
         // ===== Top N siswa untuk mapel dipakai =====
@@ -1022,13 +1020,9 @@ class DashboardController extends Controller
             ? $this->buildTopMapelList($selectedKelasAjarId, (int) $mapelDipakai->intrakurikuler_id, $start, $end, $topN)
             : collect();
 
-        // ===== Atensi list: overall avg < threshold =====
+        // ===== lainnya =====
         $atensiList = $this->buildAtensiListOverall($selectedKelasAjarId, $start, $end, $atensiThreshold, $topN);
-
-        // ===== Kehadiran siswa: agregat semua mapel =====
         $attendanceList = $this->buildAttendanceListOverall($selectedKelasAjarId, $start, $end, $topN);
-
-        // ===== Jumlah mapel rendah per siswa (avg mapel < KKM) =====
         $lowSubjectCountList = $this->buildLowSubjectCountList($selectedKelasAjarId, $start, $end, $kkm, $topN);
 
         return view('dashboard.wali_kelas', [
@@ -1102,18 +1096,26 @@ class DashboardController extends Controller
         $perSiswa = $this->queryAvgOverallPerSiswa($kelasAjarId, $start, $end);
         $nilai = $perSiswa->pluck('avg_nilai')->map(fn($x) => (int) round((float) $x, 0))->all();
 
+        $bucket = max(1, (int) $bucket);
+        $maxFrom = 100 - $bucket;     // untuk bucket 10 => 90
+
+        // bikin range 0-9 ... 80-89 ... 90-100
         $ranges = [];
-        for ($from = 0; $from <= 100; $from += $bucket) {
-            $to = min($from + $bucket - 1, 100);
-            $key = "{$from}-{$to}";
-            $ranges[$key] = 0;
+        for ($from = 0; $from <= $maxFrom; $from += $bucket) {
+            $to = ($from === $maxFrom) ? 100 : ($from + $bucket - 1);
+            $ranges["{$from}-{$to}"] = 0;
         }
 
         foreach ($nilai as $n) {
             $n = max(0, min(100, (int) $n));
+
+            // floor normal, tapi nilai 100 bakal jadi 100 -> dipaksa ke bin terakhir
             $from = (int) (floor($n / $bucket) * $bucket);
-            $to = min($from + $bucket - 1, 100);
+            if ($from > $maxFrom) $from = $maxFrom;
+
+            $to = ($from === $maxFrom) ? 100 : ($from + $bucket - 1);
             $key = "{$from}-{$to}";
+
             if (isset($ranges[$key])) $ranges[$key]++;
         }
 
