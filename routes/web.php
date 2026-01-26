@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AbsensiControllerEkstrakurikuler;
 use App\Http\Controllers\AbsensiControllerIntrakurikuler;
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Akademik\KelasController;
 use App\Http\Controllers\Akademik\StaffController;
 use App\Http\Controllers\Akademik\TahunAjaranController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IntrakurikulerController;
 use App\Http\Controllers\LingkupMateriController;
 use App\Http\Controllers\PenilaianEkstrakurikulerController;
+use App\Http\Controllers\SekolahController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\SuperAdmin\UserController;
 use App\Http\Controllers\TujuanPembelajaranController;
@@ -79,8 +81,16 @@ Route::middleware(['auth', 'role:Bagian Akademik'])->prefix('akademik')->name('a
 
         Route::get('load-siswa', [SiswaController::class, 'showLoadSiswaForm'])->name('kelas.show-load-siswa');
         Route::post('load-siswa', [SiswaController::class, 'loadSiswaFromKelas'])->name('kelas.load-siswa');
+
         // Route::get('ajax/kelas/search', [SiswaController::class, 'ajaxSearchKelas'])->name('ajax.kelas.search');
     });
+    Route::get('/akun', [AccountController::class, 'index'])->name('akun.index');
+    Route::patch('/akun/{user}/toggle', [AccountController::class, 'toggleActive'])->name('akun.toggle');
+
+    Route::get('/sekolah', [SekolahController::class, 'index'])->name('sekolah.index');
+    Route::get('/sekolah/edit', [SekolahController::class, 'edit'])->name('sekolah.edit');
+    Route::put('/sekolah', [SekolahController::class, 'update'])->name('sekolah.update');
+
 
     Route::get('kelas/ajax/kelas/search', [SiswaController::class, 'ajaxSearchKelas'])->name('ajax.kelas.search');
     Route::resource('staff', StaffController::class);
@@ -105,15 +115,12 @@ Route::middleware(['auth'])->group(function () {
             Route::resource('assesment-sumatif', AssesmentSumatifController::class)
                 ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
 
-            // ✅ DETAIL (GET)
             Route::get('assesment-sumatif/{riwayatKelas}/detail', [AssesmentSumatifController::class, 'detailAssesmentSumatif'])
                 ->name('assesment_sumatif.detail');
 
-            // ✅ SIMPAN (POST kalau belum ada skor sama sekali)
             Route::post('assesment-sumatif/{riwayatKelas}/detail', [AssesmentSumatifController::class, 'storeDetailAssesmentSumatif'])
                 ->name('assesment_sumatif.detail.store');
 
-            // ✅ UPDATE (PUT kalau sudah ada skor)
             Route::put('assesment-sumatif/{riwayatKelas}/detail', [AssesmentSumatifController::class, 'updateDetailAssesmentSumatif'])
                 ->name('assesment_sumatif.detail.update');
 

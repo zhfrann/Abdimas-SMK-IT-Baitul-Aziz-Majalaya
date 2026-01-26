@@ -7,9 +7,15 @@
         <span class="pc-mtext">Dashboard</span>
     </a>
 </li>
+<li class="pc-item pc-hasmenu">
+    <a href="{{ route('akademik.sekolah.index') }}" class="pc-link">
+        <span class="pc-micon"><i class="bi bi-building"></i></span>
+        <span class="pc-mtext">Sekolah</span>
+    </a>
+</li>
 
 <li class="pc-item pc-caption">
-    <label>Manajement Staff</label>
+    <label>Manajement Account</label>
     <svg class="pc-icon">
         <use xlink:href="#custom-flag"></use>
     </svg>
@@ -19,7 +25,14 @@
         <span class="pc-micon">
             <i class="bi bi-people"></i>
         </span>
-        <span class="pc-mtext">List Staff</span></a>
+        <span class="pc-mtext">Staff</span></a>
+</li>
+<li class="pc-item pc-hasmenu">
+    <a href="{{ route('akademik.akun.index') }}" class="pc-link">
+        <span class="pc-micon">
+            <i class="bi bi-people"></i>
+        </span>
+        <span class="pc-mtext">Account activate</span></a>
 </li>
 
 <li class="pc-item pc-caption">

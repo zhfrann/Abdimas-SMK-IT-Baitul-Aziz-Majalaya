@@ -20,8 +20,24 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        // Pastikan Auth::attempt menggunakan username
-        if (Auth::attempt(['username' => $credentials['username'], 'password' => $credentials['password']], $request->boolean('remember'))) {
+        $remember = $request->boolean('remember');
+
+        // 1) attempt dulu
+        if (Auth::attempt(['username' => $credentials['username'], 'password' => $credentials['password']], $remember)) {
+
+            // 2) cek active
+            if (!Auth::user()->is_active) {
+                Auth::logout();
+
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()->withErrors([
+                    'username' => 'Akun Anda nonaktif. Silakan hubungi admin.',
+                ])->onlyInput('username');
+            }
+
+            // 3) lanjut normal
             $request->session()->regenerate();
 
             if (Auth::user()->hasRole('Super Admin')) {
@@ -39,7 +55,6 @@ class AuthController extends Controller
             if (Auth::user()->hasRole('Kepala Sekolah')) {
                 return redirect()->intended('/dashboard/kepala-sekolah');
             }
-            
         }
 
         return back()->withErrors([
