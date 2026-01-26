@@ -9,6 +9,8 @@ use App\Models\RiwayatKelas;
 use App\Models\SkorAsesmenSiswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class AssesmentSumatifController extends Controller
 {
@@ -328,5 +330,243 @@ class AssesmentSumatifController extends Controller
             return (int) array_values($vals)[0];
         }
         return null;
+    }
+
+    public function importExcelSumatif(Request $request, Intrakurikuler $intrakurikuler)
+    {
+        $request->validate([
+            'excel' => 'required|file|mimes:xlsx,xls|max:10240',
+        ]);
+
+        $intrakurikuler->load(['kelasAjar.tahunAjaran']);
+
+        $kelasAjarId   = $intrakurikuler->kelas_ajar_id;
+        $tahunAjaranId = $intrakurikuler->kelasAjar->tahun_ajaran_id;
+
+        // === Ambil semua riwayat kelas (untuk matching nama) ===
+        $riwayatKelas = RiwayatKelas::query()
+            ->where('kelas_ajar_id', $kelasAjarId)
+            ->with(['siswa.user'])
+            ->get();
+
+        // Map nama (lowercase+trim) -> riwayat_kelas_id
+        $namaToRiwayat = $riwayatKelas->mapWithKeys(function ($rk) {
+            $nama = $rk->siswa?->user?->name ?? $rk->siswa?->nama ?? '';
+            $key = Str::of($nama)->lower()->trim()->__toString();
+            return [$key => $rk->riwayat_kelas_id];
+        });
+
+        // === Pastikan asesmen tersedia (lingkup + non_test + test) ===
+        // (Kalau kamu udah selalu create di detail, ini tetap aman.)
+        DB::transaction(function () use ($intrakurikuler, $tahunAjaranId) {
+            $lingkupMateri = LingkupMateri::query()
+                ->where('intrakurikuler_id', $intrakurikuler->intrakurikuler_id)
+                ->orderBy('lingkup_materi_id')
+                ->get();
+
+            $no = 1;
+            foreach ($lingkupMateri as $lm) {
+                AsesmenSumatif::firstOrCreate(
+                    [
+                        'intrakurikuler_id' => $intrakurikuler->intrakurikuler_id,
+                        'tahun_ajaran_id'   => $tahunAjaranId,
+                        'asesmen_type'      => 'sumatif_lingkup',
+                        'lingkup_materi_id' => $lm->lingkup_materi_id,
+                    ],
+                    ['asesmen_no' => $no]
+                );
+                $no++;
+            }
+
+            AsesmenSumatif::firstOrCreate(
+                [
+                    'intrakurikuler_id' => $intrakurikuler->intrakurikuler_id,
+                    'tahun_ajaran_id'   => $tahunAjaranId,
+                    'asesmen_type'      => 'non_test',
+                    'lingkup_materi_id' => null,
+                ],
+                ['asesmen_no' => 1]
+            );
+
+            AsesmenSumatif::firstOrCreate(
+                [
+                    'intrakurikuler_id' => $intrakurikuler->intrakurikuler_id,
+                    'tahun_ajaran_id'   => $tahunAjaranId,
+                    'asesmen_type'      => 'test',
+                    'lingkup_materi_id' => null,
+                ],
+                ['asesmen_no' => 2]
+            );
+        });
+
+        $asesmenLingkup = AsesmenSumatif::query()
+            ->where('intrakurikuler_id', $intrakurikuler->intrakurikuler_id)
+            ->where('tahun_ajaran_id', $tahunAjaranId)
+            ->where('asesmen_type', 'sumatif_lingkup')
+            ->orderBy('asesmen_no')
+            ->get();
+
+        $nonTestAsesmen = AsesmenSumatif::query()
+            ->where('intrakurikuler_id', $intrakurikuler->intrakurikuler_id)
+            ->where('tahun_ajaran_id', $tahunAjaranId)
+            ->where('asesmen_type', 'non_test')
+            ->first();
+
+        $testAsesmen = AsesmenSumatif::query()
+            ->where('intrakurikuler_id', $intrakurikuler->intrakurikuler_id)
+            ->where('tahun_ajaran_id', $tahunAjaranId)
+            ->where('asesmen_type', 'test')
+            ->first();
+
+        // === Baca Excel ===
+        $filePath = $request->file('excel')->getRealPath();
+        $spreadsheet = IOFactory::load($filePath);
+        $sheet = $spreadsheet->getSheet(0); // sheet pertama
+
+        // Template kamu: header 1-3, data mulai row 4
+        $startRow = 4;
+
+        // Kolom dinamis:
+        // A: No, B: Nama, C..(C+sumatifCount-1): Sumatif 1..n
+        // setelah itu: NA Lingkup, NonTes, Tes, NA AkhirSem, Nilai Rapor
+        $sumatifCount = $asesmenLingkup->count(); // harus sama dengan jumlah kolom sumatif
+
+        // kalau template ngikut LingkupMateri tapi asesmenLingkup kosong:
+        if ($sumatifCount === 0) {
+            return back()->with('error', 'Belum ada lingkup materi/asesmen sumatif lingkup untuk mapel ini.');
+        }
+
+        $firstSumatifColIndex = 3; // C
+        $lastSumatifColIndex  = $firstSumatifColIndex + $sumatifCount - 1;
+
+        $colNaLingkupIndex  = $lastSumatifColIndex + 1;
+        $colNonTesIndex     = $colNaLingkupIndex + 1;
+        $colTesIndex        = $colNaLingkupIndex + 2;
+
+        // helper baca cell jadi int/null
+        $toIntOrNull = function ($v) {
+            if ($v === null) return null;
+            if (is_string($v)) {
+                $v = trim($v);
+                if ($v === '' || $v === '-') return null;
+            }
+            if (!is_numeric($v)) return null;
+            $n = (int) round((float) $v);
+            if ($n < 0 || $n > 100) return null;
+            return $n;
+        };
+
+        DB::transaction(function () use (
+            $sheet,
+            $startRow,
+            $namaToRiwayat,
+            $asesmenLingkup,
+            $nonTestAsesmen,
+            $testAsesmen,
+            $firstSumatifColIndex,
+            $sumatifCount,
+            $colNonTesIndex,
+            $colTesIndex,
+            $tahunAjaranId,
+            $toIntOrNull
+        ) {
+            $row = $startRow;
+
+            while (true) {
+                // Nama siswa di kolom B (index 2)
+                $nama = $sheet->getCellByColumnAndRow(2, $row)->getValue();
+                $namaKey = Str::of((string)$nama)->lower()->trim()->__toString();
+
+                // stop kalau nama kosong (anggap akhir data)
+                if ($namaKey === '') break;
+
+                // cari riwayat_kelas_id
+                $riwayatId = $namaToRiwayat[$namaKey] ?? null;
+                if (!$riwayatId) {
+                    // kalau nama ga ketemu: skip row
+                    $row++;
+                    continue;
+                }
+
+                // 1) Sumatif lingkup 1..n (C..)
+                for ($i = 0; $i < $sumatifCount; $i++) {
+                    $asesmenId = $asesmenLingkup[$i]->asesmen_sumatif_id;
+                    $colIndex  = $firstSumatifColIndex + $i;
+
+                    $val = $sheet->getCellByColumnAndRow($colIndex, $row)->getCalculatedValue();
+                    $nilai = $toIntOrNull($val);
+
+                    if ($nilai === null) {
+                        SkorAsesmenSiswa::query()
+                            ->where('riwayat_kelas_id', $riwayatId)
+                            ->where('asesmen_sumatif_id', $asesmenId)
+                            ->delete();
+                    } else {
+                        SkorAsesmenSiswa::updateOrCreate(
+                            [
+                                'riwayat_kelas_id'   => $riwayatId,
+                                'asesmen_sumatif_id' => $asesmenId,
+                            ],
+                            [
+                                'nilai'          => $nilai,
+                                'tahun_ajaran_id' => $tahunAjaranId,
+                            ]
+                        );
+                    }
+                }
+
+                // 2) Non Tes
+                if ($nonTestAsesmen) {
+                    $val = $sheet->getCellByColumnAndRow($colNonTesIndex, $row)->getCalculatedValue();
+                    $nilai = $toIntOrNull($val);
+
+                    if ($nilai === null) {
+                        SkorAsesmenSiswa::query()
+                            ->where('riwayat_kelas_id', $riwayatId)
+                            ->where('asesmen_sumatif_id', $nonTestAsesmen->asesmen_sumatif_id)
+                            ->delete();
+                    } else {
+                        SkorAsesmenSiswa::updateOrCreate(
+                            [
+                                'riwayat_kelas_id'   => $riwayatId,
+                                'asesmen_sumatif_id' => $nonTestAsesmen->asesmen_sumatif_id,
+                            ],
+                            [
+                                'nilai'          => $nilai,
+                                'tahun_ajaran_id' => $tahunAjaranId,
+                            ]
+                        );
+                    }
+                }
+
+                // 3) Tes
+                if ($testAsesmen) {
+                    $val = $sheet->getCellByColumnAndRow($colTesIndex, $row)->getCalculatedValue();
+                    $nilai = $toIntOrNull($val);
+
+                    if ($nilai === null) {
+                        SkorAsesmenSiswa::query()
+                            ->where('riwayat_kelas_id', $riwayatId)
+                            ->where('asesmen_sumatif_id', $testAsesmen->asesmen_sumatif_id)
+                            ->delete();
+                    } else {
+                        SkorAsesmenSiswa::updateOrCreate(
+                            [
+                                'riwayat_kelas_id'   => $riwayatId,
+                                'asesmen_sumatif_id' => $testAsesmen->asesmen_sumatif_id,
+                            ],
+                            [
+                                'nilai'          => $nilai,
+                                'tahun_ajaran_id' => $tahunAjaranId,
+                            ]
+                        );
+                    }
+                }
+
+                $row++;
+            }
+        });
+
+        return back()->with('success', 'Import Excel Sumatif berhasil. Nilai sudah tersimpan ke database.');
     }
 }

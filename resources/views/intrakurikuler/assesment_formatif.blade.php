@@ -27,15 +27,16 @@
                     </div>
 
                     <div class="d-flex align-items-center gap-2 flex-wrap">
-                        <a href="/template-assesmen-formatif-excel" class="btn btn-primary">
+                        <a href="{{ route('templateFormatif', $intrakurikuler->intrakurikuler_id) }}"
+                            class="btn btn-primary">
                             <i class="bi bi-download"></i> Unduh Template Excel
                         </a>
-                        <form action="" method="" enctype="multipart/form-data"
-                            class="d-flex align-items-center gap-2">
+                        <form action="{{ route('assesment-formatif.import', $intrakurikuler->intrakurikuler_id) }}"
+                            method="POST" enctype="multipart/form-data" class="d-flex align-items-center gap-2">
                             @csrf
                             <label class="btn btn-outline-secondary mb-0">
                                 <i class="bi bi-upload"></i> Pilih File Excel
-                                <input type="file" name="excel" accept=".xlsx,.xls" class="d-none" required
+                                <input type="file" name="file" accept=".xlsx,.xls" class="d-none" required
                                     onchange="this.form.querySelector('button[type=submit]').disabled = !this.value;">
                             </label>
                             <button type="submit" class="btn btn-success" disabled>

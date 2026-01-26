@@ -21,14 +21,18 @@
                     <span class="d-block m-t-5">{{ $intrakurikuler->kelasAjar?->kelas?->nama_kelas ?? '-' }}</span>
                 </div>
                 <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <a href="/template-assesmen-sumatif-excel" class="btn btn-primary">
+                    <a href="{{ route('assesment_sumatif.template', $intrakurikuler->intrakurikuler_id) }}" class="btn btn-primary">
                         <i class="bi bi-download"></i> Unduh Template Excel
                     </a>
-                    <form action="" method="" enctype="multipart/form-data" class="d-flex align-items-center gap-2">
+
+                    <form action="{{ route('assesment_sumatif.import', $intrakurikuler->intrakurikuler_id) }}"
+                        method="POST" enctype="multipart/form-data"
+                        class="d-flex align-items-center gap-2">
                         @csrf
                         <label class="btn btn-outline-secondary mb-0">
                             <i class="bi bi-upload"></i> Pilih File Excel
-                            <input type="file" name="excel" accept=".xlsx,.xls" class="d-none" required onchange="this.form.querySelector('button[type=submit]').disabled = !this.value;">
+                            <input type="file" name="excel" accept=".xlsx,.xls" class="d-none" required
+                                onchange="this.form.querySelector('button[type=submit]').disabled = !this.value;">
                         </label>
                         <button type="submit" class="btn btn-success" disabled>
                             <i class="bi bi-save"></i> Simpan Data Excel
@@ -61,7 +65,7 @@
                                 <td><span class="badge bg-light-primary">{{ $r['total_akhir_semester'] ?? '-' }}</span></td>
                                 <td><span class="badge bg-light-primary">{{ $r['nilai_rapor'] ?? '-' }}</span></td>
                                 <td>
-                                    {{-- 
+                                    {{--
                                         - sumatif akhir lingkup materi (ambil datanya)
                                         - sumatif akhir Semester
                                         - 
@@ -71,7 +75,7 @@
                                         'riwayatKelas' => $r['riwayat_kelas_id'],
                                     ]) }}">
                                         <button type="button" class="btn btn-sm btn-light-primary">Detail Nilai</button>
-                                    </a>  
+                                    </a>
                                 </td>
                             </tr>
                             @empty

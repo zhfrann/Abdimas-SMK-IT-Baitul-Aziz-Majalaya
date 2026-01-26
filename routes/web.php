@@ -52,6 +52,10 @@ Route::middleware('auth')->group(function () {
                 ->name('guruMapel');
         });
 
+        Route::middleware('role:Siswa')->group(function () {
+            Route::get('/siswa', [DashboardController::class, 'dashboardSiswa'])->name('siswa');
+        });
+
         Route::middleware('role:Wali Kelas')->group(function () {
             Route::get('/wali-kelas', [DashboardController::class, 'waliKelas'])
                 ->name('waliKelas');
@@ -119,6 +123,18 @@ Route::middleware(['auth'])->group(function () {
 
             Route::resource('assesment-formatif', AssesmentFormatifController::class);
 
+            Route::get('/template-asesmen-formatif', [DummyExcelController::class, 'downloadFormatif'])->name('templateFormatif');
+            Route::post('/assesmen-formatif/import', [AssesmentFormatifController::class, 'importExcel'])->name('assesment-formatif.import');
+
+            Route::get(
+                'template-assesmen-sumatif-excel',
+                [DummyExcelController::class, 'downloadSumatifTemplate']
+            )->name('assesment_sumatif.template');
+            Route::post('/assesmen-sumatif/import', [AssesmentSumatifController::class, 'importExcelSumatif'])
+                ->name('assesment_sumatif.import');
+
+
+
             Route::get('assesment-formatif/{riwayatKelas}/detail', [AssesmentFormatifController::class, 'detailAssesmentFormatif'])
                 ->name('assesment-formatif.detail');
             Route::post('assesment-formatif/{riwayatKelas}/save-detail', [AssesmentFormatifController::class, 'saveDetail'])
@@ -173,10 +189,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('ekstrakurikuler/{ekstrakurikuler}/rekap', [AbsensiControllerEkstrakurikuler::class, 'rekap'])
             ->name('ekstrakurikuler.rekap');
     })->middleware('role:Guru Mapel|Bagian Akademik|Super Admin');
-
-    // Define a GET route with dynamic placeholders for route parameters
-    Route::get('/template-assesmen-formatif-excel', [DummyExcelController::class, 'downloadFormatif']);
-    Route::get('/template-assesmen-sumatif-excel', [DummyExcelController::class, 'downloadSumatif']);
 
     Route::prefix('dokumen')->name('dokumen.')->group(function () {
         Route::get('kelas', [CetakDokumenController::class, 'kelas'])->name('kelas');

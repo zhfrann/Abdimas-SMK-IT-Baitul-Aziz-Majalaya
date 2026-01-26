@@ -14,11 +14,14 @@
             <div class="card pc-user-card">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
+
+                        {{-- Foto Profil --}}
+                        {{-- <div class="flex-shrink-0">
                             <img src="/build/images/user/avatar-1.jpg" alt="user-image"
                                 class="user-avtar wid-45 rounded-circle" />
-                        </div>
-                        <div class="flex-grow-1 ms-3 me-2">
+                        </div> --}}
+
+                        <div class="flex-grow-1 ms-2 me-2">
                             <h6 class="mb-0">{{ auth()->user()->name }}</h6>
                             <small>{{ auth()->user()->roles->first()->name }}</small>
                         </div>
@@ -50,6 +53,9 @@
 
             <ul class="pc-navbar">
 
+                @role('Kepala Sekolah')
+                    @include('layouts.menu-list-kepala-sekolah')
+                @endrole
 
                 @role('Super Admin')
                     @include('layouts.menu-list-superadmin')
@@ -64,9 +70,12 @@
                 @endrole
 
                 @role('Bagian Akademik')
-                @include('layouts.menu-list-akademik')
+                    @include('layouts.menu-list-akademik')
                 @endrole
 
+                @role('Siswa')
+                    @include('layouts.menu-list-siswa')
+                @endrole
 
             </ul>
         </div>

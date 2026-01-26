@@ -38,10 +38,12 @@
                             <div class="mb-4 col-md-6">
                                 <label class="form-label fs-5 f-w-600">Deskripsi Capaian Tertinggi dalam Rapor</label>
                                 <textarea class="form-control" id="capaianTertinggi" name="capaian_tertinggi" rows="4">{{ old('capaian_tertinggi') }}</textarea>
+                                {{-- <textarea class="form-control" id="capaianTertinggi" name="capaian_tertinggi" rows="4">{{ old('capaian_tertinggi', ($riwayatKelas->siswa->user->name ?? $riwayatKelas->siswa->nama) . ' menunjukkan pemahaman dalam ') }}</textarea> --}}
                             </div>
                             <div class="mb-4 col-md-6">
                                 <label class="form-label fs-5 f-w-600">Deskripsi Capaian Terendah dalam Rapor</label>
                                 <textarea class="form-control" id="capaianTerendah" name="capaian_terendah" rows="4">{{ old('capaian_terendah') }}</textarea>
+                                {{-- <textarea class="form-control" id="capaianTerendah" name="capaian_terendah" rows="4">{{ old('capaian_terendah', ($riwayatKelas->siswa->user->name ?? $riwayatKelas->siswa->nama) . ' membutuhkan bimbingan dalam ') }}</textarea> --}}
                             </div>
 
                             @foreach ($intrakurikuler->tujuanPembelajaran as $tp)
@@ -152,9 +154,9 @@
                 }
             });
 
-            let tertinggi = namaSiswa + (tpTercapai.length > 0 ? ' menunjukkan pemahaman dalam ' + tpTercapai.join(', ') :
+            let tertinggi = `${namaSiswa} menunjukkan pemahaman dalam ` + (tpTercapai.length > 0 ? tpTercapai.join(', ') :
                 '');
-            let terendah = namaSiswa + (tpTidakTercapai.length > 0 ? ' membutuhkan bimbingan dalam ' + tpTidakTercapai.join(
+            let terendah = `${namaSiswa} membutuhkan bimbingan dalam ` + (tpTidakTercapai.length > 0 ? tpTidakTercapai.join(
                 ', ') : '');
 
             document.getElementById('capaianTertinggi').value = tertinggi;
