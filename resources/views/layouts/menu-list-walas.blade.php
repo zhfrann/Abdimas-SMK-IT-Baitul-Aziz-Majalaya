@@ -7,7 +7,22 @@
                     <span class="pc-mtext">Dashboard</span>
                   </a>
                 </li>
+                <li class="pc-item pc-caption">
+                  <label>Cetak dokument</label>
+                  <svg class="pc-icon">
+                    <use xlink:href="#custom-flag"></use>
+                  </svg>
+                </li>
+                <li class="pc-item pc-hasmenu">
+                  <a href="{{ route('dokumen.kelas') }}" class="pc-link">
+                    <span class="pc-micon">
+                      <i class="bi bi-journal-bookmark"></i>
+                    </span>
+                    <span class="pc-mtext">Rapor</span></a>
+                </li>
                 {{-- <li class="pc-item pc-caption">
+
+
   <label>Other</label>
   <svg class="pc-icon">
     <use xlink:href="#custom-notification-status"></use>

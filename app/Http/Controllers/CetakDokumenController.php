@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\KelasAjar;
 use App\Models\Sekolah;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Spatie\LaravelPdf\Facades\Pdf;
 
 class CetakDokumenController extends Controller
@@ -12,13 +13,28 @@ class CetakDokumenController extends Controller
     // Tabel kelas
     public function kelas()
     {
-        $kelasList = KelasAjar::query()
-            ->join('tahun_ajaran', 'kelas_ajar.tahun_ajaran_id', '=', 'tahun_ajaran.tahun_ajaran_id')
-            ->with('kelas', 'tahunAjaran', 'waliKelas')
-            ->withCount('riwayatKelas')
-            ->orderBy('tahun_ajaran.tahun', 'desc')
-            ->select('kelas_ajar.*')
-            ->get();
+        $user = Auth::user();
+        $userId = Auth::id();
+        
+        if($user->hasRole('Wali Kelas')){
+            $kelasList = KelasAjar::query()
+                ->where('wali_user_id', $userId)
+                ->join('tahun_ajaran', 'kelas_ajar.tahun_ajaran_id', '=', 'tahun_ajaran.tahun_ajaran_id')
+                ->with('kelas', 'tahunAjaran', 'waliKelas')
+                ->withCount('riwayatKelas')
+                ->orderBy('tahun_ajaran.tahun', 'desc')
+                ->select('kelas_ajar.*')
+                ->get();
+        }
+        if($user->hasRole('Bagian Akademik')){
+            $kelasList = KelasAjar::query()
+                ->join('tahun_ajaran', 'kelas_ajar.tahun_ajaran_id', '=', 'tahun_ajaran.tahun_ajaran_id')
+                ->with('kelas', 'tahunAjaran', 'waliKelas')
+                ->withCount('riwayatKelas')
+                ->orderBy('tahun_ajaran.tahun', 'desc')
+                ->select('kelas_ajar.*')
+                ->get();
+        }
 
         return view('dokumen.kelas', compact('kelasList'));
     }
