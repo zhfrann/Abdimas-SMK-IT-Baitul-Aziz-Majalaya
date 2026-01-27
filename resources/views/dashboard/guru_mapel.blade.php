@@ -336,7 +336,6 @@
                     <h5 class="mb-0">Butuh Atensi</h5>
                     <span class="text-muted"><small>Urut nilai terendah</small></span>
                 </div>
-                <p class="text-muted mb-3">Saran: follow-up siswa dengan nilai rendah</p>
             </div>
 
             <ul class="list-group list-group-flush">
@@ -405,7 +404,6 @@
                     <h5 class="mb-0">Unggul</h5>
                     <span class="text-muted"><small>Urut nilai tertinggi</small></span>
                 </div>
-                <p class="text-muted mb-3">Saran: beri apresiasi / challenge lanjutan</p>
             </div>
 
             <ul class="list-group list-group-flush">

@@ -361,13 +361,12 @@ class DummyExcelController extends Controller
             ->orderBy('lingkup_materi_id')
             ->get();
 
+        // fallback: minimal 10 kolom sumatif
         if ($lingkupList->count() === 0) {
-            $lingkupList = collect(range(1, 10))->map(function () {
-                return (object)[
-                    'lingkup_materi_id' => null,
-                    'nama_materi' => '',
-                ];
-            });
+            $lingkupList = collect(range(1, 10))->map(fn() => (object)[
+                'lingkup_materi_id' => null,
+                'nama_materi' => '',
+            ]);
         }
 
         $sumatifCount = $lingkupList->count();
@@ -376,47 +375,38 @@ class DummyExcelController extends Controller
         $riwayatKelasList = $intrakurikuler->kelasAjar?->riwayatKelas ?? collect();
         $riwayatIds = $riwayatKelasList->pluck('riwayat_kelas_id')->filter()->values();
 
-        /**
-         * ===========================
-         * 1) Ambil ASESMEN SUMATIF existing (untuk mapping ke kolom)
-         * ===========================
-         */
+        // 1) Ambil asesmen sumatif existing
         $asesmen = AsesmenSumatif::query()
             ->where('intrakurikuler_id', $intrakurikuler_id)
             ->when($tahunAjaranId, fn($q) => $q->where('tahun_ajaran_id', $tahunAjaranId))
             ->get();
 
-        // Map: lingkup_materi_id => asesmen_sumatif_id (untuk type sumatif_lingkup)
         $lingkupAsesmenMap = $asesmen
             ->where('asesmen_type', 'sumatif_lingkup')
             ->filter(fn($a) => !is_null($a->lingkup_materi_id))
             ->keyBy('lingkup_materi_id');
 
-        $asesmenTestId = optional($asesmen->firstWhere('asesmen_type', 'test'))->asesmen_sumatif_id;
+        $asesmenTestId    = optional($asesmen->firstWhere('asesmen_type', 'test'))->asesmen_sumatif_id;
         $asesmenNonTestId = optional($asesmen->firstWhere('asesmen_type', 'non_test'))->asesmen_sumatif_id;
 
         $asesmenIds = $asesmen->pluck('asesmen_sumatif_id')->filter()->values();
 
-        /**
-         * ===========================
-         * 2) Ambil SKOR existing dan group biar cepat lookup
-         * ===========================
-         */
+        // 2) Ambil skor existing
         $skorMap = collect();
         if ($riwayatIds->isNotEmpty() && $asesmenIds->isNotEmpty()) {
             $skorMap = SkorAsesmenSiswa::query()
                 ->whereIn('riwayat_kelas_id', $riwayatIds)
                 ->whereIn('asesmen_sumatif_id', $asesmenIds)
                 ->get()
-                ->keyBy(function ($s) {
-                    return $s->riwayat_kelas_id . ':' . $s->asesmen_sumatif_id;
-                });
+                ->keyBy(fn($s) => $s->riwayat_kelas_id . ':' . $s->asesmen_sumatif_id);
         }
 
         // ===========================
         // EXCEL
         // ===========================
         $spreadsheet = new Spreadsheet();
+        $spreadsheet->getDefaultStyle()->getFont()->setName('Calibri')->setSize(11);
+
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Template Sumatif');
 
@@ -445,6 +435,8 @@ class DummyExcelController extends Controller
         $colNaAkhirSem = Coordinate::stringFromColumnIndex($colNaAkhirSemIndex);
         $colNilaiRapor = Coordinate::stringFromColumnIndex($colNilaiRaporIndex);
 
+        $lastCol = $colNilaiRapor;
+
         // ===== HEADER (3 baris) =====
         $sheet->mergeCells("{$colNo}1:{$colNo}3");
         $sheet->mergeCells("{$colNama}1:{$colNama}3");
@@ -466,20 +458,18 @@ class DummyExcelController extends Controller
         }
 
         $sheet->setCellValue("{$colNaLingkup}2", "NA Sumatif\nLingkup Materi");
-        $sheet->getStyle("{$colNaLingkup}2")->getAlignment()->setWrapText(true);
-
         $sheet->setCellValue("{$colNonTes}2", "Non Tes");
         $sheet->setCellValue("{$colTes}2", "Tes");
-
         $sheet->setCellValue("{$colNaAkhirSem}2", "NA Sumatif\nAkhir Semester");
-        $sheet->getStyle("{$colNaAkhirSem}2")->getAlignment()->setWrapText(true);
 
         for ($i = 0; $i < $sumatifCount; $i++) {
             $col = Coordinate::stringFromColumnIndex($firstSumatifColIndex + $i);
             $sheet->setCellValue("{$col}3", $lingkupList[$i]->nama_materi ?? '');
-            $sheet->getStyle("{$col}3")->getAlignment()->setWrapText(true);
         }
         $sheet->setCellValue("{$colNaLingkup}3", "-");
+        $sheet->setCellValue("{$colNonTes}3", "-");
+        $sheet->setCellValue("{$colTes}3", "-");
+        $sheet->setCellValue("{$colNaAkhirSem}3", "-");
 
         // ===== DATA SISWA mulai baris 4 =====
         $row = 4;
@@ -493,55 +483,55 @@ class DummyExcelController extends Controller
             $sheet->setCellValue("{$colNo}{$row}", $no++);
             $sheet->setCellValue("{$colNama}{$row}", $namaSiswa);
 
-            // === PREFILL SUMATIF LINGKUP (kolom C..dst) ===
+            // SUMATIF LINGKUP
             for ($i = 0; $i < $sumatifCount; $i++) {
                 $col = Coordinate::stringFromColumnIndex($firstSumatifColIndex + $i);
 
                 $lingkupId = $lingkupList[$i]->lingkup_materi_id ?? null;
-                $nilai = '';
+                $nilai = null;
 
                 if ($lingkupId && $lingkupAsesmenMap->has($lingkupId)) {
                     $asesmenId = $lingkupAsesmenMap[$lingkupId]->asesmen_sumatif_id;
                     $key = $riwayatId . ':' . $asesmenId;
-                    $nilai = $skorMap->has($key) ? $skorMap[$key]->nilai : '';
+                    $nilai = $skorMap->has($key) ? $skorMap[$key]->nilai : null;
                 }
 
-                // isi nilai existing (kalau ada), kalau gak ada kosong
                 if ($nilai === null || $nilai === '') {
                     $sheet->setCellValueExplicit("{$col}{$row}", "", DataType::TYPE_STRING);
                 } else {
-                    $sheet->setCellValueExplicit("{$col}{$row}", (string)$nilai, DataType::TYPE_NUMERIC);
+                    // pastikan bener-bener angka (ini sering bikin NA/formula jadi aman)
+                    $sheet->setCellValueExplicit("{$col}{$row}", (float)$nilai, DataType::TYPE_NUMERIC);
                 }
             }
 
-            // === PREFILL NON TEST & TEST ===
-            $nonTesVal = '';
+            // NON TEST & TEST
+            $nonTesVal = null;
             if ($asesmenNonTestId) {
                 $key = $riwayatId . ':' . $asesmenNonTestId;
-                $nonTesVal = $skorMap->has($key) ? $skorMap[$key]->nilai : '';
+                $nonTesVal = $skorMap->has($key) ? $skorMap[$key]->nilai : null;
             }
 
-            $tesVal = '';
+            $tesVal = null;
             if ($asesmenTestId) {
                 $key = $riwayatId . ':' . $asesmenTestId;
-                $tesVal = $skorMap->has($key) ? $skorMap[$key]->nilai : '';
+                $tesVal = $skorMap->has($key) ? $skorMap[$key]->nilai : null;
             }
 
-            $sheet->setCellValueExplicit("{$colNonTes}{$row}", $nonTesVal === '' ? "" : (string)$nonTesVal, $nonTesVal === '' ? DataType::TYPE_STRING : DataType::TYPE_NUMERIC);
-            $sheet->setCellValueExplicit("{$colTes}{$row}", $tesVal === '' ? "" : (string)$tesVal, $tesVal === '' ? DataType::TYPE_STRING : DataType::TYPE_NUMERIC);
+            $sheet->setCellValueExplicit("{$colNonTes}{$row}", ($nonTesVal === null || $nonTesVal === '') ? "" : (float)$nonTesVal, ($nonTesVal === null || $nonTesVal === '') ? DataType::TYPE_STRING : DataType::TYPE_NUMERIC);
+            $sheet->setCellValueExplicit("{$colTes}{$row}", ($tesVal === null || $tesVal === '') ? "" : (float)$tesVal, ($tesVal === null || $tesVal === '') ? DataType::TYPE_STRING : DataType::TYPE_NUMERIC);
 
-            // Formula NA Lingkup Materi (avg C..LastSumatif)
+            // Formula NA Lingkup Materi
             $rangeSumatif = "{$firstSumatifCol}{$row}:{$lastSumatifCol}{$row}";
             $sheet->setCellValue(
                 "{$colNaLingkup}{$row}",
-                "=IF(COUNTA({$rangeSumatif})=0,\"-\",ROUND(AVERAGE({$rangeSumatif}),0))"
+                "=IFERROR(IF(COUNT({$rangeSumatif})=0,\"-\",ROUND(AVERAGE({$rangeSumatif}),0)),\"-\")"
             );
 
-            // Formula NA Akhir Semester (avg NonTes & Tes)
+            // Formula NA Akhir Semester
             $rangeAkhirSem = "{$colNonTes}{$row}:{$colTes}{$row}";
             $sheet->setCellValue(
                 "{$colNaAkhirSem}{$row}",
-                "=IF(COUNTA({$rangeAkhirSem})=0,\"\",ROUND(AVERAGE({$rangeAkhirSem}),0))"
+                "=IFERROR(IF(COUNT({$rangeAkhirSem})=0,\"\",ROUND(AVERAGE({$rangeAkhirSem}),0)),\"\")"
             );
 
             // Nilai rapor
@@ -553,9 +543,66 @@ class DummyExcelController extends Controller
             $row++;
         }
 
-        // (Styling kamu bisa tetap sama seperti sebelumnya)
-        // Freeze pane
+        $lastRow = $row - 1;
+
+        // ===========================
+        // STYLING (biar rapi & ga “bug”)
+        // ===========================
+        // ukuran kolom
+        $sheet->getColumnDimension('A')->setWidth(5);
+        $sheet->getColumnDimension('B')->setWidth(32);
+
+        for ($i = 0; $i < $sumatifCount; $i++) {
+            $col = Coordinate::stringFromColumnIndex($firstSumatifColIndex + $i);
+            $sheet->getColumnDimension($col)->setWidth(12);
+        }
+
+        $sheet->getColumnDimension($colNaLingkup)->setWidth(16);
+        $sheet->getColumnDimension($colNonTes)->setWidth(10);
+        $sheet->getColumnDimension($colTes)->setWidth(10);
+        $sheet->getColumnDimension($colNaAkhirSem)->setWidth(16);
+        $sheet->getColumnDimension($colNilaiRapor)->setWidth(12);
+
+        // tinggi header biar wrap aman
+        $sheet->getRowDimension(1)->setRowHeight(24);
+        $sheet->getRowDimension(2)->setRowHeight(34);
+        $sheet->getRowDimension(3)->setRowHeight(42);
+
+        // wrap + center header
+        $sheet->getStyle("A1:{$lastCol}3")->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+            ->setVertical(Alignment::VERTICAL_CENTER)
+            ->setWrapText(true);
+
+        $sheet->getStyle("A1:{$lastCol}3")->getFont()->setBold(true);
+
+        // background header
+        $sheet->getStyle("A1:{$lastCol}3")->getFill()
+            ->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFEFEFEF');
+
+        // border seluruh table
+        $sheet->getStyle("A1:{$lastCol}{$lastRow}")->getBorders()->getAllBorders()
+            ->setBorderStyle(Border::BORDER_THIN);
+
+        // format angka (0) untuk nilai input & hasil rapor
+        $inputStartCol = $firstSumatifCol;
+        $inputEndCol = $colTes; // sampai tes
+        $sheet->getStyle("{$inputStartCol}4:{$inputEndCol}{$lastRow}")
+            ->getNumberFormat()->setFormatCode('0');
+
+        $sheet->getStyle("{$colNilaiRapor}4:{$colNilaiRapor}{$lastRow}")
+            ->getNumberFormat()->setFormatCode('0');
+
+        // Freeze: biar No & Nama tetap terlihat
         $sheet->freezePane("{$firstSumatifCol}4");
+
+        // print setup (biar enak diprint)
+        $sheet->getPageSetup()->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE);
+        $sheet->getPageSetup()->setFitToWidth(1);
+        $sheet->getPageSetup()->setFitToHeight(0);
+        $sheet->getPageSetup()->setRowsToRepeatAtTopByStartAndEnd(1, 3);
+        $sheet->setAutoFilter("A3:{$lastCol}3");
 
         // Filename aman
         $namaKelas = $intrakurikuler->kelasAjar?->kelas?->nama_kelas ?? '';
@@ -572,7 +619,6 @@ class DummyExcelController extends Controller
             $writer->save('php://output');
         }, $filename, [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
             'Cache-Control' => 'max-age=0',
         ]);
     }
