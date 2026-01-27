@@ -6,15 +6,34 @@ use App\Models\Ekstrakurikuler;
 use App\Models\TahunAjaran;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class EkstrakurikulerController extends Controller
 {
     public function index()
     {
-        $tahunAjaran = TahunAjaran::query()->orderByDesc('tahun_ajaran_id')->get();
-        $guru = User::query()->role('Guru Mapel')->orderBy('name')->get();
-        $ekstrakurikuler = Ekstrakurikuler::query()->with(['tahunAjaran', 'pembina'])->withCount('peserta')->orderByDesc('ekstrakurikuler_id')->get();
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        $tahunAjaran = TahunAjaran::query()
+            ->orderByDesc('tahun_ajaran_id')
+            ->get();
+
+        $guru = User::query()
+            ->role('Guru Mapel')
+            ->orderBy('name')
+            ->get();
+
+        $ekstraQuery = Ekstrakurikuler::query()
+            ->with(['tahunAjaran', 'pembina'])
+            ->withCount('peserta')
+            ->orderByDesc('ekstrakurikuler_id');
+
+        if ($user->hasRole('Guru Mapel')) {
+            $ekstraQuery->where('user_id', $user->id);
+        }
+        $ekstrakurikuler = $ekstraQuery->get();
 
         return view('ekstrakurikuler.table_ekstrakurikuler', compact('tahunAjaran', 'guru', 'ekstrakurikuler'));
     }

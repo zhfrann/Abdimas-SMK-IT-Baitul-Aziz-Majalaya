@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Intrakurikuler;
 use App\Models\LingkupMateri;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
 class LingkupMateriController extends Controller
@@ -109,8 +110,36 @@ class LingkupMateriController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $intrakurikuler, string $lingkup_materi)
     {
-        //
+        try {
+            return DB::transaction(function () use ($intrakurikuler, $lingkup_materi) {
+
+                // pastikan lingkup materi memang milik intrakurikuler tsb
+                $lm = LingkupMateri::query()
+                    ->where('lingkup_materi_id', $lingkup_materi)
+                    ->where('intrakurikuler_id', $intrakurikuler)
+                    ->firstOrFail();
+
+                $lm->delete();
+
+                return back()->with('success', 'Lingkup Materi berhasil dihapus.');
+            });
+        } catch (QueryException $e) {
+            // MySQL FK constraint biasanya SQLSTATE 23000 / errorInfo[1] = 1451 (cannot delete/ update parent row)
+            $sqlState = $e->errorInfo[0] ?? null;
+            $mysqlCode = $e->errorInfo[1] ?? null;
+
+            if ($sqlState === '23000' && in_array((int)$mysqlCode, [1451, 1452], true)) {
+                return back()->with(
+                    'warning',
+                    'Tidak bisa menghapus Lingkup Materi karena masih terhubung dengan data lain. Hapus data terkait terlebih dahulu.'
+                );
+            }
+
+            return back()->with('warning', 'Gagal menghapus Lingkup Materi. Coba lagi.');
+        } catch (\Throwable $e) {
+            return back()->with('warning', 'Gagal menghapus Lingkup Materi. Coba lagi.');
+        }
     }
 }

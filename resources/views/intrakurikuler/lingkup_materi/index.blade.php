@@ -3,12 +3,12 @@
 @section('title', 'Lingkup Materi')
 
 @section('css')
-  <link rel="stylesheet" href="/build/css/plugins/style.css" />
+<link rel="stylesheet" href="/build/css/plugins/style.css" />
 @endsection
 
 @section('content')
 
-<x-breadcrumb item="Intrakurikuler" active="Lingkup Materi"/>
+<x-breadcrumb item="Intrakurikuler" active="Lingkup Materi" />
 
 <div class="row">
   <div class="col-xl-12">
@@ -35,8 +35,7 @@
           data-mode="create"
           data-title="Tambah Lingkup Materi"
           data-id=""
-          data-nama=""
-        >
+          data-nama="">
           Tambah Lingkup Materi
         </button>
         @endrole
@@ -45,7 +44,10 @@
       {{-- Body --}}
       <div class="card-body table-border-style">
         @if (session('success'))
-          <div class="alert alert-success">{{ session('success') }}</div>
+        <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+        @if (session('warning'))
+        <div class="alert alert-warning">{{ session('warning') }}</div>
         @endif
 
         <div class="table-responsive">
@@ -63,7 +65,7 @@
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ $lm->nama_materi }}</td>
                 <td>
-                  @role('Bagian Akademik|Super Admin')
+                  @role('Bagian Akademik|Super Admin|Guru Mapel')
                   <button
                     type="button"
                     class="btn btn-sm btn-light-warning"
@@ -72,18 +74,17 @@
                     data-mode="edit"
                     data-title="Edit Lingkup Materi"
                     data-id="{{ $lm->lingkup_materi_id }}"
-                    data-nama="{{ e($lm->nama_materi) }}"
-                  >
+                    data-nama="{{ e($lm->nama_materi) }}">
                     Update
                   </button>
 
                   <form
-                    action="{{ route('lingkup-materi.destroy', [$intrakurikuler->intrakurikuler_id, $lm->lingkup_materi_id]) }}"
+                    action="{{ route('lingkup-materi.destroy', ['intrakurikuler' => $intrakurikuler->intrakurikuler_id, 'lingkup_materi' => $lm->lingkup_materi_id]) }}"
                     method="POST"
-                    class="d-inline"
-                  >
+                    class="d-inline">
                     @csrf
                     @method('DELETE')
+
                     <button type="submit" class="btn btn-sm btn-light-danger"
                       onclick="return confirm('Yakin hapus data ini?')">
                       Delete
@@ -117,14 +118,13 @@
   {{-- lempar data dari PHP ke HTML, supaya JS murni --}}
   data-store-url="{{ route('lingkup-materi.store', $intrakurikuler->intrakurikuler_id) }}"
   data-update-url-template="{{ route('lingkup-materi.update', [$intrakurikuler->intrakurikuler_id, '___ID___']) }}"
-  data-has-errors="{{ $errors->any() ? 1 : 0 }}"
->
+  data-has-errors="{{ $errors->any() ? 1 : 0 }}">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
 
       <form id="lingkupMateriForm"
-            method="POST"
-            action="{{ route('lingkup-materi.store', $intrakurikuler->intrakurikuler_id) }}">
+        method="POST"
+        action="{{ route('lingkup-materi.store', $intrakurikuler->intrakurikuler_id) }}">
         @csrf
 
         {{-- Spoof method: JS cukup ganti value input ini --}}
@@ -143,15 +143,15 @@
           <div class="mb-3">
             <label class="form-label">Nama materi</label>
             <input type="text"
-                   class="form-control @error('nama_materi') is-invalid @enderror"
-                   name="nama_materi"
-                   id="lm_nama"
-                   placeholder="Masukkan nama materi"
-                   value="{{ old('nama_materi') }}"
-                   required>
+              class="form-control @error('nama_materi') is-invalid @enderror"
+              name="nama_materi"
+              id="lm_nama"
+              placeholder="Masukkan nama materi"
+              value="{{ old('nama_materi') }}"
+              required>
 
             @error('nama_materi')
-              <span class="invalid-feedback">{{ $message }}</span>
+            <span class="invalid-feedback">{{ $message }}</span>
             @enderror
           </div>
         </div>
@@ -170,64 +170,66 @@
 @endsection
 
 @section('scripts')
-  <!-- [Page Specific JS] start -->
-  <script type="module">
-    import { DataTable } from '/build/js/plugins/module.js';
-    window.dt = new DataTable('#pc-dt-simple');
-  </script>
+<!-- [Page Specific JS] start -->
+<script type="module">
+  import {
+    DataTable
+  } from '/build/js/plugins/module.js';
+  window.dt = new DataTable('#pc-dt-simple');
+</script>
 
-  <script>
-    (function () {
-      const modalEl = document.getElementById('lingkupMateriModal');
-      if (!modalEl) return;
+<script>
+  (function() {
+    const modalEl = document.getElementById('lingkupMateriModal');
+    if (!modalEl) return;
 
-      // ambil data dari dataset (hasil render Blade) => JS tetap pure
-      const storeUrl = modalEl.dataset.storeUrl;
-      const updateUrlTemplate = modalEl.dataset.updateUrlTemplate;
+    // ambil data dari dataset (hasil render Blade) => JS tetap pure
+    const storeUrl = modalEl.dataset.storeUrl;
+    const updateUrlTemplate = modalEl.dataset.updateUrlTemplate;
 
-      const form = document.getElementById('lingkupMateriForm');
-      const methodInput = document.getElementById('lm_method');
+    const form = document.getElementById('lingkupMateriForm');
+    const methodInput = document.getElementById('lm_method');
 
-      const titleEl = document.getElementById('lingkupMateriModalTitle');
-      const idEl = document.getElementById('lm_id');
-      const namaEl = document.getElementById('lm_nama');
+    const titleEl = document.getElementById('lingkupMateriModalTitle');
+    const idEl = document.getElementById('lm_id');
+    const namaEl = document.getElementById('lm_nama');
 
-      modalEl.addEventListener('show.bs.modal', function (event) {
-        const btn = event.relatedTarget;
-        if (!btn) return;
+    modalEl.addEventListener('show.bs.modal', function(event) {
+      const btn = event.relatedTarget;
+      if (!btn) return;
 
-        const mode = btn.getAttribute('data-mode') || 'create';
-        const title = btn.getAttribute('data-title') || 'Tambah Lingkup Materi';
-        const id = btn.getAttribute('data-id') || '';
-        const nama = btn.getAttribute('data-nama') || '';
+      const mode = btn.getAttribute('data-mode') || 'create';
+      const title = btn.getAttribute('data-title') || 'Tambah Lingkup Materi';
+      const id = btn.getAttribute('data-id') || '';
+      const nama = btn.getAttribute('data-nama') || '';
 
-        titleEl.textContent = title;
-        idEl.value = id;
-        namaEl.value = nama;
+      titleEl.textContent = title;
+      idEl.value = id;
+      namaEl.value = nama;
 
-        if (mode === 'edit' && id) {
-          form.action = updateUrlTemplate.replace('___ID___', id);
-          methodInput.value = 'PUT';
-        } else {
-          form.action = storeUrl;
-          methodInput.value = 'POST';
-        }
-      });
-
-      modalEl.addEventListener('hidden.bs.modal', function () {
-        idEl.value = '';
-        namaEl.value = '';
-        methodInput.value = 'POST';
+      if (mode === 'edit' && id) {
+        form.action = updateUrlTemplate.replace('___ID___', id);
+        methodInput.value = 'PUT';
+      } else {
         form.action = storeUrl;
-        titleEl.textContent = 'Tambah Lingkup Materi';
-      });
-
-      // kalau validasi error, buka modal otomatis (tanpa Blade di JS)
-      if (modalEl.dataset.hasErrors === "1") {
-        const modal = new bootstrap.Modal(modalEl);
-        modal.show();
+        methodInput.value = 'POST';
       }
-    })();
-  </script>
-  <!-- [Page Specific JS] end -->
+    });
+
+    modalEl.addEventListener('hidden.bs.modal', function() {
+      idEl.value = '';
+      namaEl.value = '';
+      methodInput.value = 'POST';
+      form.action = storeUrl;
+      titleEl.textContent = 'Tambah Lingkup Materi';
+    });
+
+    // kalau validasi error, buka modal otomatis (tanpa Blade di JS)
+    if (modalEl.dataset.hasErrors === "1") {
+      const modal = new bootstrap.Modal(modalEl);
+      modal.show();
+    }
+  })();
+</script>
+<!-- [Page Specific JS] end -->
 @endsection
