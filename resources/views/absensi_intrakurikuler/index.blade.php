@@ -26,7 +26,7 @@
 
           <div class="d-flex gap-2">
             <a href="{{ route('absensi.intrakurikuler.rekap', $intrakurikuler->intrakurikuler_id) }}"
-               class="btn btn-outline-secondary">
+              class="btn btn-outline-secondary">
               Rekap Absensi
             </a>
           </div>
@@ -48,20 +48,20 @@
       <div class="card-body pt-3">
         {{-- VALIDATION ERRORS --}}
         @if ($errors->any())
-          <div class="alert alert-danger">
-            <ul class="mb-0">
-              @foreach ($errors->all() as $err)
-                <li>{{ $err }}</li>
-              @endforeach
-            </ul>
-          </div>
+        <div class="alert alert-danger">
+          <ul class="mb-0">
+            @foreach ($errors->all() as $err)
+            <li>{{ $err }}</li>
+            @endforeach
+          </ul>
+        </div>
         @endif
 
         @if (session('success'))
-          <div class="alert alert-success">{{ session('success') }}</div>
+        <div class="alert alert-success">{{ session('success') }}</div>
         @endif
         @if (session('warning'))
-          <div class="alert alert-warning">{{ session('warning') }}</div>
+        <div class="alert alert-warning">{{ session('warning') }}</div>
         @endif
 
         <div class="table-responsive">
@@ -77,54 +77,58 @@
 
             <tbody>
               @foreach ($students as $s)
-                @php
-                  $att = $attendanceMap->get($s['riwayat_kelas_id']);
-                @endphp
+              @php
+              $att = $attendanceMap->get($s['riwayat_kelas_id']);
+              @endphp
 
-                <tr>
-                  <td>
-                    <div class="d-flex align-items-center">
-                      <div class="flex-shrink-0">
-                        <img src="{{ $s['avatar'] }}" alt="user" class="img-radius wid-40" />
-                      </div>
-                      <div class="flex-grow-1 ms-3">
-                        <h6 class="mb-0">{{ $s['name'] }}</h6>
-                        <small class="text-muted">{{ $intrakurikuler->kelasAjar?->kelas?->nama_kelas ?? '-' }}</small>
-                      </div>
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                      <img src="{{ $s['avatar'] }}" alt="user" class="img-radius wid-40" />
                     </div>
-                  </td>
+                    <div class="flex-grow-1 ms-3">
+                      <h6 class="mb-0">{{ $s['name'] }}</h6>
+                      <small class="text-muted">{{ $intrakurikuler->kelasAjar?->kelas?->nama_kelas ?? '-' }}</small>
+                    </div>
+                  </div>
+                </td>
 
-                  <td>
-                    @if($att)
-                      <span class="badge bg-light-primary text-capitalize">{{ $att->status }}</span>
-                    @else
-                      <span class="badge bg-light-secondary">Belum</span>
-                    @endif
-                  </td>
+                <td>
+                  @if($att)
+                  <span class="badge bg-light-primary text-capitalize">{{ $att->status }}</span>
+                  @else
+                  <span class="badge bg-light-secondary">Belum</span>
+                  @endif
+                </td>
 
-                  <td><span class="text-muted">{{ $att?->note ?: '-' }}</span></td>
+                <td><span class="text-muted">{{ $att?->note ?: '-' }}</span></td>
 
-                  <td class="text-end">
-                    <button
-                      type="button"
-                      class="btn {{ $att ? 'btn-outline-primary' : 'btn-primary' }} btn-sm"
-                      data-bs-toggle="modal"
-                      data-bs-target="#absenModal"
-                      data-mode="{{ $att ? 'edit' : 'create' }}"
-                      data-date="{{ $selectedDate }}"
-                      data-riwayat-kelas-id="{{ $s['riwayat_kelas_id'] }}"
-                      data-student-name="{{ $s['name'] }}"
-                      data-status="{{ $att?->status ?? '' }}"
-                      data-note="{{ $att?->note ?? '' }}"
-                    >
-                      {{ $att ? 'Edit' : 'Absensi' }}
-                    </button>
-                  </td>
-                </tr>
+                <td class="text-end">
+                  <button
+                    type="button"
+                    class="btn {{ $att ? 'btn-outline-primary' : 'btn-primary' }} btn-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#absenModal"
+                    data-mode="{{ $att ? 'edit' : 'create' }}"
+                    data-date="{{ $selectedDate }}"
+                    data-riwayat-kelas-id="{{ $s['riwayat_kelas_id'] }}"
+                    data-student-name="{{ $s['name'] }}"
+                    data-status="{{ $att?->status ?? '' }}"
+                    data-note="{{ $att?->note ?? '' }}">
+                    {{ $att ? 'Edit' : 'Absensi' }}
+                  </button>
+                </td>
+              </tr>
               @endforeach
             </tbody>
 
           </table>
+        </div>
+        <div class="mt-3 ps-2">
+          <a href="{{ route('absensi.intrakurikuler.list') }}" class="btn btn-light-secondary px-3">
+            Kembali
+          </a>
         </div>
       </div>
 
@@ -184,7 +188,9 @@
 
 @section('scripts')
 <script type="module">
-  import { DataTable } from '/build/js/plugins/module.js';
+  import {
+    DataTable
+  } from '/build/js/plugins/module.js';
   window.dt = new DataTable('#pc-dt-simple');
 </script>
 
@@ -247,7 +253,7 @@
   mStatus.addEventListener('change', () => toggleNote(mStatus.value));
 
   // Bootstrap 5 event: show.bs.modal
-  absenModalEl.addEventListener('show.bs.modal', function (event) {
+  absenModalEl.addEventListener('show.bs.modal', function(event) {
     const btn = event.relatedTarget; // tombol yang diklik
 
     const mode = btn.getAttribute('data-mode') || 'create';

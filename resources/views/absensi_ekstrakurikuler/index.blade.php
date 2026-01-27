@@ -122,6 +122,12 @@
 
           </table>
         </div>
+                </div>
+        <div class="ps-3 mb-3">
+          <a href="{{ route('absensi.ekstrakurikuler.list') }}" class="btn btn-light-secondary px-3">
+            Kembali
+          </a>
+        </div>
       </div>
 
     </div>

@@ -93,9 +93,13 @@
                                     <th>No</th>
                                     <th>Ekstrakurikuler</th>
                                     <th>Tahun Ajaran</th>
+                                    @role('Bagain Akademik|Super Admin')
                                     <th>Guru</th>
+                                    @endrole
                                     <th>Jumlah Siswa</th>
+                                    @role('Bagain Akademik|Super Admin')
                                     <th>Action</th>
+                                    @endrole
                                     <th>Akademik</th>
                                 </tr>
                             </thead>
@@ -108,8 +112,11 @@
                                             {{ $item->tahunAjaran?->tahun ?? '-' }}
                                             {{ $item->tahunAjaran?->semester ?? '' }}
                                         </td>
+                                        @role('Bagain Akademik|Super Admin')
                                         <td>{{ $item->pembina?->name ?? '-' }}</td>
+                                        @endrole
                                         <td>{{ $item->peserta_count ?? '-' }}</td>
+                                        @role('Bagain Akademik|Super Admin')
                                         <td>
                                             <button type="button" class="btn btn-sm btn-light-warning mb-1"
                                                 data-bs-toggle="modal" data-bs-target="#modalEkstra" data-mode="edit"
@@ -129,6 +136,7 @@
                                                     class="btn btn-sm btn-light-danger mb-1">Hapus</button>
                                             </form>
                                         </td>
+                                        @endrole
                                         <td>
                                             <a href="{{ route('ekstrakurikuler.manage-siswa.index', $item->ekstrakurikuler_id) }}"
                                                 class="btn btn-sm btn-light-primary mb-1">Manage Siswa</a>

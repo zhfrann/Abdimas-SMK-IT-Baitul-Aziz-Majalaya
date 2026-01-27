@@ -99,7 +99,9 @@
                                     <th>Tahun Ajaran</th>
                                     <th>Semester</th>
                                     <th>Kelas</th>
+                                    @role('Bagian Akademik|Super Admin')
                                     <th>Guru</th>
+                                    @endrole
                                     <th>Jumlah Siswa</th>
                                     @role('Bagian Akademik|Super Admin')
                                         <th>Actions</th>
@@ -121,7 +123,9 @@
                                             {{ ucfirst($item->kelasAjar?->tahunAjaran?->semester ?? '-') }}
                                         </td>
                                         <td>{{ $item->kelasAjar?->kelas?->nama_kelas ?? '-' }}</td>
+                                        @role('Bagian Akademik|Super Admin')
                                         <td>{{ $item->pengampu?->staff?->nama ?? ($item->pengampu?->name ?? 'N/A') }}</td>
+                                        @endrole
                                         <td>{{ $item->kelasAjar?->riwayat_kelas_count ?? 0 }}</td>
 
                                         @role('Bagian Akademik|Super Admin')
