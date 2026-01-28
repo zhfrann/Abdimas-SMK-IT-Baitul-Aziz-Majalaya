@@ -6,6 +6,8 @@
 <link rel="stylesheet" href="/build/css/plugins/style.css" />
 @endsection
 
+
+
 @section('content')
 
 <x-breadcrumb item="Intrakurikuler" active="Lingkup Materi" />
@@ -65,33 +67,32 @@
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ $lm->nama_materi }}</td>
                 <td>
-                  @role('Bagian Akademik|Super Admin|Guru Mapel')
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-light-warning"
-                    data-bs-toggle="modal"
-                    data-bs-target="#lingkupMateriModal"
-                    data-mode="edit"
-                    data-title="Edit Lingkup Materi"
-                    data-id="{{ $lm->lingkup_materi_id }}"
-                    data-nama="{{ e($lm->nama_materi) }}">
-                    Update
-                  </button>
+  @role('Bagian Akademik|Super Admin|Guru Mapel')
+    <div class="d-inline-flex align-items-center gap-2">
+      <button
+        type="button"
+        class="btn btn-sm btn-light-warning"
+        data-bs-toggle="modal"
+        data-bs-target="#lingkupMateriModal"
+        data-mode="edit"
+        data-title="Edit Lingkup Materi"
+        data-id="{{ $lm->lingkup_materi_id }}"
+        data-nama="{{ e($lm->nama_materi) }}">
+        Update
+      </button>
 
-                  <form
-                    action="{{ route('lingkup-materi.destroy', ['intrakurikuler' => $intrakurikuler->intrakurikuler_id, 'lingkup_materi' => $lm->lingkup_materi_id]) }}"
-                    method="POST"
-                    class="d-inline">
-                    @csrf
-                    @method('DELETE')
-
-                    <button type="submit" class="btn btn-sm btn-light-danger"
-                      onclick="return confirm('Yakin hapus data ini?')">
-                      Delete
-                    </button>
-                  </form>
-                  @endrole
-                </td>
+      <button
+        type="button"
+        class="btn btn-sm btn-light-danger text-lg"
+        data-bs-toggle="modal"
+        data-bs-target="#confirmDeleteModal"
+        data-action="{{ route('lingkup-materi.destroy', ['intrakurikuler' => $intrakurikuler->intrakurikuler_id, 'lingkup_materi' => $lm->lingkup_materi_id]) }}"
+        data-name="{{ e($lm->nama_materi) }}">
+        Delete
+      </button>
+    </div>
+  @endrole
+</td>
               </tr>
               @empty
               <tr>
@@ -167,6 +168,35 @@
   </div>
 </div>
 
+<!-- modal delete -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Konfirmasi Hapus</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <p class="mb-0">Yakin hapus <strong id="deleteItemName">data</strong>?</p>
+      </div>
+
+      <div class="modal-footer d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Batal</button>
+
+        <form id="deleteConfirmForm" method="POST" class="m-0">
+          @csrf
+          @method('DELETE')
+          <button type="submit" class="btn btn-danger">Ya, Hapus</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
 @endsection
 
 @section('scripts')
@@ -229,6 +259,22 @@
       const modal = new bootstrap.Modal(modalEl);
       modal.show();
     }
+  })();
+
+  (function() {
+    const modalEl = document.getElementById('confirmDeleteModal');
+    if (!modalEl) return;
+
+    const nameEl = document.getElementById('deleteItemName');
+    const formEl = document.getElementById('deleteConfirmForm');
+
+    modalEl.addEventListener('show.bs.modal', function(event) {
+      const btn = event.relatedTarget;
+      if (!btn) return;
+
+      formEl.action = btn.getAttribute('data-action');
+      nameEl.textContent = btn.getAttribute('data-name') || 'data ini';
+    });
   })();
 </script>
 <!-- [Page Specific JS] end -->

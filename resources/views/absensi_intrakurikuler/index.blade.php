@@ -38,10 +38,6 @@
             <input type="text" id="pickDate" class="form-control" placeholder="Pilih tanggal" autocomplete="off" />
             <input type="hidden" id="dateSelected" value="{{ $selectedDate }}">
           </div>
-
-          <div class="col-12 col-md-4">
-            <button type="button" id="btnApply" class="btn btn-primary">Terapkan</button>
-          </div>
         </div>
       </div>
 
@@ -78,7 +74,7 @@
             <tbody>
               @foreach ($students as $s)
               @php
-              $att = $attendanceMap->get($s['riwayat_kelas_id']);
+                $att = $attendanceMap->get($s['riwayat_kelas_id']);
               @endphp
 
               <tr>
@@ -96,9 +92,9 @@
 
                 <td>
                   @if($att)
-                  <span class="badge bg-light-primary text-capitalize">{{ $att->status }}</span>
+                    <span class="badge bg-light-primary text-capitalize">{{ $att->status }}</span>
                   @else
-                  <span class="badge bg-light-secondary">Belum</span>
+                    <span class="badge bg-light-secondary">Belum</span>
                   @endif
                 </td>
 
@@ -111,7 +107,6 @@
                     data-bs-toggle="modal"
                     data-bs-target="#absenModal"
                     data-mode="{{ $att ? 'edit' : 'create' }}"
-                    data-date="{{ $selectedDate }}"
                     data-riwayat-kelas-id="{{ $s['riwayat_kelas_id'] }}"
                     data-student-name="{{ $s['name'] }}"
                     data-status="{{ $att?->status ?? '' }}"
@@ -125,6 +120,7 @@
 
           </table>
         </div>
+
         <div class="mt-3 ps-2">
           <a href="{{ route('absensi.intrakurikuler.list') }}" class="btn btn-light-secondary px-3">
             Kembali
@@ -188,19 +184,25 @@
 
 @section('scripts')
 <script type="module">
-  import {
-    DataTable
-  } from '/build/js/plugins/module.js';
+  import { DataTable } from '/build/js/plugins/module.js';
   window.dt = new DataTable('#pc-dt-simple');
 </script>
 
 <script src="/build/js/plugins/flatpickr.min.js"></script>
 
 <script>
-  // ====== DATE PICKER ======
+  // ====== DATE PICKER (auto request) ======
   const pickDate = document.getElementById('pickDate');
   const dateSelected = document.getElementById('dateSelected');
-  const btnApply = document.getElementById('btnApply');
+
+  function redirectWithDate(dateStr) {
+    const params = new URLSearchParams(window.location.search);
+    if (dateStr) params.set('date', dateStr);
+    else params.delete('date');
+
+    const target = `${window.location.pathname}?${params.toString()}`;
+    if (target !== window.location.href) window.location.href = target;
+  }
 
   const fp = flatpickr(pickDate, {
     mode: 'single',
@@ -208,25 +210,23 @@
     defaultDate: dateSelected.value || null,
     maxDate: 'today',
     onChange: function(selectedDates) {
-      if (selectedDates.length) {
-        dateSelected.value = fp.formatDate(selectedDates[0], 'Y-m-d');
-      }
+      if (!selectedDates.length) return;
+      const dateStr = fp.formatDate(selectedDates[0], 'Y-m-d');
+
+      // kalau sama dengan query saat ini, jangan reload
+      const cur = new URLSearchParams(window.location.search).get('date') || '';
+      if (dateStr === cur) return;
+
+      dateSelected.value = dateStr;
+      redirectWithDate(dateStr);
     }
   });
 
-  // supaya input terlihat terisi (optional tapi enak)
   if (dateSelected.value) {
     fp.setDate(dateSelected.value, false);
   }
 
-  btnApply.addEventListener('click', () => {
-    const params = new URLSearchParams(window.location.search);
-    if (dateSelected.value) params.set('date', dateSelected.value);
-    else params.delete('date');
-    window.location.href = `${window.location.pathname}?${params.toString()}`;
-  });
-
-  // ====== MODAL (WAJIB: robust utk DataTable) ======
+  // ====== MODAL ======
   const absenModalEl = document.getElementById('absenModal');
 
   const title = document.getElementById('absenModalTitle');
@@ -252,9 +252,9 @@
 
   mStatus.addEventListener('change', () => toggleNote(mStatus.value));
 
-  // Bootstrap 5 event: show.bs.modal
   absenModalEl.addEventListener('show.bs.modal', function(event) {
-    const btn = event.relatedTarget; // tombol yang diklik
+    const btn = event.relatedTarget;
+    if (!btn) return;
 
     const mode = btn.getAttribute('data-mode') || 'create';
     const rkId = btn.getAttribute('data-riwayat-kelas-id') || '';
@@ -262,10 +262,9 @@
     const status = btn.getAttribute('data-status') || '';
     const note = btn.getAttribute('data-note') || '';
 
-    // tanggal: ambil dari data-date, kalau kosong fallback ke dateSelected
-    const date = btn.getAttribute('data-date') || dateSelected.value || '';
+    // tanggal selalu ambil dari picker/hidden (paling update)
+    const date = dateSelected.value || '';
 
-    // SET hidden input (INILAH yang bikin validasi lolos)
     mTanggal.value = date;
     mRiwayatKelasId.value = rkId;
 

@@ -6,6 +6,8 @@ use App\Models\Intrakurikuler;
 use App\Models\LingkupMateri;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class LingkupMateriController extends Controller
 {
@@ -35,7 +37,7 @@ class LingkupMateriController extends Controller
             'nama_materi' => ['required', 'string', 'max:255'],
         ]);
 
-        // optional: cegah duplikat nama materi di intrakurikuler yang sama
+
         $exists = LingkupMateri::where('intrakurikuler_id', $intrakurikuler->intrakurikuler_id)
             ->where('nama_materi', $validated['nama_materi'])
             ->exists();
@@ -77,16 +79,21 @@ class LingkupMateriController extends Controller
      */
     public function update(Request $request, Intrakurikuler $intrakurikuler, LingkupMateri $lingkupMateri)
     {
+        $user = Auth::user();
         // pastikan data lingkup materi memang milik intrakurikuler yg sedang dibuka
         if ((int) $lingkupMateri->intrakurikuler_id !== (int) $intrakurikuler->intrakurikuler_id) {
             abort(404);
+        }
+
+        if (!$user->hasRole('Bagian Akademik') && !((int) $intrakurikuler->pengampu_user_id === (int) $user->id)) {
+            abort(403); // atau 404 kalau mau “nggak bocorin”
+            // abort(404);
         }
 
         $validated = $request->validate([
             'nama_materi' => ['required', 'string', 'max:255'],
         ]);
 
-        // optional: cegah duplikat nama materi di intrakurikuler yang sama (kecuali record ini sendiri)
         $exists = LingkupMateri::where('intrakurikuler_id', $intrakurikuler->intrakurikuler_id)
             ->where('nama_materi', $validated['nama_materi'])
             ->where('lingkup_materi_id', '!=', $lingkupMateri->lingkup_materi_id)
@@ -112,28 +119,37 @@ class LingkupMateriController extends Controller
      */
     public function destroy(string $intrakurikuler, string $lingkup_materi)
     {
-        try {
-            return DB::transaction(function () use ($intrakurikuler, $lingkup_materi) {
+        $user = Auth::user();
 
-                // pastikan lingkup materi memang milik intrakurikuler tsb
+        try {
+            return DB::transaction(function () use ($user, $intrakurikuler, $lingkup_materi) {
+
                 $lm = LingkupMateri::query()
                     ->where('lingkup_materi_id', $lingkup_materi)
                     ->where('intrakurikuler_id', $intrakurikuler)
                     ->firstOrFail();
+
+                $intra = Intrakurikuler::query()
+                    ->where('intrakurikuler_id', $intrakurikuler)
+                    ->firstOrFail();
+
+
+                if (! $user->hasRole('Bagian Akademik') && ! ((int) $intra->pengampu_user_id === (int) $user->id)) {
+                    abort(403);
+                }
 
                 $lm->delete();
 
                 return back()->with('success', 'Lingkup Materi berhasil dihapus.');
             });
         } catch (QueryException $e) {
-            // MySQL FK constraint biasanya SQLSTATE 23000 / errorInfo[1] = 1451 (cannot delete/ update parent row)
             $sqlState = $e->errorInfo[0] ?? null;
             $mysqlCode = $e->errorInfo[1] ?? null;
 
-            if ($sqlState === '23000' && in_array((int)$mysqlCode, [1451, 1452], true)) {
+            if ($sqlState === '23000' && (int)$mysqlCode === 1451) {
                 return back()->with(
                     'warning',
-                    'Tidak bisa menghapus Lingkup Materi karena masih terhubung dengan data lain. Hapus data terkait terlebih dahulu.'
+                    'Tidak bisa menghapus Lingkup Materi karena masih terhubung dengan data lain.'
                 );
             }
 

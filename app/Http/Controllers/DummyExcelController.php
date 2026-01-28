@@ -535,10 +535,18 @@ class DummyExcelController extends Controller
             );
 
             // Nilai rapor
+            // $sheet->setCellValue(
+            //     "{$colNilaiRapor}{$row}",
+            //     "=IF({$colNaAkhirSem}{$row}<>\"\",{$colNaAkhirSem}{$row},{$colNaLingkup}{$row})"
+            // );
+
             $sheet->setCellValue(
                 "{$colNilaiRapor}{$row}",
-                "=IF({$colNaAkhirSem}{$row}<>\"\",{$colNaAkhirSem}{$row},{$colNaLingkup}{$row})"
+                "=IF(AND({$colNaAkhirSem}{$row}<>\"\",{$colNaLingkup}{$row}<>\"-\"),"
+                    . "ROUND(AVERAGE({$colNaAkhirSem}{$row},{$colNaLingkup}{$row}),0),"
+                    . "IF({$colNaAkhirSem}{$row}<>\"\",{$colNaAkhirSem}{$row},IF({$colNaLingkup}{$row}=\"-\",\"\",{$colNaLingkup}{$row})))"
             );
+
 
             $row++;
         }

@@ -182,7 +182,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h5 class="mb-0">Komposisi Status Kehadiran (Weekly)</h5>
+                    <h5 class="mb-0">Status Kehadiran (Weekly)</h5>
                 </div>
 
                 <div id="chart-absensi-stacked"></div>

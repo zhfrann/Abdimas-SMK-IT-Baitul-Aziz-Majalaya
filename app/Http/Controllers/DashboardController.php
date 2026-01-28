@@ -539,10 +539,15 @@ class DashboardController extends Controller
 
         $prettyCategories = array_map(function ($d) use ($granularity) {
             $c = Carbon::parse($d);
-            return $granularity === 'day'
-                ? $c->format('d M')
-                : 'Minggu ' . $c->format('d M');
+            if ($granularity === 'day') {
+                return $c->format('d M');
+            }
+
+            $startW = $c->copy(); // ini sudah Monday
+            $endW   = $c->copy()->endOfWeek(Carbon::SUNDAY);
+            return $startW->format('d M') . ' - ' . $endW->format('d M');
         }, $categories);
+
 
         return [
             'categories' => $prettyCategories,

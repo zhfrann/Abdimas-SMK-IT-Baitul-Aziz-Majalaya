@@ -15,17 +15,40 @@
                       <use xlink:href="#custom-flag"></use>
                     </svg>
                   </li>
-                  <li class="pc-item pc-hasmenu">
-                    <a href="{{ route('intrakurikuler.index') }}" class="pc-link">
-                      <span class="pc-micon">
-                        {{-- <svg class="pc-icon">
-          <use xlink:href="#custom-status-up"></use>
-        </svg> --}}
-                        <i class="bi bi-journal-bookmark"></i>
-                      </span>
-                      <span class="pc-mtext">Intrakurikuler</span></a>
+
+                  @php
+                  $intraActive = request()->routeIs([
+                  'intrakurikuler.*',
+                  'lingkup-materi.*',
+                  'tujuan-pembelajaran.*',
+                  'assesment-sumatif.*',
+                  'assesment-formatif.*',
+                  ]);
+
+                  $ekstraActive = request()->routeIs([
+                  'ekstrakurikuler.*',
+                  'manage-siswa.*',
+                  'penilaian_ekstrakurikuler.*',
+                  ]);
+
+                  $absensiIntraActive = request()->routeIs([
+                  'absensi.intrakurikuler.*',
+                  ]);
+
+                  $absensiEkstraActive = request()->routeIs([
+                  'absensi.ekstrakurikuler.*',
+                  ]);
+                  @endphp
+
+                  <li class="pc-item {{ $intraActive ? 'active' : '' }}">
+                    <a href="{{ route('intrakurikuler.index') }}" class="pc-link {{ $intraActive ? 'active' : '' }}">
+                      <span class="pc-micon"><i class="bi bi-journal-bookmark"></i></span>
+                      <span class="pc-mtext">Intrakurikuler</span>
+                    </a>
                   </li>
-                  <li class="pc-item pc-hasmenu">
+
+
+                  <li class="pc-item   {{ $ekstraActive ? 'active' : '' }}">
                     <a href="{{ route('ekstrakurikuler.index') }}" class="pc-link">
                       <span class="pc-micon">
                         {{-- <svg class="pc-icon">
@@ -43,7 +66,8 @@
                       <use xlink:href="#custom-flag"></use>
                     </svg>
                   </li>
-                  <li class="pc-item pc-hasmenu">
+
+                  <li class="pc-item {{ $absensiIntraActive ? 'active' : '' }}">
                     <a href="{{ route('absensi.intrakurikuler.list') }}" class="pc-link">
                       <span class="pc-micon">
                         {{-- <svg class="pc-icon">
@@ -53,8 +77,8 @@
                       </span>
                       <span class="pc-mtext">Absensi Intrakurikuler</span></a>
                   </li>
-                  <li class="pc-item pc-hasmenu">
-                    <a href="{{ route('absensi.ekstrakurikuler.list') }}" class="pc-link">
+                  <li class="pc-item {{ $absensiEkstraActive ? 'active' : '' }}">
+                    <a href="{{ route('absensi.ekstrakurikuler.list') }}" class="pc-link {{ $absensiEkstraActive ? 'active' : '' }}">
                       <span class="pc-micon">
                         {{-- <svg class="pc-icon">
           <use xlink:href="#custom-shield"></use>
