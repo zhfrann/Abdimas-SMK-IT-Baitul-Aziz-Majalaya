@@ -51,10 +51,6 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-3">
-                                <label class="form-label mb-1">Cari</label>
-                                <input type="text" class="form-control" name="q" value="{{ $q }}" placeholder="Nama / username / email">
-                            </div>
 
                             <div class="col-md-2 text-end">
                                 <button class="btn btn-primary w-100" type="submit">

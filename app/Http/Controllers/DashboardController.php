@@ -935,7 +935,7 @@ class DashboardController extends Controller
 
         // ===== default fixed =====
         $topN = 10;
-        $atensiThreshold = 60; // < 60 = butuh atensi
+        $atensiThreshold = 60; // < 60 = butuh atensi (untuk KPI)
         $kkm = 75;             // avg mapel < 75 dianggap mapel rendah
         $bucket = 10;          // histogram bucket 10
 
@@ -967,7 +967,6 @@ class DashboardController extends Controller
                 'kpi' => $this->emptyKpiWali(),
                 'chartDistribusi' => $this->emptyChartDistribusi(),
                 'topMapelList' => collect(),
-                'atensiList' => collect(),
                 'attendanceList' => collect(),
                 'lowSubjectCountList' => collect(),
             ]);
@@ -1005,28 +1004,26 @@ class DashboardController extends Controller
             $topMapel = $mapels->firstWhere('intrakurikuler_id', $focusIdDefault) ?? $mapels->first();
         }
 
-        // ===== mapel pilihan user (harus klik tombol Terapkan) =====
+        // ===== mapel pilihan user (klik Terapkan) =====
         $selectedMapelId = (int) $request->get('intrakurikuler_id', 0);
         $selectedMapel = $selectedMapelId
             ? ($mapels->firstWhere('intrakurikuler_id', $selectedMapelId) ?? null)
             : null;
 
-        // mapel yang dipakai untuk tabel Top 10
         $mapelDipakai = $selectedMapel ?? $topMapel;
 
         // ===== KPI =====
         $kpi = $this->buildKpiWaliKelas($selectedKelasAjarId, $start, $end, $atensiThreshold);
 
-        // ===== Distribusi (FIX bucket: last bin 90-100) =====
+        // ===== Distribusi =====
         $chartDistribusi = $this->buildDistribusiAvgSiswaOverall($selectedKelasAjarId, $start, $end, $bucket);
 
-        // ===== Top N siswa untuk mapel dipakai =====
+        // ===== Top N siswa mapel dipakai =====
         $topMapelList = $mapelDipakai
             ? $this->buildTopMapelList($selectedKelasAjarId, (int) $mapelDipakai->intrakurikuler_id, $start, $end, $topN)
             : collect();
 
         // ===== lainnya =====
-        $atensiList = $this->buildAtensiListOverall($selectedKelasAjarId, $start, $end, $atensiThreshold, $topN);
         $attendanceList = $this->buildAttendanceListOverall($selectedKelasAjarId, $start, $end, $topN);
         $lowSubjectCountList = $this->buildLowSubjectCountList($selectedKelasAjarId, $start, $end, $kkm, $topN);
 
@@ -1042,11 +1039,11 @@ class DashboardController extends Controller
             'kpi' => $kpi,
             'chartDistribusi' => $chartDistribusi,
             'topMapelList' => $topMapelList,
-            'atensiList' => $atensiList,
             'attendanceList' => $attendanceList,
             'lowSubjectCountList' => $lowSubjectCountList,
         ]);
     }
+
 
     // =========================
     // KPI WALI KELAS (nilai + kehadiran)
@@ -1151,23 +1148,6 @@ class DashboardController extends Controller
             ->get();
 
         return $rows->map(fn($r) => [
-            'nama' => $r->nama,
-            'avg_nilai' => round((float) $r->avg_nilai, 1),
-        ]);
-    }
-
-    // =========================
-    // Atensi list (overall semua mapel)
-    // =========================
-    private function buildAtensiListOverall(int $kelasAjarId, Carbon $start, Carbon $end, int $threshold, int $limit)
-    {
-        $perSiswa = $this->queryAvgOverallPerSiswa($kelasAjarId, $start, $end)
-            ->filter(fn($r) => (float) $r->avg_nilai < $threshold)
-            ->sortBy(fn($r) => (float) $r->avg_nilai)
-            ->take($limit)
-            ->values();
-
-        return $perSiswa->map(fn($r) => [
             'nama' => $r->nama,
             'avg_nilai' => round((float) $r->avg_nilai, 1),
         ]);

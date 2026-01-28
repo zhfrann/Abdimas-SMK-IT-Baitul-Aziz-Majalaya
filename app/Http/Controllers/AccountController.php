@@ -14,7 +14,6 @@ class AccountController extends Controller
         // filter
         $role = $request->get('role', 'all');        // all / nama role
         $status = $request->get('status', 'all');    // all / active / inactive
-        $q = trim((string) $request->get('q', ''));  // search
 
         // list role untuk dropdown (semua role)
         $roles = Role::query()->orderBy('name')->get(['id', 'name']);
@@ -26,13 +25,6 @@ class AccountController extends Controller
             })
             ->when($status === 'active', fn($query) => $query->where('is_active', 1))
             ->when($status === 'inactive', fn($query) => $query->where('is_active', 0))
-            ->when($q !== '', function ($query) use ($q) {
-                $query->where(function ($w) use ($q) {
-                    $w->where('name', 'like', "%{$q}%")
-                        ->orWhere('username', 'like', "%{$q}%")
-                        ->orWhere('email', 'like', "%{$q}%");
-                });
-            })
             ->orderBy('name')
             ->get();
 
@@ -41,7 +33,6 @@ class AccountController extends Controller
             'roles' => $roles,
             'role' => $role,
             'status' => $status,
-            'q' => $q,
             'currentUserId' => Auth::id(),
         ]);
     }
