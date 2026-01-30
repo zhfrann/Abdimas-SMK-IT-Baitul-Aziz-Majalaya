@@ -12,7 +12,7 @@ class KelasAjar extends Model
 
     protected $table = 'kelas_ajar';
     protected $primaryKey = 'kelas_ajar_id';
-    protected $fillable = ['kelas_id', 'tahun_ajaran_id', 'wali_user_id'];
+    protected $fillable = ['kelas_id', 'tahun_ajaran_id', 'wali_user_id', 'kkm'];
 
     public function kelas(): BelongsTo
     {

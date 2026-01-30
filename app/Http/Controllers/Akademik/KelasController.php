@@ -38,6 +38,7 @@ class KelasController extends Controller
             'nama_kelas' => 'required|string|max:100',
             'tahun_ajaran_id' => 'required|exists:tahun_ajaran,tahun_ajaran_id',
             'wali_user_id' => 'required|exists:users,id',
+            'kkm'             => 'required|integer|min:0|max:100'
         ]);
 
         DB::beginTransaction();
@@ -63,6 +64,7 @@ class KelasController extends Controller
                 'kelas_id' => $kelas->kelas_id,
                 'tahun_ajaran_id' => $request->tahun_ajaran_id,
                 'wali_user_id' => $request->wali_user_id,
+                'kkm'             => (int) $request->kkm
             ]);
 
             DB::commit();
@@ -79,6 +81,7 @@ class KelasController extends Controller
             'nama_kelas' => 'required|string|max:100',
             'tahun_ajaran_id' => 'required|exists:tahun_ajaran,tahun_ajaran_id',
             'wali_user_id' => 'required|exists:users,id',
+            'kkm'             => 'required|integer|min:0|max:100'
         ]);
 
         DB::beginTransaction();
@@ -106,6 +109,7 @@ class KelasController extends Controller
                 'kelas_id' => $kelas->kelas_id,
                 'tahun_ajaran_id' => $request->tahun_ajaran_id,
                 'wali_user_id' => $request->wali_user_id,
+                'kkm'             => (int) $request->kkm
             ]);
 
             DB::commit();
