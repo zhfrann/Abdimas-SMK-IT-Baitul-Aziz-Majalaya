@@ -182,7 +182,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label>Pendidikan Sebelumnya</label>
+                            <label>Sekolah Asal</label>
                             <input type="text" name="pendidikan_sebelumnya" value="{{ old('pendidikan_sebelumnya') }}"
                                 class="form-control @error('pendidikan_sebelumnya') is-invalid @enderror">
                             @error('pendidikan_sebelumnya')
