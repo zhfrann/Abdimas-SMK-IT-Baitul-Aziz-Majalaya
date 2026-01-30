@@ -310,7 +310,7 @@
         <div class="card">
             <div class="card-header pb-0 pt-2">
                 <div class="d-flex align-items-center justify-content-between">
-                    <h5 class="mb-0">Sebaran Nilai (Histogram)</h5>
+                    <h5 class="mb-0">Sebaran Nilai</h5>
                     <span class="text-muted"><small>Bucket: 10</small></span>
                 </div>
             </div>
