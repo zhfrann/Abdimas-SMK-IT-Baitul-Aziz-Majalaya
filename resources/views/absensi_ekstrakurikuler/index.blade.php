@@ -65,7 +65,6 @@
                 <th>Nama</th>
                 <th>Status</th>
                 <th>Keterangan</th>
-                <th>Update</th>
                 <th class="text-end">Action</th>
               </tr>
             </thead>
@@ -98,7 +97,6 @@
                   </td>
 
                   <td><span class="text-muted">{{ $att?->note ?: '-' }}</span></td>
-                  <td><span class="text-muted">{{ $att?->updated_at?->format('H:i') ?? '-' }}</span></td>
 
                   <td class="text-end">
                     <button

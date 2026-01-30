@@ -128,8 +128,35 @@ class AbsensiControllerEkstrakurikuler extends Controller
             'peserta.siswa.user',
         ]);
 
-        $from = $request->get('from') ?: now()->startOfMonth()->format('Y-m-d');
-        $to   = $request->get('to')   ?: now()->format('Y-m-d');
+        $today = now()->toDateString();
+        $defaultFrom = now()->startOfMonth()->toDateString();
+        $defaultTo   = $today;
+
+        $rawFrom = $request->query('from');
+        $rawTo   = $request->query('to');
+
+        try {
+            $from = $rawFrom
+                ? Carbon::createFromFormat('Y-m-d', $rawFrom)->toDateString()
+                : $defaultFrom;
+        } catch (\Throwable $e) {
+            $from = $defaultFrom;
+        }
+
+        try {
+            // kalau to kosong tapi from ada => anggap 1 hari
+            $to = $rawTo
+                ? Carbon::createFromFormat('Y-m-d', $rawTo)->toDateString()
+                : ($rawFrom ? $from : $defaultTo);
+        } catch (\Throwable $e) {
+            $to = ($rawFrom ? $from : $defaultTo);
+        }
+
+        if ($to > $today) $to = $today;
+
+        if ($from > $to) {
+            [$from, $to] = [$to, $from];
+        }
 
         $peserta = $ekstrakurikuler->peserta;
 

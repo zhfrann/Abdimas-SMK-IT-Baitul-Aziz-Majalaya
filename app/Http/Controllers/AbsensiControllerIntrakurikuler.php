@@ -38,7 +38,6 @@ class AbsensiControllerIntrakurikuler extends Controller
 
         $intrakurikuler = $q->get();
 
-        // opsional kalau kamu masih butuh buat modal create intrakurikuler
         $kelasAjar = KelasAjar::with(['kelas', 'tahunAjaran'])
             ->orderByDesc('tahun_ajaran_id')
             ->orderByDesc('kelas_ajar_id')
@@ -59,30 +58,27 @@ class AbsensiControllerIntrakurikuler extends Controller
         $intrakurikuler->load([
             'kelasAjar.kelas',
             'kelasAjar.tahunAjaran',
-            'kelasAjar.riwayatKelas.siswa.user', // pastikan relasi ada
+            'kelasAjar.riwayatKelas.siswa.user',
         ]);
 
-        // daftar siswa berdasar kelas_ajar intrakurikuler ini
         $students = $intrakurikuler->kelasAjar->riwayatKelas
             ->map(function ($rk) {
                 return [
                     'riwayat_kelas_id' => $rk->riwayat_kelas_id,
                     'name' => $rk->siswa?->nama ?? $rk->siswa?->user?->name ?? '-',
-                    'kelas' => $rk->kelasAjar?->kelas?->nama_kelas ?? $rk->kelas_ajar_id, // fallback
-                    'avatar' => '/build/images/user/avatar-1.jpg', // optional: ganti kalau punya avatar
+                    'kelas' => $rk->kelasAjar?->kelas?->nama_kelas ?? $rk->kelas_ajar_id,
+                    'avatar' => '/build/images/user/avatar-1.jpg',
                 ];
             })
             ->values()
             ->all();
 
-        // absensi tanggal ini untuk semua siswa (key: riwayat_kelas_id)
         $attendanceMap = KehadiranIntrakurikuler::query()
             ->where('intrakurikuler_id', $intrakurikuler->intrakurikuler_id)
             ->whereDate('tanggal', $selectedDate)
             ->get()
             ->keyBy('riwayat_kelas_id');
 
-        // rekap kecil
         $recap = [
             'hadir' => 0,
             'alpha' => 0,
@@ -115,12 +111,10 @@ class AbsensiControllerIntrakurikuler extends Controller
             'note' => ['nullable', 'string'],
         ]);
 
-        // validasi note wajib untuk izin/sakit
         if (in_array($data['status'], ['izin', 'sakit'], true) && blank($data['note'])) {
             return back()->with('warning', 'Keterangan wajib diisi untuk status Izin / Sakit.');
         }
 
-        // pastikan riwayat_kelas_id memang milik kelas_ajar intrakurikuler ini
         $validRk = RiwayatKelas::query()
             ->where('riwayat_kelas_id', $data['riwayat_kelas_id'])
             ->where('kelas_ajar_id', $intrakurikuler->kelas_ajar_id)
@@ -142,7 +136,6 @@ class AbsensiControllerIntrakurikuler extends Controller
             'updated_by' => Auth::id(),
         ];
 
-        // kalau insert baru, set created_by juga
         KehadiranIntrakurikuler::query()->updateOrCreate(
             $where,
             $values + ['created_by' => Auth::id()]
@@ -159,14 +152,42 @@ class AbsensiControllerIntrakurikuler extends Controller
             'kelasAjar.riwayatKelas.siswa.user',
         ]);
 
-        // default range: bulan ini
-        $from = $request->get('from') ?: now()->startOfMonth()->format('Y-m-d');
-        $to   = $request->get('to')   ?: now()->format('Y-m-d');
+        $today = now()->toDateString();
+        $defaultFrom = now()->startOfMonth()->toDateString();
+        $defaultTo   = $today;
 
-        // list siswa
+        $rawFrom = $request->query('from');
+        $rawTo   = $request->query('to');
+
+        // Parse from
+        try {
+            $from = $rawFrom
+                ? Carbon::createFromFormat('Y-m-d', $rawFrom)->toDateString()
+                : $defaultFrom;
+        } catch (\Throwable $e) {
+            $from = $defaultFrom;
+        }
+
+        // Parse to
+        try {
+            // kalau to kosong tapi from ada, anggap 1 hari
+            $to = $rawTo
+                ? Carbon::createFromFormat('Y-m-d', $rawTo)->toDateString()
+                : ($rawFrom ? $from : $defaultTo);
+        } catch (\Throwable $e) {
+            $to = ($rawFrom ? $from : $defaultTo);
+        }
+
+        // Clamp ke hari ini
+        if ($to > $today) $to = $today;
+
+        // Kalau kebalik, swap
+        if ($from > $to) {
+            [$from, $to] = [$to, $from];
+        }
+
         $rkList = $intrakurikuler->kelasAjar->riwayatKelas;
 
-        // aggregate counts per riwayat_kelas_id
         $stats = KehadiranIntrakurikuler::query()
             ->select([
                 'riwayat_kelas_id',
