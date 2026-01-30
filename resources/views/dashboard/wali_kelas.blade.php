@@ -10,75 +10,65 @@
     <div class="col-12">
       <div class="card">
         <div class="card-body">
-          <div class="row g-3">
-            {{-- KELAS: auto submit --}}
-            <div class="col-md-6">
-              <form method="GET" action="{{ route('dashboard.waliKelas') }}" id="form-kelas">
-                <label class="form-label mb-1">Kelas (Wali)</label>
-                <select class="form-select" name="kelas_ajar_id" id="kelas-ajar" required>
-                  @forelse($kelasAjars as $ka)
-                    <option value="{{ $ka->kelas_ajar_id }}"
-                      @selected(optional($selectedKelasAjar)->kelas_ajar_id == $ka->kelas_ajar_id)>
-                      {{ $ka->nama_kelas }} • {{ $ka->tahun }} ({{ $ka->semester }})
-                    </option>
-                  @empty
-                    <option selected>Belum ada kelas</option>
-                  @endforelse
-                </select>
-              </form>
+          <form method="GET" action="{{ route('dashboard.waliKelas') }}" id="form-kelas">
+            <div class="row g-3">
+  <div class="col-12">
+    <label class="form-label mb-1">Kelas (Wali)</label>
 
-              <small class="text-muted d-block mt-2">
-                Periode otomatis: <b>semester</b> sesuai tahun ajaran kelas.
-              </small>
+    <select class="form-select" name="kelas_ajar_id" id="kelas-ajar" required>
+      @forelse($kelasAjars as $ka)
+        <option value="{{ $ka->kelas_ajar_id }}"
+          @selected(optional($selectedKelasAjar)->kelas_ajar_id == $ka->kelas_ajar_id)>
+          {{ $ka->nama_kelas }} • {{ $ka->tahun }} ({{ $ka->semester }})
+        </option>
+      @empty
+        <option selected>Belum ada kelas</option>
+      @endforelse
+    </select>
+
+    {{-- keep show_all state --}}
+    <input type="hidden" name="show_all" value="{{ $showAll ? 1 : 0 }}">
+
+    {{-- info bawah select --}}
+    @if($selectedKelasAjar)
+      <div class="d-flex align-items-center   flex-wrap gap-2 mt-2">
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <span class="badge bg-light-primary">
+            KKM Kelas: <b>{{ (int) $kkm }}</b>
+          </span>
+        </div>
+
+        <span class="badge bg-light-secondary">
+          {{ $selectedKelasAjar->tahun }} ({{ $selectedKelasAjar->semester }})
+        </span>
+      </div>
+    @endif
+  </div>
+</div>
+
+          </form>
+
+          @if($kelasAjars->isEmpty())
+            <div class="alert alert-warning mt-3 mb-0">
+              Anda belum menjadi wali kelas.
             </div>
-
-            {{-- MAPEL: butuh tombol Terapkan --}}
-            <div class="col-md-6">
-              <form method="GET" action="{{ route('dashboard.waliKelas') }}" id="form-mapel">
-                <input type="hidden" name="kelas_ajar_id" value="{{ optional($selectedKelasAjar)->kelas_ajar_id }}">
-
-                <label class="form-label mb-1">Mapel (untuk Top Siswa)</label>
-
-                <div class="d-flex gap-2">
-                  <select class="form-select" name="intrakurikuler_id"
-                    @disabled(!$selectedKelasAjar || $mapels->isEmpty()) required>
-                    @forelse($mapels as $m)
-                      <option value="{{ $m->intrakurikuler_id }}"
-                        @selected(optional($selectedMapel)->intrakurikuler_id == $m->intrakurikuler_id || (!$selectedMapel && optional($topMapel)->intrakurikuler_id == $m->intrakurikuler_id))>
-                        {{ $m->nama_pelajaran }}
-                      </option>
-                    @empty
-                      <option selected>Tidak ada mapel</option>
-                    @endforelse
-                  </select>
-
-                  <button class="btn btn-primary" type="submit" @disabled(!$selectedKelasAjar || $mapels->isEmpty())>
-                    Terapkan
-                  </button>
-                </div>
-
-                <small class="text-muted d-block mt-2">
-                  Default (otomatis) mapel fokus:
-                  <b>{{ $topMapel?->nama_pelajaran ?? '-' }}</b>
-                </small>
-              </form>
-            </div>
-
-          </div>
+          @endif
         </div>
       </div>
     </div>
 
     @if (!$selectedKelasAjar)
-      <div class="col-12">
-        <div class="alert alert-warning mb-0">Anda belum menjadi wali kelas.</div>
-      </div>
+      {{-- no content --}}
     @else
       {{-- HEADER --}}
       <div class="col-12">
-        <div class="d-flex align-items-center justify-content-between mb-2">
+        <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
           <h5 class="mb-0">Dashboard Wali: {{ $selectedKelasAjar->nama_kelas }}</h5>
-          <span class="text-muted">{{ $selectedKelasAjar->tahun }} ({{ $selectedKelasAjar->semester }})</span>
+          <div class="text-muted">
+            <span>{{ $selectedKelasAjar->tahun }} ({{ $selectedKelasAjar->semester }})</span>
+            <span class="mx-2">•</span>
+            <span>KKM: <b>{{ (int) $kkm }}</b></span>
+          </div>
         </div>
       </div>
 
@@ -96,7 +86,7 @@
               </div>
             </div>
             <div class="mt-3">
-              <h3 class="mb-0">{{ $kpi['avg_nilai_kelas'] }}</h3>
+              <h3 class="mb-0">{{ number_format($kpi['avg_nilai_kelas'] ?? 0, 1) }}</h3>
             </div>
           </div>
         </div>
@@ -115,7 +105,7 @@
               </div>
             </div>
             <div class="mt-3">
-              <h3 class="mb-0">{{ $kpi['unggul_count'] }}</h3>
+              <h3 class="mb-0">{{ (int) ($kpi['unggul_count'] ?? 0) }}</h3>
             </div>
           </div>
         </div>
@@ -130,11 +120,12 @@
               </div>
               <div class="ms-3">
                 <h6 class="mb-0">Butuh Atensi</h6>
-                <small class="text-muted">Avg semua mapel &lt; 60</small>
+                <small class="text-muted">Avg siswa &lt; KKM</small>
               </div>
             </div>
             <div class="mt-3">
-              <h3 class="mb-0">{{ $kpi['atensi_count'] }}</h3>
+              <h3 class="mb-0">{{ (int) ($kpi['atensi_count'] ?? 0) }}</h3>
+              <small class="text-muted">KKM: {{ (int) $kkm }}</small>
             </div>
           </div>
         </div>
@@ -153,14 +144,16 @@
               </div>
             </div>
             <div class="mt-3">
-              <h3 class="mb-0">{{ $kpi['hadir_rate'] }}%</h3>
-              <small class="text-muted">Alpha total: {{ $kpi['alpha_total'] }}</small>
+              <h3 class="mb-0">{{ number_format($kpi['hadir_rate'] ?? 0, 1) }}%</h3>
+              <small class="text-muted">
+                Alpha total: {{ (int) ($kpi['alpha_total'] ?? 0) }}
+              </small>
             </div>
           </div>
         </div>
       </div>
 
-      {{-- DISTRIBUSI --}}
+      {{-- DISTRIBUSI NILAI --}}
       <div class="col-lg-7">
         <div class="card">
           <div class="card-header">
@@ -173,94 +166,218 @@
         </div>
       </div>
 
-      {{-- TOP MAPEL --}}
-      <div class="col-lg-5">
+      {{-- BUTUH ATENSI (TOP 5 / ALL) --}}
+      <div class="col-lg-5" id="atensi-list">
         <div class="card">
-          <div class="card-header">
-            <h5 class="mb-0">Top 10 Siswa ({{ $mapelDipakai?->nama_pelajaran ?? '-' }})</h5>
-            <small class="text-muted">Avg nilai per siswa pada mapel terpilih</small>
+          <div class="card-body border-bottom pb-0">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+              <div>
+                <h5 class="mb-0">Butuh Atensi</h5>
+                <small class="text-muted d-block mt-1">Avg siswa &lt; KKM (urut terendah)</small>
+              </div>
+              <span class="badge bg-light-danger">KKM: <b>{{ (int) $kkm }}</b></span>
+            </div>
           </div>
-          <div class="card-body p-0">
-            <div class="table-responsive">
-              <table class="table table-hover mb-0">
-                <thead>
-                  <tr>
-                    <th>Nama</th>
-                    <th class="text-end">Avg</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @forelse($topMapelList as $t)
-                    <tr>
-                      <td>{{ $t['nama'] }}</td>
-                      <td class="text-end fw-semibold">{{ $t['avg_nilai'] }}</td>
-                    </tr>
-                  @empty
-                    <tr>
-                      <td colspan="2" class="text-muted text-center py-3">
-                        Belum ada data nilai mapel pada semester ini.
-                      </td>
-                    </tr>
-                  @endforelse
-                </tbody>
-              </table>
+
+          <ul class="list-group list-group-flush">
+            @forelse ($atensiList as $s)
+              <li class="list-group-item">
+                <div class="d-flex align-items-center">
+                  <div class="flex-shrink-0">
+                    <div class="avtar avtar-s border bg-light-danger">
+                      <span>BA</span>
+                    </div>
+                  </div>
+                  <div class="flex-grow-1 ms-3">
+                    <div class="row g-1 align-items-center">
+                      <div class="col-7">
+                        <h6 class="mb-0">{{ $s['nama'] }}</h6>
+                      </div>
+                      <div class="col-5 text-end">
+                        <p class="text-muted mb-0">
+                          <small>Avg: <b>{{ number_format($s['avg'], 1) }}</b></small>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            @empty
+              <li class="list-group-item">
+                <div class="text-muted">Tidak ada siswa di bawah KKM pada semester ini.</div>
+              </li>
+            @endforelse
+          </ul>
+
+          <div class="card-footer">
+            <div class="d-grid">
+              @if (!$showAll)
+                <a class="btn btn-outline-secondary"
+                   href="{{ request()->fullUrlWithQuery(['show_all' => 1]) }}#atensi-list">
+                  Lihat Semua
+                </a>
+              @else
+                <a class="btn btn-outline-secondary"
+                   href="{{ request()->fullUrlWithQuery(['show_all' => 0]) }}#atensi-list">
+                  Tampilkan Ringkas
+                </a>
+              @endif
             </div>
           </div>
         </div>
       </div>
 
-      {{-- KEHADIRAN (lebih informatif, full width) --}}
+      {{-- ROW: MAPEL RENDAH + KEHADIRAN (50/50) --}}
       <div class="col-12">
-        <div class="card h-100">
-          <div class="card-header">
-            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-              <div>
-                <h5 class="mb-0">Kehadiran Siswa</h5>
-                {{-- <small class="text-muted">
-                  Top 10 prioritas berdasarkan <b>Hadir% terendah</b> (agregat semua mapel) • ditampilkan juga Alpha & total pertemuan
-                </small> --}}
+        <div class="row g-3">
+          {{-- MAPEL RENDAH PER SISWA --}}
+          <div class="col-lg-6" id="low-mapel">
+            <div class="card h-100">
+              <div class="card-header">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                  <div>
+                    <h5 class="mb-0">Mapel Rendah per Siswa</h5>
+                    <small class="text-muted">
+                      Mapel dengan <b>avg &lt; KKM</b> beserta daftar mapel & nilai.
+                    </small>
+                  </div>
+                  <span class="badge bg-light-primary">KKM: <b>{{ (int) $kkm }}</b></span>
+                </div>
+              </div>
+
+              <div class="card-body p-0">
+                <div class="table-responsive" style="max-height: 420px; overflow: auto;">
+                  <table class="table table-hover mb-0 w-100">
+                    <thead class="sticky-top bg-white">
+                      <tr>
+                        <th style="min-width: 160px">Nama</th>
+                        <th class="text-end" style="width: 120px">Jml</th>
+                        <th style="min-width: 260px">Detail</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @forelse($lowSubjectList as $r)
+                        <tr>
+                          <td class="fw-semibold">{{ $r['nama'] }}</td>
+                          <td class="text-end">
+                            <span class="badge bg-light-danger">{{ (int) $r['low_count'] }}</span>
+                          </td>
+                          <td>
+                            @if(empty($r['subjects']))
+                              <span class="text-muted">-</span>
+                            @else
+                              <div class="d-flex flex-wrap gap-2">
+                                @foreach($r['subjects_preview'] as $s)
+                                  <span class="badge bg-light-warning">
+                                    {{ $s['nama_pelajaran'] }}: <b>{{ number_format($s['avg'], 1) }}</b>
+                                  </span>
+                                @endforeach
+
+                                @if(($r['subjects_hidden_count'] ?? 0) > 0)
+                                  <span class="badge bg-light-secondary">
+                                    +{{ (int) $r['subjects_hidden_count'] }} lagi
+                                  </span>
+                                @endif
+                              </div>
+                            @endif
+                          </td>
+                        </tr>
+                      @empty
+                        <tr>
+                          <td colspan="3" class="text-muted text-center py-3">
+                            Belum ada data nilai mapel di bawah KKM pada semester ini.
+                          </td>
+                        </tr>
+                      @endforelse
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="card-footer">
+                <div class="d-grid">
+                  @if (!$showAll)
+                    <a class="btn btn-outline-secondary"
+                       href="{{ request()->fullUrlWithQuery(['show_all' => 1]) }}#low-mapel">
+                      Lihat Semua
+                    </a>
+                  @else
+                    <a class="btn btn-outline-secondary"
+                       href="{{ request()->fullUrlWithQuery(['show_all' => 0]) }}#low-mapel">
+                      Tampilkan Ringkas
+                    </a>
+                  @endif
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="card-body p-0">
-            <div class="table-responsive" style="max-height: 360px; overflow: auto;">
-              <table class="table table-hover mb-0 w-100">
-                <thead class="sticky-top bg-white">
-                  <tr>
-                    <th>Nama</th>
-                    <th class="text-end">Hadir</th>
-                    <th class="text-end">Alpha</th>
-                    <th class="text-end">Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @forelse($attendanceList as $x)
-                    @php
-                      $label = $x['label'] ?? 'Aman';
-                      $badge = 'bg-light-success';
-                      if ($label === 'Waspada') $badge = 'bg-light-warning';
-                      if ($label === 'Prioritas') $badge = 'bg-light-danger';
-                    @endphp
-                    <tr>
-                      <td class="fw-semibold">{{ $x['nama'] }}</td>
-                      <td class="text-end">
-                        <span class="fw-semibold">{{ $x['hadir_pct'] }}%</span>
-                      </td>
-                      <td class="text-end fw-semibold text-danger">{{ $x['alpha'] }}</td>
-                      <td class="text-end text-muted">{{ $x['total'] }}</td>
-                    </tr>
-                  @empty
-                    <tr>
-                      <td colspan="5" class="text-muted text-center py-3">
-                        Belum ada data absensi pada semester ini.
-                      </td>
-                    </tr>
-                  @endforelse
-                </tbody>
-              </table>
+          {{-- KEHADIRAN (ringkas biar muat 50%) --}}
+          <div class="col-lg-6" id="attendance">
+            <div class="card h-100">
+              <div class="card-header">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                  <div>
+                    <h5 class="mb-0">Kehadiran Siswa</h5>
+                    <small class="text-muted">
+                      Prioritas: <b>Hadir% terendah</b> (agregat semua mapel)
+                    </small>
+                  </div>
+                  <span class="badge bg-light-secondary">
+                    {{ $showAll ? 'Semua siswa' : 'Top 10 prioritas' }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="card-body p-0">
+                <div class="table-responsive" style="max-height: 420px; overflow: auto;">
+                  <table class="table table-hover mb-0 w-100">
+                    <thead class="sticky-top bg-white">
+                      <tr>
+                        <th style="min-width: 160px">Nama</th>
+                        <th class="text-end">Hadir%</th>
+                        <th class="text-end">Alpha</th>
+                        <th class="text-end">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @forelse($attendanceList as $x)
+                        <tr>
+                          <td class="fw-semibold">{{ $x['nama'] }}</td>
+                          <td class="text-end fw-semibold">{{ number_format($x['hadir_pct'], 1) }}%</td>
+                          <td class="text-end fw-semibold text-danger">{{ (int) $x['alpha'] }}</td>
+                          <td class="text-end text-muted">{{ (int) $x['total'] }}</td>
+                        </tr>
+                      @empty
+                        <tr>
+                          <td colspan="4" class="text-muted text-center py-3">
+                            Belum ada data absensi pada semester ini.
+                          </td>
+                        </tr>
+                      @endforelse
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="card-footer">
+                <div class="d-grid">
+                  @if (!$showAll)
+                    <a class="btn btn-outline-secondary"
+                       href="{{ request()->fullUrlWithQuery(['show_all' => 1]) }}#attendance">
+                      Lihat Semua
+                    </a>
+                  @else
+                    <a class="btn btn-outline-secondary"
+                       href="{{ request()->fullUrlWithQuery(['show_all' => 0]) }}#attendance">
+                      Tampilkan Ringkas
+                    </a>
+                  @endif
+                </div>
+              </div>
             </div>
           </div>
+
         </div>
       </div>
     @endif
@@ -271,7 +388,7 @@
   <script src="/build/js/plugins/apexcharts.min.js"></script>
 
   <script>
-    // auto submit kelas (tanpa tombol)
+    // auto submit kelas
     const kelasSel = document.querySelector('#kelas-ajar');
     const formKelas = document.querySelector('#form-kelas');
     if (kelasSel && formKelas) {
@@ -298,16 +415,12 @@
       });
 
       chartDistribusiInstance.render().then(() => {
-        setTimeout(() => {
-          if (chartDistribusiInstance) chartDistribusiInstance.resize();
-        }, 150);
+        setTimeout(() => chartDistribusiInstance?.resize(), 150);
       });
     }
 
     document.addEventListener('DOMContentLoaded', () => setTimeout(renderDistribusiChart, 50));
     window.addEventListener('load', () => setTimeout(renderDistribusiChart, 0));
-    window.addEventListener('resize', () => {
-      if (chartDistribusiInstance) chartDistribusiInstance.resize();
-    });
+    window.addEventListener('resize', () => chartDistribusiInstance?.resize());
   </script>
 @endsection
