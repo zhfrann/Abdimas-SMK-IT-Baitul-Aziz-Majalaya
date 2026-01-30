@@ -929,17 +929,17 @@ class DashboardController extends Controller
     }
 
 
+
     public function waliKelas(Request $request)
     {
         $userId = Auth::id();
 
-        // ===== default fixed =====
+        // ===== default =====
         $topN = 10;
-        $atensiThreshold = 60; // < 60 = butuh atensi (untuk KPI)
-        $kkm = 75;             // avg mapel < 75 dianggap mapel rendah
-        $bucket = 10;          // histogram bucket 10
+        $atensiThreshold = 60; // avg semua mapel < 60 => atensi
+        $bucket = 10;          // histogram bucket
 
-        // ===== kelas_ajar yang di-wali oleh user ini =====
+        // ===== kelas_ajar wali =====
         $kelasAjars = DB::table('kelas_ajar as ka')
             ->join('kelas as k', 'k.kelas_id', '=', 'ka.kelas_id')
             ->join('tahun_ajaran as ta', 'ta.tahun_ajaran_id', '=', 'ka.tahun_ajaran_id')
@@ -968,25 +968,24 @@ class DashboardController extends Controller
                 'chartDistribusi' => $this->emptyChartDistribusi(),
                 'topMapelList' => collect(),
                 'attendanceList' => collect(),
-                'lowSubjectCountList' => collect(),
             ]);
         }
 
-        // ===== pilih kelas_ajar (dropdown, auto submit) =====
+        // ===== kelas_ajar terpilih =====
         $selectedKelasAjarId = (int) $request->get('kelas_ajar_id', $kelasAjars->first()->kelas_ajar_id);
         $selectedKelasAjar = $kelasAjars->firstWhere('kelas_ajar_id', $selectedKelasAjarId) ?? $kelasAjars->first();
         $selectedKelasAjarId = (int) $selectedKelasAjar->kelas_ajar_id;
 
-        // ===== range semester berdasarkan tahun_ajaran di kelas terpilih =====
+        // ===== range semester =====
         [$start, $end] = $this->resolveSemesterRangeFromKelasAjar($selectedKelasAjar);
 
-        // ===== mapel di kelas_ajar ini =====
+        // ===== mapel di kelas_ajar =====
         $mapels = DB::table('intrakurikuler as i')
             ->where('i.kelas_ajar_id', $selectedKelasAjarId)
             ->orderBy('i.nama_pelajaran')
             ->get(['i.intrakurikuler_id', 'i.nama_pelajaran']);
 
-        // ===== mapel fokus otomatis (default) =====
+        // ===== mapel fokus default (mapel dengan avg kelas terendah) =====
         $topMapel = null;
         if ($mapels->isNotEmpty()) {
             $mapelAvgRows = DB::table('skor_asesmen_siswa as sas')
@@ -1004,7 +1003,7 @@ class DashboardController extends Controller
             $topMapel = $mapels->firstWhere('intrakurikuler_id', $focusIdDefault) ?? $mapels->first();
         }
 
-        // ===== mapel pilihan user (klik Terapkan) =====
+        // ===== mapel pilihan user =====
         $selectedMapelId = (int) $request->get('intrakurikuler_id', 0);
         $selectedMapel = $selectedMapelId
             ? ($mapels->firstWhere('intrakurikuler_id', $selectedMapelId) ?? null)
@@ -1023,9 +1022,9 @@ class DashboardController extends Controller
             ? $this->buildTopMapelList($selectedKelasAjarId, (int) $mapelDipakai->intrakurikuler_id, $start, $end, $topN)
             : collect();
 
-        // ===== lainnya =====
+        // ===== Kehadiran lebih informatif =====
+        // urutan: hadir% paling rendah, kalau sama alpha terbanyak
         $attendanceList = $this->buildAttendanceListOverall($selectedKelasAjarId, $start, $end, $topN);
-        $lowSubjectCountList = $this->buildLowSubjectCountList($selectedKelasAjarId, $start, $end, $kkm, $topN);
 
         return view('dashboard.wali_kelas', [
             'kelasAjars' => $kelasAjars,
@@ -1040,10 +1039,8 @@ class DashboardController extends Controller
             'chartDistribusi' => $chartDistribusi,
             'topMapelList' => $topMapelList,
             'attendanceList' => $attendanceList,
-            'lowSubjectCountList' => $lowSubjectCountList,
         ]);
     }
-
 
     // =========================
     // KPI WALI KELAS (nilai + kehadiran)
@@ -1070,10 +1067,10 @@ class DashboardController extends Controller
             ->where('i.kelas_ajar_id', $kelasAjarId)
             ->whereBetween('ki.tanggal', [$start->toDateString(), $end->toDateString()])
             ->selectRaw('
-            COUNT(*) as total,
-            SUM(CASE WHEN ki.status = "hadir" THEN 1 ELSE 0 END) as hadir,
-            SUM(CASE WHEN ki.status = "alpha" THEN 1 ELSE 0 END) as alpha
-        ')
+                COUNT(*) as total,
+                SUM(CASE WHEN ki.status = "hadir" THEN 1 ELSE 0 END) as hadir,
+                SUM(CASE WHEN ki.status = "alpha" THEN 1 ELSE 0 END) as alpha
+            ')
             ->first();
 
         $totalAbs = (int) ($absRow->total ?? 0);
@@ -1099,9 +1096,8 @@ class DashboardController extends Controller
         $nilai = $perSiswa->pluck('avg_nilai')->map(fn($x) => (int) round((float) $x, 0))->all();
 
         $bucket = max(1, (int) $bucket);
-        $maxFrom = 100 - $bucket;     // untuk bucket 10 => 90
+        $maxFrom = 100 - $bucket;
 
-        // bikin range 0-9 ... 80-89 ... 90-100
         $ranges = [];
         for ($from = 0; $from <= $maxFrom; $from += $bucket) {
             $to = ($from === $maxFrom) ? 100 : ($from + $bucket - 1);
@@ -1111,7 +1107,6 @@ class DashboardController extends Controller
         foreach ($nilai as $n) {
             $n = max(0, min(100, (int) $n));
 
-            // floor normal, tapi nilai 100 bakal jadi 100 -> dipaksa ke bin terakhir
             $from = (int) (floor($n / $bucket) * $bucket);
             if ($from > $maxFrom) $from = $maxFrom;
 
@@ -1154,7 +1149,11 @@ class DashboardController extends Controller
     }
 
     // =========================
-    // Kehadiran siswa (overall semua mapel)
+    // Kehadiran siswa (overall semua mapel) - lebih informatif
+    // - hadir_pct: persen hadir
+    // - alpha: jumlah alpha
+    // - total: total pertemuan tercatat
+    // sort: hadir_pct ASC, alpha DESC
     // =========================
     private function buildAttendanceListOverall(int $kelasAjarId, Carbon $start, Carbon $end, int $limit)
     {
@@ -1166,59 +1165,36 @@ class DashboardController extends Controller
             ->whereBetween('ki.tanggal', [$start->toDateString(), $end->toDateString()])
             ->groupBy('ki.riwayat_kelas_id', 's.nama')
             ->selectRaw('
-            s.nama as nama,
-            SUM(CASE WHEN ki.status = "hadir" THEN 1 ELSE 0 END) as hadir_count,
-            SUM(CASE WHEN ki.status = "alpha" THEN 1 ELSE 0 END) as alpha_count,
-            COUNT(*) as total_count
-        ')
+                s.nama as nama,
+                SUM(CASE WHEN ki.status = "hadir" THEN 1 ELSE 0 END) as hadir_count,
+                SUM(CASE WHEN ki.status = "alpha" THEN 1 ELSE 0 END) as alpha_count,
+                COUNT(*) as total_count
+            ')
             ->orderByRaw('(SUM(CASE WHEN ki.status="hadir" THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0)) asc')
+            ->orderByRaw('SUM(CASE WHEN ki.status="alpha" THEN 1 ELSE 0 END) desc')
             ->limit($limit)
             ->get();
 
         return $rows->map(function ($r) {
             $total = (int) ($r->total_count ?? 0);
             $hadir = (int) ($r->hadir_count ?? 0);
+            $alpha = (int) ($r->alpha_count ?? 0);
+
             $pct = $total > 0 ? round(($hadir / $total) * 100, 1) : 0.0;
+
+            // label sederhana biar informatif
+            $label = 'Aman';
+            if ($pct < 80 || $alpha >= 3) $label = 'Waspada';
+            if ($pct < 70 || $alpha >= 5) $label = 'Prioritas';
 
             return [
                 'nama' => $r->nama,
                 'hadir_pct' => $pct,
-                'alpha' => (int) ($r->alpha_count ?? 0),
+                'alpha' => $alpha,
+                'total' => $total,
+                'label' => $label,
             ];
         });
-    }
-
-    // =========================
-    // Jumlah mapel rendah per siswa
-    // =========================
-    private function buildLowSubjectCountList(int $kelasAjarId, Carbon $start, Carbon $end, int $kkm, int $limit)
-    {
-        $lowRows = DB::table('skor_asesmen_siswa as sas')
-            ->join('asesmen_sumatif as a', 'a.asesmen_sumatif_id', '=', 'sas.asesmen_sumatif_id')
-            ->join('intrakurikuler as i', 'i.intrakurikuler_id', '=', 'a.intrakurikuler_id')
-            ->where('i.kelas_ajar_id', $kelasAjarId)
-            ->whereNotNull('sas.nilai')
-            ->whereBetween(DB::raw('DATE(sas.created_at)'), [$start->toDateString(), $end->toDateString()])
-            ->groupBy('sas.riwayat_kelas_id', 'a.intrakurikuler_id')
-            ->havingRaw('AVG(sas.nilai) < ?', [$kkm])
-            ->selectRaw('sas.riwayat_kelas_id, COUNT(*) as low_mapel_count')
-            ->get();
-
-        if ($lowRows->isEmpty()) return collect();
-
-        $counts = $lowRows->groupBy('riwayat_kelas_id')->map(fn($g) => $g->count());
-
-        $siswaMap = DB::table('riwayat_kelas as rk')
-            ->join('siswa as s', 's.siswa_id', '=', 'rk.siswa_id')
-            ->whereIn('rk.riwayat_kelas_id', $counts->keys()->all())
-            ->pluck('s.nama', 'rk.riwayat_kelas_id');
-
-        return $counts->map(function ($cnt, $rkId) use ($siswaMap) {
-            return [
-                'nama' => $siswaMap[$rkId] ?? 'Tanpa Nama',
-                'low_mapel_count' => (int) $cnt,
-            ];
-        })->sortByDesc('low_mapel_count')->take($limit)->values();
     }
 
     // =========================
