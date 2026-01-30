@@ -24,6 +24,7 @@ class KelasAjarSeeder extends Seeder
                     'tahun_ajaran_id' => $ta->tahun_ajaran_id,
                 ], [
                     'wali_user_id' => $wali->id,
+                    'kkm' => rand(70, 80),
                 ]);
             }
         }
