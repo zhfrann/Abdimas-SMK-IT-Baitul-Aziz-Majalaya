@@ -307,11 +307,12 @@ class DashboardController extends Controller
         ));
     }
 
+
     public function guruMapel(Request $request)
     {
         $userId = Auth::id();
 
-        // ====== Mapel yang diampu guru ini ======
+        // ====== Mapel yang diampu guru ini (ambil juga KKM dari kelas_ajar) ======
         $mapels = DB::table('intrakurikuler as i')
             ->join('kelas_ajar as ka', 'ka.kelas_ajar_id', '=', 'i.kelas_ajar_id')
             ->join('kelas as k', 'k.kelas_id', '=', 'ka.kelas_id')
@@ -328,38 +329,41 @@ class DashboardController extends Controller
                 'ta.tahun_ajaran_id',
                 'ta.tahun',
                 'ta.semester',
+                'ka.kkm',
             ]);
 
-        // default filter UI
-        $periode         = 'semester'; // week|month|semester
-        $granularity     = 'week';     // week|day
-        $bucket          = 10;         // 10|5
-        $kkm             = (int) $request->get('kkm', 75);
-        $thresholdRawan  = (float) $request->get('rawan_threshold', 0.80);   // 0.80
-        $atensiThreshold = (int) $request->get('atensi_threshold', 60);      // default 60
-        $showAll         = $request->boolean('show_all');                    // ?show_all=1
-        $limitList       = $showAll ? 10000 : 6;
+        // ====== UI default (yang masih dipakai) ======
+        $periode        = 'semester';
+        $granularity    = 'week';
+        $bucket         = 10;
+        $thresholdRawan = 0.80;
+
+        $showAll   = $request->boolean('show_all');
+        $limitAtensi = $showAll ? 10000 : 5;  // atensi 5 default, bisa load semua
+        $limitUnggul = 5;                      // unggul selalu 5
 
         // kalau belum punya mapel
         if ($mapels->isEmpty()) {
             return view('dashboard.guru_mapel', [
-                'mapels'          => $mapels,
-                'selected'        => null,
-                'periode'         => $periode,
-                'granularity'     => $granularity,
-                'bucket'          => $bucket,
-                'kkm'             => $kkm,
-                'thresholdRawan'  => $thresholdRawan,
-                'atensiThreshold' => $atensiThreshold,
+                'mapels' => $mapels,
+                'selected' => null,
+                'showAll' => $showAll,
 
-                'kpiAbsensi'      => $this->emptyKpiAbsensi(),
-                'chartAbsensi'    => $this->emptyChartAbsensi(),
+                'periode' => $periode,
+                'granularity' => $granularity,
+                'bucket' => $bucket,
+
+                'kkm' => 0,
+                'thresholdRawan' => $thresholdRawan,
+
+                'kpiAbsensi' => $this->emptyKpiAbsensi(),
+                'chartAbsensi' => $this->emptyChartAbsensi(),
                 'rawanAbsensiList' => collect(),
 
-                'kpiNilai'             => $this->emptyKpiNilai(),
+                'kpiNilai' => $this->emptyKpiNilai(),
                 'chartNilaiDistribusi' => $this->emptyChartNilaiDistribusi(),
-                'atensiList'           => collect(),
-                'unggulList'           => collect(),
+                'atensiList' => collect(),
+                'unggulList' => collect(),
             ]);
         }
 
@@ -367,6 +371,9 @@ class DashboardController extends Controller
         $selectedId = (int) $request->get('intrakurikuler_id', $mapels->first()->intrakurikuler_id);
         $selected   = $mapels->firstWhere('intrakurikuler_id', $selectedId) ?? $mapels->first();
         $selectedId = (int) $selected->intrakurikuler_id;
+
+        // ====== KKM dari DB (kelas_ajar.kkm) ======
+        $kkm = (int) ($selected->kkm ?? 75);
 
         // ====== Range tanggal current & prev ======
         [$start, $end] = $this->resolveDateRange($periode, $selected);
@@ -377,19 +384,20 @@ class DashboardController extends Controller
         $chartAbsensi     = $this->buildChartAbsensi($selectedId, $start, $end, $granularity);
         $rawanAbsensiList = $this->buildRawanAbsensiList($selectedId, $start, $end, $thresholdRawan, 6);
 
-        // ====== NILAI (PAKAI NILAI AKHIR: SL + SAS) ======
-        $kpiNilai             = $this->buildKpiNilai($selectedId, $start, $end, $prevStart, $prevEnd, $kkm);
+        // ====== NILAI ======
+        $kpiNilai             = $this->buildKpiNilai($selectedId, $start, $end, $prevStart, $prevEnd, $kkm, $limitUnggul);
         $chartNilaiDistribusi = $this->buildNilaiDistribusi($selectedId, $start, $end, $bucket);
 
+        // Atensi = nilai < KKM, Unggul = Top 5 nilai tertinggi
         [$atensiList, $unggulList] = $this->buildAtensiUnggulList(
             $selectedId,
             $start,
             $end,
             $prevStart,
             $prevEnd,
-            $limitList,
-            $atensiThreshold,   // threshold atensi (bisa diset = KKM kalau mau)
-            85                  // threshold unggul
+            $kkm,
+            $limitAtensi,
+            $limitUnggul
         );
 
         return view('dashboard.guru_mapel', compact(
@@ -401,7 +409,6 @@ class DashboardController extends Controller
             'bucket',
             'kkm',
             'thresholdRawan',
-            'atensiThreshold',
             'kpiAbsensi',
             'chartAbsensi',
             'rawanAbsensiList',
@@ -487,7 +494,7 @@ class DashboardController extends Controller
     // =========================
     private function buildChartAbsensi(int $intrakurikulerId, Carbon $start, Carbon $end, string $granularity): array
     {
-        $granularity = in_array($granularity, ['day', 'week']) ? $granularity : 'week';
+        $granularity = in_array($granularity, ['day', 'week'], true) ? $granularity : 'week';
 
         $rows = DB::table('kehadiran_intrakurikuler')
             ->where('intrakurikuler_id', $intrakurikulerId)
@@ -523,9 +530,8 @@ class DashboardController extends Controller
                 $data['izin'][$key]  = 0;
             }
 
-            $status = $r->status;
-            if (isset($data[$status])) {
-                $data[$status][$key] += (int) $r->c;
+            if (isset($data[$r->status])) {
+                $data[$r->status][$key] += (int) $r->c;
             }
         }
 
@@ -539,15 +545,12 @@ class DashboardController extends Controller
 
         $prettyCategories = array_map(function ($d) use ($granularity) {
             $c = Carbon::parse($d);
-            if ($granularity === 'day') {
-                return $c->format('d M');
-            }
+            if ($granularity === 'day') return $c->format('d M');
 
-            $startW = $c->copy(); // ini sudah Monday
+            $startW = $c->copy();
             $endW   = $c->copy()->endOfWeek(Carbon::SUNDAY);
             return $startW->format('d M') . ' - ' . $endW->format('d M');
         }, $categories);
-
 
         return [
             'categories' => $prettyCategories,
@@ -593,13 +596,10 @@ class DashboardController extends Controller
     }
 
     // =========================
-    // NILAI - HELPER UTAMA (SL + TEST + NON_TEST -> SAS -> FINAL)
+    // NILAI - FINAL SCORE PER SISWA
     // =========================
-    private function finalScorePerSiswa(
-        int $intrakurikulerId,
-        Carbon $start,
-        Carbon $end
-    ) {
+    private function finalScorePerSiswa(int $intrakurikulerId, Carbon $start, Carbon $end)
+    {
         $rows = DB::table('skor_asesmen_siswa as sas')
             ->join('asesmen_sumatif as a', 'a.asesmen_sumatif_id', '=', 'sas.asesmen_sumatif_id')
             ->where('a.intrakurikuler_id', $intrakurikulerId)
@@ -620,32 +620,21 @@ class DashboardController extends Controller
                 $test    = $r->test_nilai       !== null ? (float) $r->test_nilai       : null;
                 $nonTest = $r->non_test_nilai   !== null ? (float) $r->non_test_nilai   : null;
 
-                // SAS dari test & non_test
                 $sas = null;
                 $components = [];
                 if ($test !== null)    $components[] = $test;
                 if ($nonTest !== null) $components[] = $nonTest;
 
-                if (count($components) === 1) {
-                    $sas = $components[0]; // hanya satu → pakai apa adanya
-                } elseif (count($components) === 2) {
-                    $sas = array_sum($components) / 2; // dua-duanya → rata-rata
-                }
+                if (count($components) === 1) $sas = $components[0];
+                if (count($components) === 2) $sas = array_sum($components) / 2;
 
-                // Final: (SL + SAS) / 2 kalau dua-duanya ada
-                if ($sl !== null && $sas !== null) {
-                    $final = ($sl + $sas) / 2;
-                } elseif ($sl !== null) {
-                    $final = $sl;
-                } else {
-                    $final = $sas; // bisa null kalau nggak ada apa-apa
-                }
+                if ($sl !== null && $sas !== null)      $final = ($sl + $sas) / 2;
+                elseif ($sl !== null)                   $final = $sl;
+                else                                     $final = $sas;
 
                 return [
                     'riwayat_kelas_id' => (int) $r->riwayat_kelas_id,
-                    'sl'    => $sl,
-                    'sas'   => $sas,
-                    'final' => $final !== null ? round($final, 1) : null,
+                    'final' => $final !== null ? round((float) $final, 1) : null,
                 ];
             })
             ->filter(fn($x) => $x['final'] !== null)
@@ -653,7 +642,7 @@ class DashboardController extends Controller
     }
 
     // =========================
-    // NILAI - KPI
+    // NILAI - KPI (unggul = Top 5 count)
     // =========================
     private function buildKpiNilai(
         int $intrakurikulerId,
@@ -661,10 +650,11 @@ class DashboardController extends Controller
         Carbon $end,
         Carbon $prevStart,
         Carbon $prevEnd,
-        int $kkm
+        int $kkm,
+        int $topLimit = 5
     ): array {
-        $current = $this->nilaiAgg($intrakurikulerId, $start, $end, $kkm);
-        $prev    = $this->nilaiAgg($intrakurikulerId, $prevStart, $prevEnd, $kkm);
+        $current = $this->nilaiAgg($intrakurikulerId, $start, $end, $kkm, $topLimit);
+        $prev    = $this->nilaiAgg($intrakurikulerId, $prevStart, $prevEnd, $kkm, $topLimit);
 
         $avgDelta = round(($current['avg'] ?? 0) - ($prev['avg'] ?? 0), 1);
 
@@ -676,100 +666,70 @@ class DashboardController extends Controller
             'below_kkm'      => $current['below_kkm'],
             'below_kkm_prev' => $prev['below_kkm'],
 
-            'unggul'         => $current['unggul'],
-            'unggul_prev'    => $prev['unggul'],
+            // "unggul" sekarang artinya jumlah Top-N yang bisa ditampilkan (maks 5)
+            'unggul'         => $current['top_count'],
+            'unggul_prev'    => $prev['top_count'],
         ];
     }
 
-    private function nilaiAgg(
-        int $intrakurikulerId,
-        Carbon $start,
-        Carbon $end,
-        int $kkm
-    ): array {
+    private function nilaiAgg(int $intrakurikulerId, Carbon $start, Carbon $end, int $kkm, int $topLimit = 5): array
+    {
         $finals = $this->finalScorePerSiswa($intrakurikulerId, $start, $end);
 
         if ($finals->isEmpty()) {
             return [
-                'avg'       => 0.0,
+                'avg' => 0.0,
                 'below_kkm' => 0,
-                'unggul'    => 0,
+                'top_count' => 0,
             ];
         }
 
-        $avg       = round($finals->avg('final'), 1);
-        $belowKkm  = $finals->filter(fn($x) => $x['final'] < $kkm)->count();
-        $unggul    = $finals->filter(fn($x) => $x['final'] >= 85)->count();
+        $avg      = round((float) $finals->avg('final'), 1);
+        $belowKkm = $finals->filter(fn($x) => (float) $x['final'] < $kkm)->count();
+
+        $topCount = min($topLimit, $finals->count());
 
         return [
-            'avg'       => $avg,
+            'avg' => $avg,
             'below_kkm' => $belowKkm,
-            'unggul'    => $unggul,
+            'top_count' => $topCount,
         ];
     }
 
-    private function buildNilaiDistribusi(
-        int $intrakurikulerId,
-        Carbon $start,
-        Carbon $end,
-        int $bucket
-    ): array {
-        $bucket = in_array($bucket, [5, 10]) ? $bucket : 10;
+    private function buildNilaiDistribusi(int $intrakurikulerId, Carbon $start, Carbon $end, int $bucket): array
+    {
+        $bucket = in_array($bucket, [5, 10], true) ? $bucket : 10;
 
-        // Ambil nilai akhir per siswa (final score)
         $finals = $this->finalScorePerSiswa($intrakurikulerId, $start, $end);
 
         $nilaiPerSiswa = $finals->pluck('final')
-            ->map(fn($n) => (int) round($n))
+            ->map(fn($n) => (int) round((float) $n))
             ->all();
 
-        // ===== Bikin bucket =====
-        // Contoh:
-        //  bucket 10 -> 0-9,10-19,...,80-89,90-100
-        //  bucket 5  -> 0-4,5-9,...,90-94,95-100
         $ranges = [];
         for ($from = 0; $from < 100; $from += $bucket) {
             if ($from + $bucket >= 100) {
-                // Paksa bucket terakhir selalu "100 - bucket" s/d 100
                 $from = 100 - $bucket;
                 $to   = 100;
-                $key  = "{$from}-{$to}";
-                $ranges[$key] = 0;
+                $ranges["{$from}-{$to}"] = 0;
                 break;
-            } else {
-                $to  = $from + $bucket - 1;
-                $key = "{$from}-{$to}";
-                $ranges[$key] = 0;
             }
+            $to = $from + $bucket - 1;
+            $ranges["{$from}-{$to}"] = 0;
         }
 
-        // ===== Isi histogram =====
         foreach ($nilaiPerSiswa as $n) {
             $n = max(0, min(100, (int) $n));
 
-            // Tentukan awal bucket
-            if ($n === 100) {
-                $from = 100 - $bucket;
-            } else {
+            if ($n === 100) $from = 100 - $bucket;
+            else {
                 $from = (int) (floor($n / $bucket) * $bucket);
-
-                // Kalau somehow nyelonong ke atas, paksa ke bucket terakhir
-                if ($from + $bucket > 100) {
-                    $from = 100 - $bucket;
-                }
+                if ($from + $bucket > 100) $from = 100 - $bucket;
             }
 
-            $to = ($from === 100 - $bucket)
-                ? 100
-                : $from + $bucket - 1;
-
+            $to = ($from === 100 - $bucket) ? 100 : ($from + $bucket - 1);
             $key = "{$from}-{$to}";
-
-            if (isset($ranges[$key])) {
-                $ranges[$key]++;
-            }
-            // kalau nggak ada, berarti ada mismatch definisi range (tapi
-            // dengan logika di atas seharusnya nggak kejadian lagi)
+            if (isset($ranges[$key])) $ranges[$key]++;
         }
 
         return [
@@ -779,26 +739,24 @@ class DashboardController extends Controller
         ];
     }
 
-
+    /**
+     * Atensi = nilai < KKM (urut rendah -> tinggi)
+     * Unggul = Top N tertinggi (urut tinggi -> rendah)
+     */
     private function buildAtensiUnggulList(
         int $intrakurikulerId,
         Carbon $start,
         Carbon $end,
         Carbon $prevStart,
         Carbon $prevEnd,
-        int $limit,
-        int $atensiThreshold = 60,
-        int $unggulThreshold = 85
+        int $kkm,
+        int $limitAtensi = 5,
+        int $limitUnggul = 5
     ): array {
-        $current = $this->finalScorePerSiswa($intrakurikulerId, $start, $end)
-            ->keyBy('riwayat_kelas_id');
+        $current = $this->finalScorePerSiswa($intrakurikulerId, $start, $end)->keyBy('riwayat_kelas_id');
+        $prev    = $this->finalScorePerSiswa($intrakurikulerId, $prevStart, $prevEnd)->keyBy('riwayat_kelas_id');
 
-        $prev = $this->finalScorePerSiswa($intrakurikulerId, $prevStart, $prevEnd)
-            ->keyBy('riwayat_kelas_id');
-
-        if ($current->isEmpty()) {
-            return [collect(), collect()];
-        }
+        if ($current->isEmpty()) return [collect(), collect()];
 
         $riwayatIds = $current->keys()->all();
 
@@ -821,15 +779,14 @@ class DashboardController extends Controller
         })->values();
 
         $atensi = $rows
-            ->filter(fn($x) => $x['nilai'] < $atensiThreshold)
+            ->filter(fn($x) => (float) $x['nilai'] < $kkm)
             ->sortBy('nilai')
-            ->when($limit > 0, fn($q) => $q->take($limit))
+            ->take(max(0, $limitAtensi))
             ->values();
 
         $unggul = $rows
-            ->filter(fn($x) => $x['nilai'] >= $unggulThreshold)
             ->sortByDesc('nilai')
-            ->when($limit > 0, fn($q) => $q->take($limit))
+            ->take(max(0, $limitUnggul))
             ->values();
 
         return [$atensi, $unggul];
@@ -842,12 +799,8 @@ class DashboardController extends Controller
     {
         $today = Carbon::today();
 
-        if ($periode === 'week') {
-            return [$today->copy()->startOfWeek(Carbon::MONDAY), $today->copy()->endOfDay()];
-        }
-        if ($periode === 'month') {
-            return [$today->copy()->startOfMonth(), $today->copy()->endOfDay()];
-        }
+        if ($periode === 'week')  return [$today->copy()->startOfWeek(Carbon::MONDAY), $today->copy()->endOfDay()];
+        if ($periode === 'month') return [$today->copy()->startOfMonth(), $today->copy()->endOfDay()];
 
         $tahun = (string) $selected->tahun; // contoh "2025/2026"
         $parts = preg_split('/\D+/', $tahun);
@@ -862,17 +815,14 @@ class DashboardController extends Controller
             $end   = Carbon::create($y2, 6, 30)->endOfDay();
         }
 
-        if ($end->greaterThan($today)) {
-            $end = $today->copy()->endOfDay();
-        }
-
+        if ($end->greaterThan($today)) $end = $today->copy()->endOfDay();
         return [$start, $end];
     }
 
     private function previousRange(Carbon $start, Carbon $end): array
     {
-        $days     = $start->diffInDays($end) + 1;
-        $prevEnd  = $start->copy()->subDay()->endOfDay();
+        $days      = $start->diffInDays($end) + 1;
+        $prevEnd   = $start->copy()->subDay()->endOfDay();
         $prevStart = $prevEnd->copy()->subDays($days - 1)->startOfDay();
         return [$prevStart, $prevEnd];
     }
@@ -883,11 +833,11 @@ class DashboardController extends Controller
     private function emptyKpiAbsensi(): array
     {
         return [
-            'rate'        => 0,
-            'rate_prev'   => 0,
-            'rate_delta'  => 0,
-            'alpha'       => 0,
-            'alpha_prev'  => 0,
+            'rate' => 0,
+            'rate_prev' => 0,
+            'rate_delta' => 0,
+            'alpha' => 0,
+            'alpha_prev' => 0,
             'alpha_delta' => 0,
             'rawan_count' => 0,
         ];
@@ -909,13 +859,13 @@ class DashboardController extends Controller
     private function emptyKpiNilai(): array
     {
         return [
-            'avg'            => 0,
-            'avg_prev'       => 0,
-            'avg_delta'      => 0,
-            'below_kkm'      => 0,
+            'avg' => 0,
+            'avg_prev' => 0,
+            'avg_delta' => 0,
+            'below_kkm' => 0,
             'below_kkm_prev' => 0,
-            'unggul'         => 0,
-            'unggul_prev'    => 0,
+            'unggul' => 0,
+            'unggul_prev' => 0,
         ];
     }
 
@@ -927,9 +877,7 @@ class DashboardController extends Controller
             'total_siswa' => 0,
         ];
     }
-
-
-
+    
     public function waliKelas(Request $request)
     {
         $userId = Auth::id();
