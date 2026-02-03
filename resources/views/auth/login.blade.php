@@ -22,7 +22,7 @@
                             <div class="mb-3">
                                 <input type="text" class="form-control @error('username') is-invalid @enderror"
                                     value="akademik1" id="floatingInput" name="username"
-                                    placeholder="NIS / NIP / Username / Kredensial Unik" />
+                                    placeholder="NIS / NUPTK / Username / Kredensial Unik" />
                                 @error('username')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>

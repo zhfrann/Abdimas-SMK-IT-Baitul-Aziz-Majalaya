@@ -49,7 +49,7 @@ class StaffController extends Controller
 
             DB::table('staff')->insert([
                 'user_id' => $user->id,
-                'nip' => $user->username,
+                'nuptk' => $user->username,
                 'nama' => $user->name,
                 'jenis_kelamin' => $request->jenis_kelamin,
                 'created_at' => now(),
@@ -81,7 +81,7 @@ class StaffController extends Controller
             'name' => 'required|string|max:255',
             // 'username' => 'required|string|max:255|unique:users,username,' . $user->id,
             // 'role' => 'required|in:guru mapel,wali kelas',
-            // 'nip' => 'required|string|unique:staff,nip,' . $staff->staff_id . ',staff_id',
+            // 'nuptk' => 'required|string|unique:staff,nuptk,' . $staff->staff_id . ',staff_id',
             'jenis_kelamin' => 'required|in:l,p',
             'password' => 'nullable|string|min:6|confirmed',
         ]);
@@ -97,7 +97,7 @@ class StaffController extends Controller
             // $user->syncRoles([$request->role]);  //karena role tidak bisa diupdate
 
             DB::table('staff')->where('staff_id', $staff->staff_id)->update([
-                // 'nip' => $request->nip,
+                // 'nuptk' => $request->nuptk,
                 'nama' => $request->name,
                 'jenis_kelamin' => $request->jenis_kelamin,
                 'updated_at' => now(),

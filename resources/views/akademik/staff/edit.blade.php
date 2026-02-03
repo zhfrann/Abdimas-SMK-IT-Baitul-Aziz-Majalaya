@@ -29,7 +29,7 @@
                             @enderror
                         </div>
                         {{-- <div class="mb-3">
-                            <label>NIP / Kredensial Unik</label>
+                            <label>NUPTK / Kredensial Unik</label>
                             <input type="text" name="username" value="{{ old('username', $user->username) }}"
                                 class="form-control @error('username') is-invalid @enderror" required>
                             @error('username')

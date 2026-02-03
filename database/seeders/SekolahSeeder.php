@@ -31,7 +31,7 @@ class SekolahSeeder extends Seeder
                 'user_id' => $kepalaSekolah->id
             ],
             [
-                'nip' => $kepalaSekolah->username,
+                'nuptk' => $kepalaSekolah->username,
                 'nama' => $kepalaSekolah->name,
                 'jenis_kelamin' => 'l',
             ]

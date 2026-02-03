@@ -234,8 +234,8 @@
                                     <option value="{{ $g->id }}"
                                         {{ old('pengampu_user_id') == $g->id ? 'selected' : '' }}>
                                         {{ $g->staff?->nama ?? $g->name }}
-                                        @if ($g->staff?->nip)
-                                            - NIP: {{ $g->staff->nip }}
+                                        @if ($g->staff?->nuptk)
+                                            - NUPTK: {{ $g->staff->nuptk }}
                                         @endif
                                     </option>
                                 @endforeach

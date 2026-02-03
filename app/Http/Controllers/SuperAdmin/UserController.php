@@ -59,7 +59,7 @@ class UserController extends Controller
             // Insert ke staff
             DB::table('staff')->insert([
                 'user_id' => $user->id,
-                'nip' => $user->username,
+                'nuptk' => $user->username,
                 'nama' => $user->name,
                 'jenis_kelamin' => $request->jenis_kelamin,
                 'created_at' => now(),

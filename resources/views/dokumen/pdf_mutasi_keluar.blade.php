@@ -31,7 +31,7 @@
                         Kepala Sekolah<br>
                         <br><br>
                         ___________________________<br>
-                        NIP.<br><br>
+                        NUPTK.<br><br>
                         Orang Tua/Wali<br><br><br>
                         ___________________________<br><br>
                     </td>

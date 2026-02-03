@@ -32,12 +32,12 @@ FK  kelurahan_id
     email
     telp
     nama_kepala_sekolah
-    nip_kepala_sekolah
+    nuptk_kepala_sekolah
 
 
 Staff
 PK  staff_id INT NOT NULL
-    nip      STRING NOT NULL
+    nuptk      STRING NOT NULL
     nama     STRING NOT NULL
     jenis_kelamin ENUM('l', 'p') NOT NULL
 

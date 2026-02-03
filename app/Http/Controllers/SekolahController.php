@@ -58,7 +58,7 @@ class SekolahController extends Controller
             'email' => ['nullable', 'email', 'max:255'],
             'telp' => ['nullable', 'string', 'max:50'],
             'nama_kepala_sekolah' => ['nullable', 'string', 'max:255'],
-            'nip_kepala_sekolah' => ['nullable', 'string', 'max:255'],
+            'nuptk_kepala_sekolah' => ['nullable', 'string', 'max:255'],
         ]);
 
         DB::table('sekolah')

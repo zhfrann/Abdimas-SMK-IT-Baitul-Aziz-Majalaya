@@ -64,7 +64,7 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->string('telp')->nullable();
             $table->string('nama_kepala_sekolah')->nullable();
-            $table->string('nip_kepala_sekolah')->nullable();
+            $table->string('nuptk_kepala_sekolah')->nullable();
             $table->timestamps();
 
             $table->foreign('kelurahan_id')
@@ -85,7 +85,7 @@ return new class extends Migration
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
 
-            $table->string('nip')->unique();
+            $table->string('nuptk')->unique();
             $table->string('nama');
             $table->enum('jenis_kelamin', ['l', 'p']);
             $table->timestamps();

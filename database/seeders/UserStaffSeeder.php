@@ -25,54 +25,54 @@ class UserStaffSeeder extends Seeder
 
         // Users & Staff
         for ($i = 1; $i <= 3; $i++) {
-            $nipGuru = 'gurumapel' . $i;
+            $nuptkGuru = 'gurumapel' . $i;
             $userGuru = User::firstOrCreate([
-                'username' => $nipGuru,
+                'username' => $nuptkGuru,
             ], [
                 'name' => 'Guru Mapel ' . $i,
-                'email' => $nipGuru . '@mail.com',
+                'email' => $nuptkGuru . '@mail.com',
                 'password' => Hash::make('password123'),
             ]);
             $userGuru->assignRole('Guru Mapel');
             Staff::firstOrCreate([
                 'user_id' => $userGuru->id
             ], [
-                'nip' => $nipGuru,
+                'nuptk' => $nuptkGuru,
                 'nama' => $userGuru->name,
                 'jenis_kelamin' => $randomGender(),
             ]);
 
-            $nipWali = 'walikelas' . $i;
+            $nuptkWali = 'walikelas' . $i;
             $userWali = User::firstOrCreate([
-                'username' => $nipWali,
+                'username' => $nuptkWali,
             ], [
                 'name' => 'Wali Kelas ' . $i,
-                'email' => $nipWali . '@mail.com',
+                'email' => $nuptkWali . '@mail.com',
                 'password' => Hash::make('password123'),
             ]);
             $userWali->assignRole('Wali Kelas');
             Staff::firstOrCreate([
                 'user_id' => $userWali->id
             ], [
-                'nip' => $nipWali,
+                'nuptk' => $nuptkWali,
                 'nama' => $userWali->name,
                 'jenis_kelamin' => $randomGender(),
             ]);
         }
         for ($i = 1; $i <= 2; $i++) {
-            $nipAkad = 'akademik' . $i;
+            $nuptkAkad = 'akademik' . $i;
             $userAkad = User::firstOrCreate([
-                'username' => $nipAkad,
+                'username' => $nuptkAkad,
             ], [
                 'name' => 'Bagian Akademik ' . $i,
-                'email' => $nipAkad . '@mail.com',
+                'email' => $nuptkAkad . '@mail.com',
                 'password' => Hash::make('password123'),
             ]);
             $userAkad->assignRole('Bagian Akademik');
             Staff::firstOrCreate([
                 'user_id' => $userAkad->id
             ], [
-                'nip' => $nipAkad,
+                'nuptk' => $nuptkAkad,
                 'nama' => $userAkad->name,
                 'jenis_kelamin' => $randomGender(),
             ]);
