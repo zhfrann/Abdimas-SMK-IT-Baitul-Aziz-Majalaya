@@ -74,6 +74,7 @@ PK  user_id      INT NOT NULL
     nama         STRING NOT NULL
     username     STRING NOT NULL UNIQUE
     password     STRING NOT NULL
+    is_active    BOOL NOT NULL DEFAULT(true)
 FK  siswa_id     INT NULLABLE
 FK  orang_tua_id INT NULLABLE
 FK  pegawai_id   INT NULLABLE
@@ -94,6 +95,7 @@ Riwayat_Kelas
 PK  riwayat_kelas_id INT NOT NULL
 FK  siswa_id         INT NOT NULL
 FK  kelas_ajar_id    INT NOT NULL
+    kkm              INT NOT NULL DEFAULT(75)
 
 
 Kelas_Ajar

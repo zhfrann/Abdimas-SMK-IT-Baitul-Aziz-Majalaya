@@ -55,7 +55,6 @@
 @endsection
 
 @section('content')
-
     <x-breadcrumb item="Intrakurikuler" active="Intrakurikuler" />
 
     <div class="row">
@@ -100,7 +99,7 @@
                                     <th>Semester</th>
                                     <th>Kelas</th>
                                     @role('Bagian Akademik|Super Admin')
-                                    <th>Guru</th>
+                                        <th>Guru</th>
                                     @endrole
                                     <th>Jumlah Siswa</th>
                                     @role('Bagian Akademik|Super Admin')
@@ -124,12 +123,12 @@
                                         </td>
                                         <td>{{ $item->kelasAjar?->kelas?->nama_kelas ?? '-' }}</td>
                                         @role('Bagian Akademik|Super Admin')
-                                        <td>{{ $item->pengampu?->staff?->nama ?? ($item->pengampu?->name ?? 'N/A') }}</td>
+                                            <td>{{ $item->pengampu?->staff?->nama ?? ($item->pengampu?->name ?? 'N/A') }}</td>
                                         @endrole
                                         <td>{{ $item->kelasAjar?->riwayat_kelas_count ?? 0 }}</td>
 
                                         @role('Bagian Akademik|Super Admin')
-                                        <td>
+                                            <td>
                                                 <button type="button" class="btn btn-sm btn-light-warning mb-1"
                                                     data-bs-toggle="modal" data-bs-target="#modalIntra" data-mode="edit"
                                                     data-id="{{ $item->intrakurikuler_id }}"

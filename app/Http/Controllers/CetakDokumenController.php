@@ -15,24 +15,24 @@ class CetakDokumenController extends Controller
     {
         $user = Auth::user();
         $userId = Auth::id();
-        
-        if($user->hasRole('Wali Kelas')){
+
+        if ($user->hasRole('Wali Kelas')) {
             $kelasList = KelasAjar::query()
                 ->where('wali_user_id', $userId)
                 ->join('tahun_ajaran', 'kelas_ajar.tahun_ajaran_id', '=', 'tahun_ajaran.tahun_ajaran_id')
+                ->select('kelas_ajar.*')
                 ->with('kelas', 'tahunAjaran', 'waliKelas')
                 ->withCount('riwayatKelas')
                 ->orderBy('tahun_ajaran.tahun', 'desc')
-                ->select('kelas_ajar.*')
                 ->get();
         }
-        if($user->hasRole('Bagian Akademik')){
+        if ($user->hasRole('Bagian Akademik')) {
             $kelasList = KelasAjar::query()
                 ->join('tahun_ajaran', 'kelas_ajar.tahun_ajaran_id', '=', 'tahun_ajaran.tahun_ajaran_id')
+                ->select('kelas_ajar.*')
                 ->with('kelas', 'tahunAjaran', 'waliKelas')
                 ->withCount('riwayatKelas')
                 ->orderBy('tahun_ajaran.tahun', 'desc')
-                ->select('kelas_ajar.*')
                 ->get();
         }
 

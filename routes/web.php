@@ -91,7 +91,6 @@ Route::middleware(['auth', 'role:Bagian Akademik'])->prefix('akademik')->name('a
     Route::get('/sekolah/edit', [SekolahController::class, 'edit'])->name('sekolah.edit');
     Route::put('/sekolah', [SekolahController::class, 'update'])->name('sekolah.update');
 
-
     Route::get('kelas/ajax/kelas/search', [SiswaController::class, 'ajaxSearchKelas'])->name('ajax.kelas.search');
     Route::resource('staff', StaffController::class);
 });

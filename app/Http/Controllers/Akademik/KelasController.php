@@ -16,9 +16,10 @@ class KelasController extends Controller
     {
         $kelasAjar = KelasAjar::query()
             ->join('tahun_ajaran', 'kelas_ajar.tahun_ajaran_id', '=', 'tahun_ajaran.tahun_ajaran_id')
-            ->with(['kelas', 'tahunAjaran', 'waliKelas'])
-            ->orderBy('tahun_ajaran.tahun', 'desc')
             ->select('kelas_ajar.*')
+            ->with(['kelas', 'tahunAjaran', 'waliKelas'])
+            ->withCount('riwayatKelas')
+            ->orderBy('tahun_ajaran.tahun', 'desc')
             ->get();
 
         return view('akademik.kelas.index', compact('kelasAjar'));
