@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Ekstrakurikuler;
 use App\Models\PenilaianEkstrakurikuler;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class PenilaianEkstrakurikulerController extends Controller
@@ -12,6 +13,14 @@ class PenilaianEkstrakurikulerController extends Controller
     public function index($ekstrakurikuler_id)
     {
         $ekskul = Ekstrakurikuler::query()->with(['peserta.siswa', 'peserta.penilaians', 'tahunAjaran'])->findOrFail($ekstrakurikuler_id);
+        $user = Auth::user();
+        if (!$user->hasRole('Bagian Akademik') && $ekskul->user_id != $user->id) {
+            $namaEkstrakurikuler = $ekskul->nama_pelajaran;
+            $tahunAjaran = $ekskul->tahunAjaran->tahun;
+            $semester = $ekskul->tahunAjaran->semester;
+            return back()->with('error', "Anda tidak punya akses untuk melihat Penilaian di ekstrakurikuler $namaEkstrakurikuler $tahunAjaran $semester");
+        }
+
 
         // Ambil semua peserta ekskul beserta penilaian (jika ada)
         $peserta = $ekskul->peserta->map(function ($peserta) {

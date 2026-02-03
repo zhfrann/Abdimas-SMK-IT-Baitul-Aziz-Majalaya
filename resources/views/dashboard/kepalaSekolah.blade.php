@@ -94,7 +94,7 @@
         {{-- Siswa Berprestasi --}}
         <div class="col-md-6">
             <div class="card">
-                <div class="card-header">Siswa Berprestasi (Top 10)</div>
+                <div class="card-header">Siswa Berprestasi</div>
                 <div class="card-body">
                     <div id="chart-rerata-siswa"></div>
                 </div>

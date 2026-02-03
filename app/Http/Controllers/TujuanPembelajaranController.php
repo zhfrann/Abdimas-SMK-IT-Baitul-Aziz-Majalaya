@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Intrakurikuler;
 use App\Models\TujuanPembelajaran;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class TujuanPembelajaranController extends Controller
@@ -13,6 +14,15 @@ class TujuanPembelajaranController extends Controller
     {
         $intrakurikuler = Intrakurikuler::with('kelasAjar.kelas')->findOrFail($intrakurikuler_id);
         $tujuanPembelajaran = TujuanPembelajaran::where('intrakurikuler_id', $intrakurikuler_id)->get();
+
+        $user = Auth::user();
+        $intrakurikuler = Intrakurikuler::query()->findOrFail($intrakurikuler_id);
+        if (!$user->hasRole('Bagian Akademik') && $intrakurikuler->pengampu_user_id != $user->id) {
+            $kelasAjar = $intrakurikuler->kelasAjar->kelas->nama_kelas;
+            $tahunAjaran = $intrakurikuler->kelasAjar->tahunAjaran->tahun;
+            $semester = $intrakurikuler->kelasAjar->tahunAjaran->semester;
+            return back()->with('error', "Anda tidak punya akses untuk melihat Tujuan Pembelajaran di intrakurikuler $intrakurikuler->nama_pelajaran kelas $kelasAjar $tahunAjaran $semester");
+        }
 
         return view('intrakurikuler.table_tujuan_pembelajaran', compact('intrakurikuler', 'tujuanPembelajaran'));
     }
@@ -30,6 +40,15 @@ class TujuanPembelajaranController extends Controller
         $request->validate([
             'deskripsi' => 'required|string|max:255',
         ]);
+
+        $user = Auth::user();
+        $intrakurikuler = Intrakurikuler::query()->findOrFail($intrakurikuler_id);
+        if (!$user->hasRole('Bagian Akademik') && $intrakurikuler->pengampu_user_id != $user->id) {
+            $kelasAjar = $intrakurikuler->kelasAjar->kelas->nama_kelas;
+            $tahunAjaran = $intrakurikuler->kelasAjar->tahunAjaran->tahun;
+            $semester = $intrakurikuler->kelasAjar->tahunAjaran->semester;
+            return back()->with('error', "Anda tidak punya akses untuk menambahkan Tujuan Pembelajaran di intrakurikuler $intrakurikuler->nama_pelajaran kelas $kelasAjar $tahunAjaran $semester");
+        }
 
         try {
             DB::beginTransaction();
@@ -67,6 +86,15 @@ class TujuanPembelajaranController extends Controller
             'deskripsi' => 'required|string|max:255',
         ]);
 
+        $user = Auth::user();
+        $intrakurikuler = Intrakurikuler::query()->findOrFail($intrakurikuler_id);
+        if (!$user->hasRole('Bagian Akademik') && $intrakurikuler->pengampu_user_id != $user->id) {
+            $kelasAjar = $intrakurikuler->kelasAjar->kelas->nama_kelas;
+            $tahunAjaran = $intrakurikuler->kelasAjar->tahunAjaran->tahun;
+            $semester = $intrakurikuler->kelasAjar->tahunAjaran->semester;
+            return back()->with('error', "Anda tidak punya akses untuk mengedit Tujuan Pembelajaran di intrakurikuler $intrakurikuler->nama_pelajaran kelas $kelasAjar $tahunAjaran $semester");
+        }
+
         try {
             DB::beginTransaction();
             $tujuan = TujuanPembelajaran::where('intrakurikuler_id', $intrakurikuler_id)->findOrFail($id);
@@ -81,6 +109,15 @@ class TujuanPembelajaranController extends Controller
 
     public function destroy($intrakurikuler_id, $id)
     {
+        $user = Auth::user();
+        $intrakurikuler = Intrakurikuler::query()->findOrFail($intrakurikuler_id);
+        if (!$user->hasRole('Bagian Akademik') && $intrakurikuler->pengampu_user_id != $user->id) {
+            $kelasAjar = $intrakurikuler->kelasAjar->kelas->nama_kelas;
+            $tahunAjaran = $intrakurikuler->kelasAjar->tahunAjaran->tahun;
+            $semester = $intrakurikuler->kelasAjar->tahunAjaran->semester;
+            return back()->with('error', "Anda tidak punya akses untuk menghapus Tujuan Pembelajaran di intrakurikuler $intrakurikuler->nama_pelajaran kelas $kelasAjar $tahunAjaran $semester");
+        }
+
         try {
             DB::beginTransaction();
             $tujuan = TujuanPembelajaran::where('intrakurikuler_id', $intrakurikuler_id)->findOrFail($id);

@@ -11,6 +11,17 @@
 
     <div class="card">
         <div class="card-body">
+
+            @if (session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+            @if (session('warning'))
+                <div class="alert alert-warning">{{ session('warning') }}</div>
+            @endif
+            @if (session('error'))
+                <div class="alert alert-danger">{{ session('error') }}</div>
+            @endif
+
             <form method="POST" action="{{ route('dokumen.cetak.sampul') }}" id="formCetakDokumen">
                 @csrf
                 <input type="hidden" name="kelas_ajar_id" value="{{ $kelasAjar->kelas_ajar_id }}">

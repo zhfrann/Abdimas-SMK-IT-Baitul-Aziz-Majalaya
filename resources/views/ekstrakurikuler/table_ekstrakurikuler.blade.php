@@ -86,6 +86,9 @@
                     @if (session('warning'))
                         <div class="alert alert-warning">{{ session('warning') }}</div>
                     @endif
+                    @if (session('error'))
+                        <div class="alert alert-danger">{{ session('error') }}</div>
+                    @endif
                     <div class="table-responsive">
                         <table class="table" id="pc-dt-simple">
                             <thead>
@@ -94,11 +97,11 @@
                                     <th>Ekstrakurikuler</th>
                                     <th>Tahun Ajaran</th>
                                     @role('Bagain Akademik|Super Admin')
-                                    <th>Guru</th>
+                                        <th>Guru</th>
                                     @endrole
                                     <th>Jumlah Siswa</th>
                                     @role('Bagain Akademik|Super Admin')
-                                    <th>Action</th>
+                                        <th>Action</th>
                                     @endrole
                                     <th>Akademik</th>
                                 </tr>
@@ -113,29 +116,29 @@
                                             {{ $item->tahunAjaran?->semester ?? '' }}
                                         </td>
                                         @role('Bagain Akademik|Super Admin')
-                                        <td>{{ $item->pembina?->name ?? '-' }}</td>
+                                            <td>{{ $item->pembina?->name ?? '-' }}</td>
                                         @endrole
                                         <td>{{ $item->peserta_count ?? '-' }}</td>
                                         @role('Bagain Akademik|Super Admin')
-                                        <td>
-                                            <button type="button" class="btn btn-sm btn-light-warning mb-1"
-                                                data-bs-toggle="modal" data-bs-target="#modalEkstra" data-mode="edit"
-                                                data-id="{{ $item->ekstrakurikuler_id }}"
-                                                data-nama="{{ $item->nama_pelajaran }}"
-                                                data-tahun="{{ $item->tahun_ajaran_id }}"
-                                                data-guru="{{ $item->user_id }}">
-                                                Edit
-                                            </button>
-                                            <form
-                                                action="{{ route('ekstrakurikuler.destroy', $item->ekstrakurikuler_id) }}"
-                                                method="POST" class="d-inline"
-                                                onsubmit="return confirm('Yakin ingin menghapus ekstrakurikuler ini?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit"
-                                                    class="btn btn-sm btn-light-danger mb-1">Hapus</button>
-                                            </form>
-                                        </td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-light-warning mb-1"
+                                                    data-bs-toggle="modal" data-bs-target="#modalEkstra" data-mode="edit"
+                                                    data-id="{{ $item->ekstrakurikuler_id }}"
+                                                    data-nama="{{ $item->nama_pelajaran }}"
+                                                    data-tahun="{{ $item->tahun_ajaran_id }}"
+                                                    data-guru="{{ $item->user_id }}">
+                                                    Edit
+                                                </button>
+                                                <form
+                                                    action="{{ route('ekstrakurikuler.destroy', $item->ekstrakurikuler_id) }}"
+                                                    method="POST" class="d-inline"
+                                                    onsubmit="return confirm('Yakin ingin menghapus ekstrakurikuler ini?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit"
+                                                        class="btn btn-sm btn-light-danger mb-1">Hapus</button>
+                                                </form>
+                                            </td>
                                         @endrole
                                         <td>
                                             <a href="{{ route('ekstrakurikuler.manage-siswa.index', $item->ekstrakurikuler_id) }}"

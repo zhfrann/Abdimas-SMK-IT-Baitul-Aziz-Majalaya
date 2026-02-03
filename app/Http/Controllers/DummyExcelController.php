@@ -20,107 +20,6 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class DummyExcelController extends Controller
 {
-    // public function downloadFormatif()
-    // {
-    //     // Dummy data
-    //     $tps = [
-    //         ['nomor' => 1, 'deskripsi' => 'membaca Al-Qur’an dengan meyakini bahwa kontrol diri (Mujahadah An-Nafs) adalah perintah agama'],
-    //         ['nomor' => 2, 'deskripsi' => 'menunjukan perilaku control diri (Mujahadah An-Nafs), sebagai implementasi dari perintah Q.S. Al-Anfal /8:72 serta Hadits terkait.'],
-    //         ['nomor' => 3, 'deskripsi' => 'menganalisis Q.S. Al-Anfal/8:72, serta hadits tentang control diri (Mujahadah An-Nafs).'],
-    //         ['nomor' => 4, 'deskripsi' => 'membaca Q.S. Al-Anfal/8:72, sesuai dengan kaidah tajwid dan Makharijul Huruf.'],
-    //         ['nomor' => 5, 'deskripsi' => 'menghafal Q.S. Al-Anfal/8:72, dengan fasih dan lancar.'],
-    //         ['nomor' => 5, 'deskripsi' => 'menyajikan hubungan antara kualitas keimanan dengan control diri (Mujahadah An-Nafs), sesuai dengan pesan Q.S. Al-Anfal /8:72, serta hadits.'],
-    //     ];
-    //     $siswa = [
-    //         ['nama' => 'ADITYA RIZKI ARIFIN'],
-    //         ['nama' => 'ALYA NUR ZAHRA'],
-    //         ['nama' => 'ARSYAD FATHI MAWARDI'],
-    //         ['nama' => 'BABY CANTIKA CAHAYA PERMATA'],
-    //     ];
-
-    //     $spreadsheet = new Spreadsheet();
-    //     $sheet = $spreadsheet->getActiveSheet();
-
-    //     // Header baris 1
-    //     $sheet->setCellValue('A1', 'No');
-    //     $sheet->setCellValue('B1', 'Nama Siswa');
-    //     $sheet->setCellValue('C1', 'Tujuan Pembelajaran');
-    //     $tpCount = count($tps);
-    //     $lastTPCol = chr(67 + ($tpCount * 2) - 1); // C = 67
-    //     $sheet->mergeCells("C1:{$lastTPCol}1");
-    //     $sheet->setCellValue(chr(ord($lastTPCol)+1).'1', 'Deskripsi Capaian Tertinggi dalam Rapor');
-    //     $sheet->setCellValue(chr(ord($lastTPCol)+2).'1', 'Deskripsi Capaian Terendah dalam Rapor');
-
-    //     // Header baris 2
-    //     $sheet->setCellValue('A2', '');
-    //     $sheet->setCellValue('B2', '');
-    //     for ($i = 0; $i < $tpCount; $i++) {
-    //         $col = chr(67 + ($i * 2));
-    //         $sheet->setCellValue($col.'2', 'TP '.($i+1));
-    //         $sheet->mergeCells($col.'2:'.chr(ord($col)+1).'2');
-    //     }
-
-    //     // Baris 3: Deskripsi TP
-    //     $sheet->setCellValue('A3', '');
-    //     $sheet->setCellValue('B3', '');
-    //     for ($i = 0; $i < $tpCount; $i++) {
-    //         $col = chr(67 + ($i * 2));
-    //         $sheet->setCellValue($col.'3', $tps[$i]['deskripsi']);
-    //         $sheet->mergeCells($col.'3:'.chr(ord($col)+1).'3');
-    //     }
-
-    //     // // Header baris 3
-    //     // $sheet->setCellValue('A3', '');
-    //     // $sheet->setCellValue('B3', '');
-    //     // for ($i = 0; $i < $tpCount; $i++) {
-    //     //     $col = chr(67 + ($i * 2));
-    //     //     $sheet->setCellValue($col.'3', 'KKTP');
-    //     //     $sheet->setCellValue(chr(ord($col)+1).'3', 'Tampil/Tidak');
-    //     // }
-
-    //     $sheet->setCellValue('A4', '');
-    //     $sheet->setCellValue('B4', '');
-    //     for ($i = 0; $i < $tpCount; $i++) {
-    //         $col = chr(67 + ($i * 2));
-    //         $sheet->setCellValue($col.'4', 'KKTP');
-    //         $sheet->setCellValue(chr(ord($col)+1).'4', 'Tampil/Tidak');
-    //     }
-
-    //     // // Header baris 4 (deskripsi TP)
-    //     // $sheet->setCellValue('A4', '');
-    //     // $sheet->setCellValue('B4', '');
-    //     // for ($i = 0; $i < $tpCount; $i++) {
-    //     //     $col = chr(67 + ($i * 2));
-    //     //     $sheet->setCellValue($col.'4', $tps[$i]['deskripsi']);
-    //     //     $sheet->mergeCells($col.'4:'.chr(ord($col)+1).'4');
-    //     // }
-    //     // $sheet->setCellValue(chr(ord($lastTPCol)+1).'4', 'Deskripsi Capaian Tertinggi dalam Rapor');
-    //     // $sheet->setCellValue(chr(ord($lastTPCol)+2).'4', 'Deskripsi Capaian Terendah dalam Rapor');
-
-    //     // Data siswa
-    //     $row = 5;
-    //     foreach ($siswa as $idx => $s) {
-    //         $sheet->setCellValue('A'.$row, $idx+1);
-    //         $sheet->setCellValue('B'.$row, $s['nama']);
-    //         for ($i = 0; $i < $tpCount; $i++) {
-    //             $col = chr(67 + ($i * 2));
-    //             $sheet->setCellValue($col.$row, ''); // KKTP
-    //             $sheet->setCellValue(chr(ord($col)+1).$row, ''); // Tampil/Tidak
-    //         }
-    //         $sheet->setCellValue(chr(ord($lastTPCol)+1).$row, '');
-    //         $sheet->setCellValue(chr(ord($lastTPCol)+2).$row, '');
-    //         $row++;
-    //     }
-
-    //     // Download
-    //     $filename = 'template_asesmen_formatif.xlsx';
-    //     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    //     header("Content-Disposition: attachment; filename=\"$filename\"");
-    //     $writer = new Xlsx($spreadsheet);
-    //     $writer->save('php://output');
-    //     exit;
-    // }
-
     public function downloadFormatif(Request $request, $intrakurikuler_id)
     {
         $intrakurikuler = Intrakurikuler::with([
@@ -154,14 +53,6 @@ class DummyExcelController extends Controller
 
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-
-        // // Hitung kolom TP
-        // $startTPCol = 'C';
-        // $lastTPCol = chr(ord($startTPCol) + ($tpCount * 2) - 1);
-
-        // // Kolom deskripsi
-        // $colTertinggi = chr(ord($lastTPCol) + 1);
-        // $colTerendah  = chr(ord($lastTPCol) + 2);
 
         $startTPColIndex = 3; // C = 3 (1-based)
         $lastTPColIndex  = $startTPColIndex + ($tpCount * 2) - 1;
@@ -296,7 +187,7 @@ class DummyExcelController extends Controller
             // Rumus Excel untuk capaian tertinggi: gabungkan deskripsi TP yang KKTP=1 dan Tampil=1
             $formulaTertinggi = '';
             for ($i = 0; $i < $tpCount; $i++) {
-                $formulaTertinggi .= 'IF(AND(' . $tpKKTPCols[$i] . '=1,' . $tpTampilCols[$i] . '=1),"' . str_replace('"', '""', $tpDeskripsi[$i]) . ', ","")';
+                $formulaTertinggi .= 'IF(AND(' . $tpKKTPCols[$i] . '=1,' . $tpTampilCols[$i] . '=1),"' . str_replace('"', '""', strtolower($tpDeskripsi[$i])) . ', ","")';
                 if ($i < $tpCount - 1) $formulaTertinggi .= '&';
             }
             // Hilangkan koma terakhir jika ada
@@ -305,14 +196,10 @@ class DummyExcelController extends Controller
             // Rumus Excel untuk capaian terendah: gabungkan deskripsi TP yang KKTP=0 dan Tampil=1
             $formulaTerendah = '';
             for ($i = 0; $i < $tpCount; $i++) {
-                $formulaTerendah .= 'IF(AND(' . $tpKKTPCols[$i] . '=0,' . $tpTampilCols[$i] . '=1),"' . str_replace('"', '""', $tpDeskripsi[$i]) . ', ","")';
+                $formulaTerendah .= 'IF(AND(' . $tpKKTPCols[$i] . '=0,' . $tpTampilCols[$i] . '=1),"' . str_replace('"', '""', strtolower($tpDeskripsi[$i])) . ', ","")';
                 if ($i < $tpCount - 1) $formulaTerendah .= '&';
             }
             $formulaTerendah = '="' . $namaSiswa . ' membutuhkan bimbingan dalam " &' . $formulaTerendah;
-
-            // Kolom capaian tertinggi/terendah
-            // $sheet->setCellValue($colTertinggi . $row, $formatif->deskripsi_catatan_tertinggi ?? '');
-            // $sheet->setCellValue($colTerendah . $row, $formatif->deskripsi_catatan_terendah ?? '');
 
             // Set formula ke cell
             $sheet->setCellValueExplicit($colTertinggi . $row, $formulaTertinggi, DataType::TYPE_FORMULA);
@@ -334,11 +221,12 @@ class DummyExcelController extends Controller
         $sheet->getColumnDimension('B')->setAutoSize(true);
 
         $namaKelas = $intrakurikuler->kelasAjar->kelas->nama_kelas;
-        $tahunAjaran = $intrakurikuler->kelasAjar->tahunAjaran->tahun;
+        $tahunAjaran = str_replace('/', '-', $intrakurikuler->kelasAjar->tahunAjaran->tahun);
         $semester = $intrakurikuler->kelasAjar->tahunAjaran->semester;
+        $namaIntrakurikuler = $intrakurikuler->nama_pelajaran;
 
         // Download
-        $filename = 'template asesmen formatif ' . " $namaKelas $tahunAjaran $semester" . '.xlsx';
+        $filename = 'Template Asesmen Formatif ' . "$namaIntrakurikuler $namaKelas $tahunAjaran $semester" . '.xlsx';
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"$filename\"");
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);

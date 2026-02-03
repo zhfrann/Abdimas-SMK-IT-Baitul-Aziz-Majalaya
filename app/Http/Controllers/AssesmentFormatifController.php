@@ -7,6 +7,7 @@ use App\Models\AsesmenFormatifDetail;
 use App\Models\Intrakurikuler;
 use App\Models\RiwayatKelas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -15,6 +16,15 @@ class AssesmentFormatifController extends Controller
 {
     public function index($intrakurikuler_id)
     {
+        $user = Auth::user();
+        $intrakurikuler = Intrakurikuler::query()->findOrFail($intrakurikuler_id);
+        if (!$user->hasRole('Bagian Akademik') && $intrakurikuler->pengampu_user_id != $user->id) {
+            $kelasAjar = $intrakurikuler->kelasAjar->kelas->nama_kelas;
+            $tahunAjaran = $intrakurikuler->kelasAjar->tahunAjaran->tahun;
+            $semester = $intrakurikuler->kelasAjar->tahunAjaran->semester;
+            return back()->with('error', "Anda tidak punya akses untuk melihat Asesmen Formatif di intrakurikuler $intrakurikuler->nama_pelajaran kelas $kelasAjar $tahunAjaran $semester");
+        }
+
         $intrakurikuler = Intrakurikuler::with([
             'kelasAjar.kelas',
             'kelasAjar.tahunAjaran',
@@ -116,6 +126,15 @@ class AssesmentFormatifController extends Controller
 
     public function detailAssesmentFormatif($intrakurikuler_id, $riwayat_kelas_id)
     {
+        $user = Auth::user();
+        $intrakurikuler = Intrakurikuler::query()->findOrFail($intrakurikuler_id);
+        if (!$user->hasRole('Bagian Akademik') && $intrakurikuler->pengampu_user_id != $user->id) {
+            $kelasAjar = $intrakurikuler->kelasAjar->kelas->nama_kelas;
+            $tahunAjaran = $intrakurikuler->kelasAjar->tahunAjaran->tahun;
+            $semester = $intrakurikuler->kelasAjar->tahunAjaran->semester;
+            return back()->with('error', "Anda tidak punya akses untuk melihat Detail Asesmen Formatif di intrakurikuler $intrakurikuler->nama_pelajaran kelas $kelasAjar $tahunAjaran $semester");
+        }
+
         $riwayatKelas = RiwayatKelas::with('siswa.user', 'kelasAjar.kelas', 'kelasAjar.tahunAjaran')->findOrFail($riwayat_kelas_id);
         $intrakurikuler = Intrakurikuler::with('tujuanPembelajaran')->findOrFail($intrakurikuler_id);
 
@@ -210,6 +229,26 @@ class AssesmentFormatifController extends Controller
         $spreadsheet = IOFactory::load($file->getPathname());
         $sheet = $spreadsheet->getActiveSheet();
 
+        $filename = $file->getClientOriginalName();
+        $expectedFilename = [
+            strtolower($intrakurikuler->nama_pelajaran),
+            strtolower($intrakurikuler->kelasAjar->kelas->nama_kelas),
+            str_replace('/', '-', strtolower($intrakurikuler->kelasAjar->tahunAjaran->tahun)),
+            strtolower($intrakurikuler->kelasAjar->tahunAjaran->semester),
+        ];
+
+        $filenameLower = strtolower($filename);
+        foreach ($expectedFilename as $part) {
+            if (strpos($filenameLower, $part) === false) {
+                $namaKelas = $intrakurikuler->kelasAjar->kelas->nama_kelas;
+                $tahunAjaran = str_replace('/', '-', $intrakurikuler->kelasAjar->tahunAjaran->tahun);
+                $semester = $intrakurikuler->kelasAjar->tahunAjaran->semester;
+                $namaIntrakurikuler = $intrakurikuler->nama_pelajaran;
+                $correctFilename = 'Template Asesmen Formatif ' . "$namaIntrakurikuler $namaKelas $tahunAjaran $semester" . '.xlsx';
+                return redirect()->back()->with('error', "Nama file Excel tidak sesuai dengan intrakurikuler yang dipilih. Pastikan Anda mengisi dan mengupload template yang benar ($correctFilename)");
+            }
+        }
+
         // Map nama siswa ke riwayat_kelas_id
         $namaToRiwayatKelas = [];
         foreach ($intrakurikuler->kelasAjar->riwayatKelas as $rk) {
@@ -231,37 +270,34 @@ class AssesmentFormatifController extends Controller
                     continue; // skip jika tidak ditemukan
                 }
 
-                // // Ambil/insert AsesmenFormatif
-                // $formatif = AsesmenFormatif::firstOrCreate([
-                //     'intrakurikuler_id' => $intrakurikuler_id,
-                //     'riwayat_kelas_id' => $riwayat_kelas_id,
-                // ]);
-
-                // // Ambil nilai capaian tertinggi/terendah
-                // $colTertinggi = chr(67 + ($tpCount * 2));
-                // $colTerendah  = chr(67 + ($tpCount * 2) + 1);
-                // $formatif->deskripsi_catatan_tertinggi = $sheet->getCell($colTertinggi . $row)->getCalculatedValue();
-                // $formatif->deskripsi_catatan_terendah  = $sheet->getCell($colTerendah . $row)->getCalculatedValue();
-                // $formatif->save();
-
                 $colTertinggiIndex = 3 + ($tpCount * 2); // C = 3
                 $colTerendahIndex  = $colTertinggiIndex + 1;
                 $colTertinggi = Coordinate::stringFromColumnIndex($colTertinggiIndex);
                 $colTerendah  = Coordinate::stringFromColumnIndex($colTerendahIndex);
 
-                $formatif = AsesmenFormatif::firstOrCreate([
-                    'intrakurikuler_id' => $intrakurikuler_id,
-                    'riwayat_kelas_id' => $riwayat_kelas_id,
-                ], [
-                    'deskripsi_catatan_tertinggi' => $sheet->getCell($colTertinggi . $row)->getCalculatedValue(),
-                    'deskripsi_catatan_terendah' => $sheet->getCell($colTerendah . $row)->getCalculatedValue(),
-                ]);
+                $tertinggi = (string) $sheet->getCell($colTertinggi . $row)->getCalculatedValue();
+                $terendah  = (string) $sheet->getCell($colTerendah . $row)->getCalculatedValue();
+
+                $formatif = AsesmenFormatif::query()->updateOrCreate(
+                    [
+                        'intrakurikuler_id' => $intrakurikuler_id,
+                        'riwayat_kelas_id'  => $riwayat_kelas_id,
+                    ],
+                    [
+                        'deskripsi_catatan_tertinggi' => $tertinggi,
+                        'deskripsi_catatan_terendah'  => $terendah,
+                    ]
+                );
 
                 // Simpan detail TP
+                $startTPColIndex = 3;
                 for ($i = 0; $i < $tpCount; $i++) {
                     $tp = $tpList[$i];
-                    $colKKTP = chr(67 + ($i * 2));
-                    $colTampil = chr(67 + ($i * 2) + 1);
+
+                    // $colKKTP = chr(67 + ($i * 2));
+                    // $colTampil = chr(67 + ($i * 2) + 1);
+                    $colKKTP  = Coordinate::stringFromColumnIndex($startTPColIndex + ($i * 2));
+                    $colTampil = Coordinate::stringFromColumnIndex($startTPColIndex + ($i * 2) + 1);
 
                     $kktp = $sheet->getCell($colKKTP . $row)->getValue();
                     $tampil = $sheet->getCell($colTampil . $row)->getValue();

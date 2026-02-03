@@ -10,6 +10,7 @@ use App\Models\Siswa;
 use App\Models\SiswaEkstrakurikuler;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class EkstrakurikulerSiswaController extends Controller
@@ -17,7 +18,14 @@ class EkstrakurikulerSiswaController extends Controller
     // Tampilkan daftar siswa ekskul
     public function index($ekstrakurikuler_id)
     {
+        $user = Auth::user();
         $ekskul = Ekstrakurikuler::with('tahunAjaran')->findOrFail($ekstrakurikuler_id);
+        if (!$user->hasRole('Bagian Akademik') && $ekskul->user_id != $user->id) {
+            $namaEkstrakurikuler = $ekskul->nama_pelajaran;
+            $tahunAjaran = $ekskul->tahunAjaran->tahun;
+            $semester = $ekskul->tahunAjaran->semester;
+            return back()->with('error', "Anda tidak punya akses untuk melihat Daftar Siswa di ekstrakurikuler $namaEkstrakurikuler $tahunAjaran $semester");
+        }
 
         $siswaEkskul = SiswaEkstrakurikuler::with(['siswa.user', 'siswa.riwayatKelasTerakhir.kelasAjar.kelas'])
             ->where('ekstrakurikuler_id', $ekskul->ekstrakurikuler_id)

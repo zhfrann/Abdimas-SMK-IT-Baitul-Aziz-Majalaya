@@ -43,6 +43,16 @@ class CetakDokumenController extends Controller
     public function pilihCetak($kelas_ajar)
     {
         $kelasAjar = KelasAjar::with(['kelas', 'tahunAjaran', 'waliKelas', 'riwayatKelas.siswa.user'])->findOrFail($kelas_ajar);
+
+        $user = Auth::user();
+        if (!$user->hasRole('Bagian Akademik') && $user->id != $kelasAjar->wali_user_id) {
+            $namaKelas = $kelasAjar->kelas->nama_kelas;
+            $tahunAjaran = $kelasAjar->tahunAjaran->tahun;
+            $semester = $kelasAjar->tahunAjaran->semester;
+
+            return back()->with('error', "Anda tidak punya akses untuk melihat Opsi Cetak Dokumen di kelas $namaKelas $tahunAjaran $semester");
+        }
+
         $siswaList = $kelasAjar->riwayatKelas->map(function ($rk) {
             $siswa = $rk->siswa;
             $user = $siswa->user ?? null;
