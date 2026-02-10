@@ -40,10 +40,7 @@ class AuthController extends Controller
             // 3) lanjut normal
             $request->session()->regenerate();
 
-            if (Auth::user()->hasRole('Super Admin')) {
-                return redirect()->intended('/dashboard');
-            }
-            if (Auth::user()->hasRole('Bagain Akademik')) {
+            if (Auth::user()->hasRole('Bagian Akademik')) {
                 return redirect()->intended('/dashboard/akademik');
             }
             if (Auth::user()->hasRole('Guru Mapel')) {

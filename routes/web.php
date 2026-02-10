@@ -66,9 +66,9 @@ Route::middleware('auth')->group(function () {
 });
 
 // Route untuk manajemen user oleh super admin
-Route::prefix('superadmin')->middleware(['auth', 'role:Super Admin'])->name('superadmin.')->group(function () {
-    Route::resource('users', UserController::class);
-});
+// Route::prefix('superadmin')->middleware(['auth', 'role:Super Admin'])->name('superadmin.')->group(function () {
+//     Route::resource('users', UserController::class);
+// });
 
 // Route khusus bagian akademik
 Route::middleware(['auth', 'role:Bagian Akademik'])->prefix('akademik')->name('akademik.')->group(function () {
@@ -101,6 +101,8 @@ Route::middleware(['auth'])->group(function () {
     // Define a GET route for the root URL ('/')
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
+
+    // intrakurikuler
     Route::resource('intrakurikuler', IntrakurikulerController::class)
         ->middleware('role:Guru Mapel|Bagian Akademik');
 
@@ -148,6 +150,7 @@ Route::middleware(['auth'])->group(function () {
         });
 
 
+    // ekstra
     Route::resource('ekstrakurikuler', EkstrakurikulerController::class)->middleware('role:Guru Mapel|Bagian Akademik');
     Route::prefix('ekstrakurikuler/{ekstrakurikuler}')->group(function () {
         Route::get('manage-siswa/create', [EkstrakurikulerSiswaController::class, 'create'])
@@ -166,6 +169,8 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('penilaian_ekstrakurikuler', PenilaianEkstrakurikulerController::class);
     })->middleware('role:Guru Mapel|Bagian Akademik');
 
+
+    // absensi 
     Route::prefix('absensi')->name('absensi.')->group(function () {
         Route::get('intrakurikuler', [AbsensiControllerIntrakurikuler::class, 'listIntrakurikuler'])
             ->name('intrakurikuler.list')
@@ -196,6 +201,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('ekstrakurikuler.rekap');
     })->middleware('role:Guru Mapel|Bagian Akademik|Super Admin');
 
+
+    // dokument
     Route::prefix('dokumen')->name('dokumen.')->group(function () {
         Route::get('kelas', [CetakDokumenController::class, 'kelas'])->name('kelas');
         Route::get('kelas/{kelas_ajar}/pilih', [CetakDokumenController::class, 'pilihCetak'])->name('kelas.pilih');
@@ -206,12 +213,11 @@ Route::middleware(['auth'])->group(function () {
         Route::post('cetak-mutasi', [CetakDokumenController::class, 'cetakMutasi'])->name('cetak.mutasi');
     });
 
-    // Route::get('{routeName}/{name?}', [HomeController::class, 'pageView']);
 });
 
-Route::get('/wilayah/provinsi', [WilayahController::class, 'provinsi']);
-Route::get('/wilayah/kabupaten/{provinsi_id}', [WilayahController::class, 'kabupaten']);
-Route::get('/wilayah/kecamatan/{kabupaten_id}', [WilayahController::class, 'kecamatan']);
-Route::get('/wilayah/kelurahan/{kecamatan_id}', [WilayahController::class, 'kelurahan']);
+// Route::get('/wilayah/provinsi', [WilayahController::class, 'provinsi']);
+// Route::get('/wilayah/kabupaten/{provinsi_id}', [WilayahController::class, 'kabupaten']);
+// Route::get('/wilayah/kecamatan/{kabupaten_id}', [WilayahController::class, 'kecamatan']);
+// Route::get('/wilayah/kelurahan/{kecamatan_id}', [WilayahController::class, 'kelurahan']);
 Route::get('ajax/tempat-lahir/kabupaten', [WilayahController::class, 'searchKabupaten'])->name('ajax.tempat_lahir.kabupaten');
 Route::get('ajax/domisili/kelurahan', [WilayahController::class, 'searchKelurahan'])->name('ajax.domisili.kelurahan');
