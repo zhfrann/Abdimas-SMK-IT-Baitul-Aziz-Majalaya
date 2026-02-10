@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Intrakurikuler;
 
+use App\Http\Controllers\Controller;
 use App\Models\Intrakurikuler;
 use App\Models\KelasAjar;
 use App\Models\User;
@@ -12,25 +13,7 @@ use Illuminate\Validation\Rule;
 
 class IntrakurikulerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    // public function index()
-    // {
-    //     $intrakurikuler = Intrakurikuler::query()
-    //         ->with([
-    //             'kelasAjar' => function ($q) {
-    //                 $q->with(['kelas', 'tahunAjaran'])
-    //                   ->withCount('riwayatKelas');
-    //             },
-    //             'pengampu.staff',
-    //         ])
-    //         ->orderByDesc('intrakurikuler_id')
-    //         ->get();
-
-    //     return view('intrakurikuler.index', compact('intrakurikuler'));
-    // }
-
+    // Halaman tabel daftar mata pelajaran intrakurikuler
     public function index()
     {
         /** @var \App\Models\User $user */
@@ -89,7 +72,6 @@ class IntrakurikulerController extends Controller
         return view('intrakurikuler.index', compact('intrakurikuler', 'kelasAjar', 'guru'));
     }
 
-
     public function create()
     {
         // $kelasAjar = KelasAjar::with(['kelas', 'tahunAjaran'])
@@ -105,6 +87,7 @@ class IntrakurikulerController extends Controller
         // return view('intrakurikuler.create', compact('kelasAjar', 'guru'));
     }
 
+    // Membuat 1 intrakurikuler pada sebuah kelas ajar beserta guru pengampunya
     public function store(Request $request)
     {
         $request->validate([
@@ -131,26 +114,11 @@ class IntrakurikulerController extends Controller
         return redirect()->route('intrakurikuler.index')->with('success', 'Intrakurikuler berhasil ditambahkan.');
     }
 
+    public function show(string $id) {}
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+    public function edit(string $id) {}
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
+    // Memperbarui 1 intrakurikuler
     public function update(Request $request, string $id)
     {
         $intrakurikuler = Intrakurikuler::findOrFail($id);
@@ -190,9 +158,7 @@ class IntrakurikulerController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    // Menghapus 1 intrakurikuler
     public function destroy(string $id)
     {
         try {

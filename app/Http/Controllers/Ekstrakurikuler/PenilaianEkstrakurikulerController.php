@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Ekstrakurikuler;
 
+use App\Http\Controllers\Controller;
 use App\Models\Ekstrakurikuler;
 use App\Models\PenilaianEkstrakurikuler;
 use Illuminate\Http\Request;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class PenilaianEkstrakurikulerController extends Controller
 {
+    // Halaman untuk penilaian siswa ekstrakurikuler
     public function index($ekstrakurikuler_id)
     {
         $ekskul = Ekstrakurikuler::query()->with(['peserta.siswa', 'peserta.penilaians', 'tahunAjaran'])->findOrFail($ekstrakurikuler_id);
@@ -38,14 +40,9 @@ class PenilaianEkstrakurikulerController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+    public function create() {}
 
+    // Membuat penilaian untuk 1 siswa ekstrakurikuler
     public function store(Request $request, $ekstrakurikuler_id)
     {
         $validated = $request->validate([
@@ -69,22 +66,11 @@ class PenilaianEkstrakurikulerController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+    public function show(string $id) {}
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+    public function edit(string $id) {}
 
+    // Memperbarui penilaian untuk 1 siswa ekstrakurikuler
     public function update(Request $request, $ekstrakurikuler_id, $siswa_ekstrakurikuler_id)
     {
         $validated = $request->validate([
@@ -105,6 +91,7 @@ class PenilaianEkstrakurikulerController extends Controller
         }
     }
 
+    // Menghapus penilaian untuk 1 siswa ekstrakurikuler
     public function destroy($ekstrakurikuler_id, $siswa_ekstrakurikuler_id)
     {
         DB::beginTransaction();
