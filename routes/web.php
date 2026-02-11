@@ -20,7 +20,6 @@ use App\Http\Controllers\LingkupMateriController;
 use App\Http\Controllers\PenilaianEkstrakurikulerController;
 use App\Http\Controllers\SekolahController;
 use App\Http\Controllers\SiswaController;
-use App\Http\Controllers\SuperAdmin\UserController;
 use App\Http\Controllers\TujuanPembelajaranController;
 use App\Http\Controllers\WilayahController;
 use Illuminate\Support\Facades\Auth;
