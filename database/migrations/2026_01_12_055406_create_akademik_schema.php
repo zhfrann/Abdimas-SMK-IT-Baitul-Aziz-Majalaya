@@ -64,7 +64,7 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->string('telp')->nullable();
             $table->string('nama_kepala_sekolah')->nullable();
-            $table->string('nuptk_kepala_sekolah')->nullable();
+            $table->string('nip_kepala_sekolah')->nullable();
             $table->timestamps();
 
             $table->foreign('kelurahan_id')
