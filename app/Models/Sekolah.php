@@ -23,7 +23,7 @@ class Sekolah extends Model
         'email',
         'telp',
         'nama_kepala_sekolah',
-        'nuptk_kepala_sekolah',
+        'nip_kepala_sekolah',
     ];
 
     public function kelurahan(): BelongsTo
