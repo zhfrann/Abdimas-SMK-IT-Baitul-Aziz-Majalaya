@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Intrakurikuler;
 
+use App\Http\Controllers\Controller;
 use App\Models\AsesmenSumatif;
 use App\Models\Intrakurikuler;
 use App\Models\LingkupMateri;
 use App\Models\SkorAsesmenSiswa;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
-use Maatwebsite\Excel\Excel as ExcelFormat;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
@@ -18,8 +17,9 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-class DummyExcelController extends Controller
+class ExcelController extends Controller
 {
+    // Generate template excel untuk asessment formatif
     public function downloadFormatif(Request $request, $intrakurikuler_id)
     {
         $intrakurikuler = Intrakurikuler::with([
@@ -234,6 +234,7 @@ class DummyExcelController extends Controller
         exit;
     }
 
+    // Generate template excel untuk asessment sumatif
     public function downloadSumatifTemplate(Request $request, $intrakurikuler_id)
     {
         $intrakurikuler = Intrakurikuler::with([

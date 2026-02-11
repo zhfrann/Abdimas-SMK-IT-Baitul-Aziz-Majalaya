@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Ekstrakurikuler;
 
+use App\Http\Controllers\Controller;
 use App\Models\Ekstrakurikuler;
 use App\Models\TahunAjaran;
 use App\Models\User;
@@ -11,6 +12,7 @@ use Illuminate\Validation\Rule;
 
 class EkstrakurikulerController extends Controller
 {
+    // Halaman Tabel Ekstrakurikuler
     public function index()
     {
         /** @var \App\Models\User $user */
@@ -38,14 +40,9 @@ class EkstrakurikulerController extends Controller
         return view('ekstrakurikuler.table_ekstrakurikuler', compact('tahunAjaran', 'guru', 'ekstrakurikuler'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+    public function create() {}
 
+    // Menambahkan ekstrakurikuler
     public function store(Request $request)
     {
         $request->validate([
@@ -70,14 +67,10 @@ class EkstrakurikulerController extends Controller
 
         return redirect()->route('ekstrakurikuler.index')->with('success', 'Ekstrakurikuler berhasil ditambahkan.');
     }
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
 
+    public function show(string $id) {}
+
+    // Mengedit Ekstrakurikuler
     public function edit($id)
     {
         $ekskul = Ekstrakurikuler::findOrFail($id);
@@ -89,6 +82,7 @@ class EkstrakurikulerController extends Controller
         ]);
     }
 
+    // Memperbarui Ekstrakurikuler
     public function update(Request $request, $id)
     {
         $ekskul = Ekstrakurikuler::findOrFail($id);
@@ -117,6 +111,7 @@ class EkstrakurikulerController extends Controller
         return redirect()->route('ekstrakurikuler.index')->with('success', 'Ekstrakurikuler berhasil diperbarui.');
     }
 
+    // Menghapus Ekstrakurikuler
     public function destroy($id)
     {
         $ekskul = Ekstrakurikuler::findOrFail($id);

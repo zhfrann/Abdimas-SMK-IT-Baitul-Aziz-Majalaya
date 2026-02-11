@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Ekstrakurikuler;
 
+use App\Http\Controllers\Controller;
 use App\Models\Ekstrakurikuler;
 use App\Models\KelasAjar;
 use App\Models\OrangTua;
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 
 class EkstrakurikulerSiswaController extends Controller
 {
-    // Tampilkan daftar siswa ekskul
+    // Halaman untuk menampilkan tabel daftar siswa ekstrakurikuler
     public function index($ekstrakurikuler_id)
     {
         $user = Auth::user();
@@ -34,6 +35,7 @@ class EkstrakurikulerSiswaController extends Controller
         return view('ekstrakurikuler.manage_siswa', compact('ekskul', 'siswaEkskul'));
     }
 
+    // Halaman untuk menambahkan siswa ekstrakurikuler
     public function create($ekstrakurikuler_id)
     {
         $ekskul = Ekstrakurikuler::with('tahunAjaran')->findOrFail($ekstrakurikuler_id);
@@ -42,6 +44,7 @@ class EkstrakurikulerSiswaController extends Controller
         return view('ekstrakurikuler.create_siswa', compact('ekskul', 'orangTua'));
     }
 
+    // Menambahkan akun siswa baru ke sebuah ekstrakurikuler
     public function store(Request $request, $ekstrakurikuler_id)
     {
         $ekskul = Ekstrakurikuler::findOrFail($ekstrakurikuler_id);
@@ -143,9 +146,7 @@ class EkstrakurikulerSiswaController extends Controller
         }
     }
 
-
-
-    // Hapus satu siswa dari ekskul
+    // Hapus satu siswa dari ekstrakurikuler
     public function destroy($ekstrakurikuler_id, $siswa_ekstrakurikuler_id)
     {
         $item = SiswaEkstrakurikuler::where('ekstrakurikuler_id', $ekstrakurikuler_id)
@@ -155,6 +156,7 @@ class EkstrakurikulerSiswaController extends Controller
         return back()->with('success', 'Siswa berhasil dihapus dari ekskul.');
     }
 
+    // Fungsi untuk mendukung pencarian siswa ketika menambahkan ke ekstrakurikuler
     public function ajaxSearchSiswa(Request $request, $ekstrakurikuler_id)
     {
         $q = $request->input('q');
@@ -193,6 +195,7 @@ class EkstrakurikulerSiswaController extends Controller
         return response()->json(['results' => $results]);
     }
 
+    // Menambahkan akun siswa yang sudah ada ke sebuah ekstrakurikuler
     public function addExistingSiswa(Request $request, $ekstrakurikuler_id)
     {
         $ekskul = Ekstrakurikuler::findOrFail($ekstrakurikuler_id);

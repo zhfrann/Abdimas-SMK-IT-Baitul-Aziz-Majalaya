@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Dokumen;
 
+use App\Http\Controllers\Controller;
 use App\Models\KelasAjar;
 use App\Models\Sekolah;
 use Illuminate\Http\Request;
@@ -10,7 +11,7 @@ use Spatie\LaravelPdf\Facades\Pdf;
 
 class CetakDokumenController extends Controller
 {
-    // Tabel kelas
+    // Halaman Tabel kelas
     public function kelas()
     {
         $user = Auth::user();
@@ -39,7 +40,7 @@ class CetakDokumenController extends Controller
         return view('dokumen.kelas', compact('kelasList'));
     }
 
-    // Pilih siswa dan jenis dokumen
+    // Halaman pilih siswa dan jenis dokumen untuk dicetak
     public function pilihCetak($kelas_ajar)
     {
         $kelasAjar = KelasAjar::with(['kelas', 'tahunAjaran', 'waliKelas', 'riwayatKelas.siswa.user'])->findOrFail($kelas_ajar);
@@ -69,7 +70,7 @@ class CetakDokumenController extends Controller
         return view('dokumen.pilih_cetak', compact('kelasAjar', 'siswaList'));
     }
 
-    // Generate PDF
+    // Generate PDF Sampul Rapor
     public function cetakSampul(Request $request)
     {
         $request->validate([
@@ -99,8 +100,7 @@ class CetakDokumenController extends Controller
         return $pdf;
     }
 
-
-    // Cetak Rapor
+    // Generate PDF Halaman Nilai Rapor
     public function cetakRapor(Request $request)
     {
         $request->validate([
@@ -153,7 +153,7 @@ class CetakDokumenController extends Controller
         return $pdf;
     }
 
-    // Cetak Buku Induk
+    // Generate PDF Buku Induk
     public function cetakBukuInduk(Request $request)
     {
         $request->validate([
@@ -206,11 +206,13 @@ class CetakDokumenController extends Controller
         return $pdf;
     }
 
+    // Halaman Cetak Mutasi
     public function mutasi()
     {
         return view('dokumen.mutasi');
     }
 
+    // Generate PDF Mutasi
     public function cetakMutasi(Request $request)
     {
         $request->validate([

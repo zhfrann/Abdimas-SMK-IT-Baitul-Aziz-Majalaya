@@ -6,24 +6,22 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Akademik\KelasController;
 use App\Http\Controllers\Akademik\StaffController;
 use App\Http\Controllers\Akademik\TahunAjaranController;
-use App\Http\Controllers\AssesmentFormatifController;
+use App\Http\Controllers\Intrakurikuler\AssesmentFormatifController;
 use App\Http\Controllers\AssesmentSumatifController;
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\CetakDokumenController;
+use App\Http\Controllers\Dokumen\CetakDokumenController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\DummyExcelController;
-use App\Http\Controllers\EkstrakurikulerController;
-use App\Http\Controllers\EkstrakurikulerSiswaController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\IntrakurikulerController;
+use App\Http\Controllers\Ekstrakurikuler\EkstrakurikulerController;
+use App\Http\Controllers\Ekstrakurikuler\EkstrakurikulerSiswaController;
+use App\Http\Controllers\Intrakurikuler\IntrakurikulerController;
 use App\Http\Controllers\LingkupMateriController;
-use App\Http\Controllers\PenilaianEkstrakurikulerController;
+use App\Http\Controllers\Ekstrakurikuler\PenilaianEkstrakurikulerController;
 use App\Http\Controllers\SekolahController;
-use App\Http\Controllers\SiswaController;
-use App\Http\Controllers\TujuanPembelajaranController;
+use App\Http\Controllers\Account\SiswaController;
+use App\Http\Controllers\Intrakurikuler\ExcelController;
+use App\Http\Controllers\Intrakurikuler\TujuanPembelajaranController;
 use App\Http\Controllers\WilayahController;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
+
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -100,7 +98,6 @@ Route::middleware(['auth'])->group(function () {
     // Define a GET route for the root URL ('/')
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-
     // intrakurikuler
     Route::resource('intrakurikuler', IntrakurikulerController::class)
         ->middleware('role:Guru Mapel|Bagian Akademik');
@@ -124,23 +121,20 @@ Route::middleware(['auth'])->group(function () {
             Route::put('assesment-sumatif/{riwayatKelas}/detail', [AssesmentSumatifController::class, 'updateDetailAssesmentSumatif'])
                 ->name('assesment_sumatif.detail.update');
 
-
             Route::resource('tujuan-pembelajaran', TujuanPembelajaranController::class)
                 ->except(['show']);
 
             Route::resource('assesment-formatif', AssesmentFormatifController::class);
 
-            Route::get('/template-asesmen-formatif', [DummyExcelController::class, 'downloadFormatif'])->name('templateFormatif');
-            Route::post('/assesmen-formatif/import', [AssesmentFormatifController::class, 'importExcel'])->name('assesment-formatif.import');
+            Route::get('/template-asesmen-formatif', [ExcelController::class, 'downloadFormatif'])
+                ->name('templateFormatif');
+            Route::post('/assesmen-formatif/import', [AssesmentFormatifController::class, 'importExcel'])
+                ->name('assesment-formatif.import');
 
-            Route::get(
-                'template-assesmen-sumatif-excel',
-                [DummyExcelController::class, 'downloadSumatifTemplate']
-            )->name('assesment_sumatif.template');
+            Route::get('template-assesmen-sumatif-excel', [ExcelController::class, 'downloadSumatifTemplate'])
+                ->name('assesment_sumatif.template');
             Route::post('/assesmen-sumatif/import', [AssesmentSumatifController::class, 'importExcelSumatif'])
                 ->name('assesment_sumatif.import');
-
-
 
             Route::get('assesment-formatif/{riwayatKelas}/detail', [AssesmentFormatifController::class, 'detailAssesmentFormatif'])
                 ->name('assesment-formatif.detail');
@@ -149,7 +143,7 @@ Route::middleware(['auth'])->group(function () {
         });
 
 
-    // ekstra
+    // Ekstrakurikuler
     Route::resource('ekstrakurikuler', EkstrakurikulerController::class)->middleware('role:Guru Mapel|Bagian Akademik');
     Route::prefix('ekstrakurikuler/{ekstrakurikuler}')->group(function () {
         Route::get('manage-siswa/create', [EkstrakurikulerSiswaController::class, 'create'])
@@ -169,7 +163,7 @@ Route::middleware(['auth'])->group(function () {
     })->middleware('role:Guru Mapel|Bagian Akademik');
 
 
-    // absensi 
+    // Absensi
     Route::prefix('absensi')->name('absensi.')->group(function () {
         Route::get('intrakurikuler', [AbsensiControllerIntrakurikuler::class, 'listIntrakurikuler'])
             ->name('intrakurikuler.list')
@@ -201,7 +195,7 @@ Route::middleware(['auth'])->group(function () {
     })->middleware('role:Guru Mapel|Bagian Akademik|Super Admin');
 
 
-    // dokument
+    // Dokumen
     Route::prefix('dokumen')->name('dokumen.')->group(function () {
         Route::get('kelas', [CetakDokumenController::class, 'kelas'])->name('kelas');
         Route::get('kelas/{kelas_ajar}/pilih', [CetakDokumenController::class, 'pilihCetak'])->name('kelas.pilih');
@@ -211,7 +205,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('mutasi', [CetakDokumenController::class, 'mutasi'])->name('mutasi');
         Route::post('cetak-mutasi', [CetakDokumenController::class, 'cetakMutasi'])->name('cetak.mutasi');
     });
-
 });
 
 // Route::get('/wilayah/provinsi', [WilayahController::class, 'provinsi']);

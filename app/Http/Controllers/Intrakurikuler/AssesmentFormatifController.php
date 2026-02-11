@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Intrakurikuler;
 
+use App\Http\Controllers\Controller;
 use App\Models\AsesmenFormatif;
 use App\Models\AsesmenFormatifDetail;
 use App\Models\Intrakurikuler;
@@ -14,6 +15,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class AssesmentFormatifController extends Controller
 {
+    // Halaman tabel asesmen formatif sebuah intrakurikuler
     public function index($intrakurikuler_id)
     {
         $user = Auth::user();
@@ -76,54 +78,19 @@ class AssesmentFormatifController extends Controller
         return view('intrakurikuler.assesment_formatif', compact('intrakurikuler', 'rows', 'tpList'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+    public function create() {}
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+    public function store(Request $request) {}
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+    public function show(string $id) {}
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+    public function edit(string $id) {}
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+    public function update(Request $request, string $id) {}
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
+    public function destroy(string $id) {}
 
+    // Halaman detail penilaian asesmen formatif untuk 1 siswa
     public function detailAssesmentFormatif($intrakurikuler_id, $riwayat_kelas_id)
     {
         $user = Auth::user();
@@ -169,6 +136,7 @@ class AssesmentFormatifController extends Controller
         ]);
     }
 
+    // Menyimpan detail penilaian asesmen formatif untuk 1 siswa
     public function saveDetail(Request $request, $intrakurikuler_id, $riwayat_kelas_id)
     {
         $formatif = AsesmenFormatif::query()->firstOrCreate([
@@ -215,6 +183,7 @@ class AssesmentFormatifController extends Controller
         }
     }
 
+    // Menyimpan pembaruan data asesmen formatif dari template excel
     public function importExcel(Request $request, $intrakurikuler_id)
     {
         $request->validate([

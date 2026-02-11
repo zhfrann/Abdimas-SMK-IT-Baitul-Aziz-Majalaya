@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Intrakurikuler;
 
+use App\Http\Controllers\Controller;
 use App\Models\Intrakurikuler;
 use App\Models\TujuanPembelajaran;
 use Illuminate\Http\Request;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class TujuanPembelajaranController extends Controller
 {
+    // Halaman tabel tujuan pembelajaran sebuah intrakurikuler
     public function index($intrakurikuler_id)
     {
         $intrakurikuler = Intrakurikuler::with('kelasAjar.kelas')->findOrFail($intrakurikuler_id);
@@ -27,14 +29,9 @@ class TujuanPembelajaranController extends Controller
         return view('intrakurikuler.table_tujuan_pembelajaran', compact('intrakurikuler', 'tujuanPembelajaran'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+    public function create() {}
 
+    // Membuat 1 tujuan pembelajaran pada sebuah intrakurikuler
     public function store(Request $request, $intrakurikuler_id)
     {
         $request->validate([
@@ -64,22 +61,11 @@ class TujuanPembelajaranController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+    public function show(string $id) {}
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+    public function edit(string $id) {}
 
+    // Mengedit 1 tujuan pembelajaran pada sebuah intrakurikuler
     public function update(Request $request, $intrakurikuler_id, $id)
     {
         $request->validate([
@@ -107,6 +93,7 @@ class TujuanPembelajaranController extends Controller
         }
     }
 
+    // Menghapus 1 tujuan pembelajaran pada sebuah intrakurikuler
     public function destroy($intrakurikuler_id, $id)
     {
         $user = Auth::user();

@@ -1,16 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Account;
 
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Models\KelasAjar;
 use App\Models\RiwayatKelas;
-use App\Models\Kabupaten;
-use App\Models\Kelurahan;
 use App\Models\OrangTua;
-use App\Models\Provinsi;
 use App\Models\Siswa;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -181,7 +179,6 @@ class SiswaController extends Controller
         }
     }
 
-
     public function edit(KelasAjar $kelas_ajar, Siswa $siswa)
     {
         $kelas_ajar->load(['kelas', 'tahunAjaran']);
@@ -216,7 +213,6 @@ class SiswaController extends Controller
             'ortuKelurahanLabel'
         ));
     }
-
 
     public function update(Request $request, KelasAjar $kelas_ajar, Siswa $siswa)
     {
@@ -327,7 +323,6 @@ class SiswaController extends Controller
             ->route('akademik.siswa.index', $kelas_ajar->kelas_ajar_id)
             ->with('success', 'Data siswa berhasil diperbarui.');
     }
-
 
     public function destroy(KelasAjar $kelas_ajar, Siswa $siswa)
     {

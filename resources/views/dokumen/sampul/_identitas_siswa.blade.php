@@ -140,7 +140,7 @@
             Bandung, {{ now()->translatedFormat('d F Y') }}<br>
             Kepala Sekolah,<br><br><br><br><br>
             <span class="ttd-nama">{{ $sekolah->nama_kepala_sekolah }}</span><br>
-            NUPTK.
+            NUPTK. {{ $sekolah->nuptk_kepala_sekolah }}
         </div>
     </div>
 
