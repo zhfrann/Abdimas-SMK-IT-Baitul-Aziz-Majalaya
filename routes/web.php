@@ -1,24 +1,24 @@
 <?php
 
-use App\Http\Controllers\AbsensiControllerEkstrakurikuler;
-use App\Http\Controllers\AbsensiControllerIntrakurikuler;
-use App\Http\Controllers\AccountController;
+use App\Http\Controllers\Absensi\AbsensiControllerEkstrakurikuler;
+use App\Http\Controllers\Absensi\AbsensiControllerIntrakurikuler;
+use App\Http\Controllers\Account\AccountController;
 use App\Http\Controllers\Akademik\KelasController;
 use App\Http\Controllers\Akademik\StaffController;
 use App\Http\Controllers\Akademik\TahunAjaranController;
 use App\Http\Controllers\Intrakurikuler\AssesmentFormatifController;
-use App\Http\Controllers\AssesmentSumatifController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Dokumen\CetakDokumenController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Ekstrakurikuler\EkstrakurikulerController;
 use App\Http\Controllers\Ekstrakurikuler\EkstrakurikulerSiswaController;
 use App\Http\Controllers\Intrakurikuler\IntrakurikulerController;
-use App\Http\Controllers\LingkupMateriController;
 use App\Http\Controllers\Ekstrakurikuler\PenilaianEkstrakurikulerController;
-use App\Http\Controllers\SekolahController;
 use App\Http\Controllers\Account\SiswaController;
+use App\Http\Controllers\Akademik\SekolahController;
+use App\Http\Controllers\Intrakurikuler\AssesmentSumatifController;
 use App\Http\Controllers\Intrakurikuler\ExcelController;
+use App\Http\Controllers\Intrakurikuler\LingkupMateriController;
 use App\Http\Controllers\Intrakurikuler\TujuanPembelajaranController;
 use App\Http\Controllers\WilayahController;
 
