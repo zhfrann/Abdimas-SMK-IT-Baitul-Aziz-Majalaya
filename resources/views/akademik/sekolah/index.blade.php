@@ -114,8 +114,8 @@
 
                             <div class="col-md-6">
                                 <div class="border rounded p-3">
-                                    <div class="text-muted">NUPTK Kepala Sekolah</div>
-                                    <div class="fw-semibold">{{ $sekolah->nuptk_kepala_sekolah ?? '-' }}</div>
+                                    <div class="text-muted">NIP Kepala Sekolah</div>
+                                    <div class="fw-semibold">{{ $sekolah->nip_kepala_sekolah ?? '-' }}</div>
                                 </div>
                             </div>
                         </div>

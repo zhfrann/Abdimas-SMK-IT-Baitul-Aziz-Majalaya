@@ -189,11 +189,11 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">NUPTK Kepala Sekolah</label>
-                                <input type="text" name="nuptk_kepala_sekolah"
-                                    class="form-control @error('nuptk_kepala_sekolah') is-invalid @enderror"
-                                    value="{{ old('nuptk_kepala_sekolah', $sekolah->nuptk_kepala_sekolah) }}">
-                                @error('nuptk_kepala_sekolah')
+                                <label class="form-label">NIP Kepala Sekolah</label>
+                                <input type="text" name="nip_kepala_sekolah"
+                                    class="form-control @error('nip_kepala_sekolah') is-invalid @enderror"
+                                    value="{{ old('nip_kepala_sekolah', $sekolah->nip_kepala_sekolah) }}">
+                                @error('nip_kepala_sekolah')
                                     <span class="invalid-feedback">{{ $message }}</span>
                                 @enderror
                             </div>
