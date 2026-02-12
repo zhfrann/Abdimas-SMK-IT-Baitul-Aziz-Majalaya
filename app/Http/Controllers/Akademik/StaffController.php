@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Akademik;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -113,7 +114,24 @@ class StaffController extends Controller
 
     public function destroy($id)
     {
+        $currentUser = Auth::user();
         $user = User::findOrFail($id);
+
+        // Tidak bisa hapus diri sendiri
+        if ($currentUser->id === $user->id) {
+            return back()->with('error', 'Anda tidak bisa menghapus akun sendiri.');
+        }
+
+        // Pastikan minimal ada 1 akun dengan role Bagian Akademik
+        if ($user->hasRole('Bagian Akademik')) {
+
+            $jumlahAkademik = User::role('Bagian Akademik')->count();
+
+            if ($jumlahAkademik <= 1) {
+                return back()->with('error', 'Tidak bisa menghapus akun Bagian Akademik terakhir.');
+            }
+        }
+
         DB::beginTransaction();
         try {
             // Hapus data staff di tabel staff

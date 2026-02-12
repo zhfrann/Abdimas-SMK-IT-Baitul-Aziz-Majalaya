@@ -51,6 +51,7 @@
                                         <td>
                                             <a href="{{ route('akademik.staff.edit', $user->id) }}"
                                                 class="btn btn-sm btn-light-warning mb-1">Edit</a>
+
                                             <form action="{{ route('akademik.staff.destroy', $user->id) }}" method="POST"
                                                 class="d-inline form-delete-staff">
                                                 @csrf
