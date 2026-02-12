@@ -92,7 +92,6 @@ Route::middleware(['auth', 'role:Bagian Akademik'])->prefix('akademik')->name('a
     Route::resource('staff', StaffController::class);
 });
 
-
 // Define a group of routes with 'auth' middleware applied
 Route::middleware(['auth'])->group(function () {
     // Define a GET route for the root URL ('/')
