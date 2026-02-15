@@ -157,13 +157,12 @@ class CetakDokumenController extends Controller
         $tahunAjaran = str_replace('/', '-', $kelasAjar->tahunAjaran->tahun);
         $semester = $kelasAjar->tahunAjaran->semester;
 
-        $filename = 'Sampul Rapor ' . $namaKelas . ' ' . $tahunAjaran . ' ' . $semester . '.pdf';
+        $filename = 'Cetak Rapor ' . $namaKelas . ' ' . $tahunAjaran . ' ' . $semester . '.pdf';
 
         $pdf = Pdf::loadView('dokumen.pdf_rapor', [
             'kelasAjar' => $kelasAjar,
             'siswaList' => $siswaList,
             'sekolah' => $sekolah,
-            // ])->format('A4');
         ])->setPaper('a4', 'portrait')
             // ->download($filename);
             ->stream($filename);
@@ -215,11 +214,19 @@ class CetakDokumenController extends Controller
             $rk->rekap_kehadiran = $kehadiran;
         }
 
-        $pdf = Pdf::view('dokumen.pdf_buku_induk', [
+        $namaKelas = $kelasAjar->kelas->nama_kelas;
+        $tahunAjaran = str_replace('/', '-', $kelasAjar->tahunAjaran->tahun);
+        $semester = $kelasAjar->tahunAjaran->semester;
+
+        $filename = 'Buku Induk tes ' . $namaKelas . ' ' . $tahunAjaran . ' ' . $semester . '.pdf';
+
+        $pdf = Pdf::loadView('dokumen.pdf_buku_induk', [
             'kelasAjar' => $kelasAjar,
             'siswaList' => $siswaList,
             'sekolah' => $sekolah,
-        ])->format('A4');
+        ])->setPaper('a4', 'portrait')
+            // ->download($filename);
+            ->stream($filename);
 
         return $pdf;
     }
