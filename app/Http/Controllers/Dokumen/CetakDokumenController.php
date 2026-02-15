@@ -245,6 +245,8 @@ class CetakDokumenController extends Controller
             'jumlah' => 'required|integer|min:1|max:50',
         ]);
 
+        $sekolah = Sekolah::query()->firstOrFail();
+
         $jenis = $request->jenis;
         $jumlah = (int) $request->jumlah;
 
@@ -252,9 +254,14 @@ class CetakDokumenController extends Controller
             ? 'dokumen.pdf_mutasi_keluar'
             : 'dokumen.pdf_mutasi_masuk';
 
-        $pdf = \Spatie\LaravelPdf\Facades\Pdf::view($view, [
+        $filename = "Mutasi $jenis.pdf";
+
+        $pdf = Pdf::loadView($view, [
             'jumlah' => $jumlah,
-        ])->format('A4');
+            'sekolah' => $sekolah,
+        ])->setPaper('a4', 'portrait')
+            // ->download($filename);
+            ->stream($filename);
 
         return $pdf;
     }
