@@ -59,7 +59,7 @@
         </table>
 
         {{-- Tabel Intrakurikuler --}}
-        <table border="1" cellpadding="4" cellspacing="0"
+        <table border="1" cellpadding="4" cellspacing="0" class="table-intrakurikuler"
             style="width:100%; font-size:11pt; border-collapse:collapse; margin-bottom: 8mm;">
             <thead>
                 <tr>
@@ -91,7 +91,7 @@
                         $rowspan = $capaianTerendah && $capaianTerendah !== '-' ? 2 : 1;
                     @endphp
                     <tr>
-                        <td style="text-align:center;" rowspan="{{ $rowspan }}">{{ $no++ }}</td>
+                        <td style="text-align:center; width: 3%;" rowspan="{{ $rowspan }}">{{ $no++ }}</td>
                         <td rowspan="{{ $rowspan }}">{{ $mapel->nama_pelajaran }}</td>
                         <td style="text-align:center;" rowspan="{{ $rowspan }}">{{ $nilaiAkhir }}</td>
                         <td>{{ $capaianTertinggi }}</td>
@@ -107,92 +107,105 @@
                     </tr>
                 @endforelse
             </tbody>
+        </table>
 
-            {{-- Tabel Ekstrakurikuler --}}
-            <table border="1" cellpadding="4" cellspacing="0"
-                style="width:100%; font-size:11pt; border-collapse:collapse; margin-bottom: 8mm;">
-                <thead>
+        {{-- Tabel Ekstrakurikuler --}}
+        <table border="1" cellpadding="4" cellspacing="0" class="table-ekstrakurikuler"
+            style="width:100%; font-size:11pt; border-collapse:collapse; margin-bottom: 8mm;">
+            <thead>
+                <tr>
+                    <th style="width:5%;">No</th>
+                    <th style="width:40%;">Ekstrakurikuler</th>
+                    <th>Keterangan</th>
+                </tr>
+            </thead>
+            <tbody>
+                @php $noEks=1; @endphp
+                @forelse ($ekskulList as $ekskul)
+                    @php
+                        $penilaian = $ekskul->penilaians->first();
+                        $deskripsi = $penilaian->deskripsi ?? '-';
+                    @endphp
                     <tr>
-                        <th style="width:5%;">No</th>
-                        <th style="width:40%;">Ekstrakurikuler</th>
-                        <th>Keterangan</th>
+                        <td style="text-align:center;">{{ $noEks++ }}</td>
+                        <td>{{ $ekskul->ekstrakurikuler->nama_pelajaran ?? '-' }}</td>
+                        <td>{{ $deskripsi }}</td>
                     </tr>
-                </thead>
-                <tbody>
-                    @php $noEks=1; @endphp
-                    @forelse ($ekskulList as $ekskul)
-                        @php
-                            $penilaian = $ekskul->penilaians->first();
-                            $deskripsi = $penilaian->deskripsi ?? '-';
-                        @endphp
-                        <tr>
-                            <td style="text-align:center;">{{ $noEks++ }}</td>
-                            <td>{{ $ekskul->ekstrakurikuler->nama_pelajaran ?? '-' }}</td>
-                            <td>{{ $deskripsi }}</td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="3" style="text-align:center;">-</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                @empty
+                    <tr>
+                        <td colspan="3" style="text-align:center;">-</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
 
-            {{-- Tabel Ketidakhadiran --}}
-            <table border="1" cellpadding="4" cellspacing="0"
-                style="width:45%; font-size:11pt; border-collapse:collapse; margin-left: 8mm; margin-bottom:18px;">
-                <thead>
-                    <tr>
-                        <th colspan="2" style="text-align:center;">Ketidakhadiran</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Sakit</td>
-                        <td>{{ $rk->rekap_kehadiran['sakit'] }} hari</td>
-                    </tr>
-                    <tr>
-                        <td>Izin</td>
-                        <td>{{ $rk->rekap_kehadiran['izin'] }} hari</td>
-                    </tr>
-                    <tr>
-                        <td>Tanpa Keterangan</td>
-                        <td>{{ $rk->rekap_kehadiran['alpha'] }} hari</td>
-                    </tr>
-                </tbody>
-            </table>
+        {{-- Tabel Ketidakhadiran --}}
+        <table border="1" cellpadding="4" cellspacing="0" class="table-ketidakhadiran"
+            style="width:45%; font-size:11pt; border-collapse:collapse; margin-left: 8mm; margin-bottom:18px;">
+            <thead>
+                <tr>
+                    <th colspan="2" style="text-align:center;">Ketidakhadiran</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Sakit</td>
+                    <td>{{ $rk->rekap_kehadiran['sakit'] }} hari</td>
+                </tr>
+                <tr>
+                    <td>Izin</td>
+                    <td>{{ $rk->rekap_kehadiran['izin'] }} hari</td>
+                </tr>
+                <tr>
+                    <td>Tanpa Keterangan</td>
+                    <td>{{ $rk->rekap_kehadiran['alpha'] }} hari</td>
+                </tr>
+            </tbody>
+        </table>
 
-            {{-- Tanda Tangan --}}
-            <div style="page-break-inside: avoid;">
-                <div style="text-align: right; margin: 0 5mm;">Bandung, {{ now()->translatedFormat('d F Y') }}</div>
-                <div style="width:100%; display:flex; justify-content:space-between; margin-top: 2mm;">
-                    {{-- Orang Tua --}}
-                    <div style="width: 30%; text-align: center;">
-                        Orang Tua,<br><br><br><br>
-                        .................................................
-                    </div>
-
-                    {{-- Wali Kelas --}}
-                    <div style="width: 30%; text-align: center;">
-                        Wali Kelas,<br><br><br><br>
-                        {{ $waliKelas->name ?? 'Wali Kelas' }}
-                    </div>
-                </div>
-                <div style="width:50%; margin: 5mm auto 0; text-align:center;">
-                    Mengetahui,<br>
-                    Kepala Sekolah<br><br><br><br>
-                    <span style="font-weight:bold;">{{ $sekolah->nama_kepala_sekolah ?? '' }}</span><br>
-                </div>
+        {{-- Tanda Tangan --}}
+        <div style="page-break-inside: avoid;">
+            <div style="text-align:right; margin:0 5mm;">
+                Bandung, {{ now()->translatedFormat('d F Y') }}
             </div>
+
+            <!-- Dua tanda tangan (kiri & kanan) -->
+            <table style="width:100%; margin-top:2mm; border-collapse:collapse;">
+                <tr>
+                    <td style="width:30%; text-align:center; vertical-align:top;">
+                        Orang Tua,<br><br><br><br><br>
+                        .................................................
+                    </td>
+
+                    <!-- Spacer -->
+                    <td style="width:40%;"></td>
+
+                    <td style="width:30%; text-align:center; vertical-align:top;">
+                        Wali Kelas,<br><br><br><br><br>
+                        {{ $waliKelas->name ?? 'Wali Kelas' }}
+                    </td>
+                </tr>
+            </table>
+
+            <table style="width:100%; margin-top:8mm; border-collapse:collapse;">
+                <tr>
+                    <td style="width:25%;"></td>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        Mengetahui,<br>
+                        Kepala Sekolah<br><br><br><br><br>
+                        <span style="font-weight:bold;">
+                            {{ $sekolah->nama_kepala_sekolah ?? '' }}
+                        </span><br>
+                    </td>
+                    <td style="width:25%;"></td>
+                </tr>
+            </table>
+        </div>
+
     </div>
 @endforeach
 
 <style>
-    @page {
-        size: A4;
-        margin: 18mm 12mm 12mm 12mm;
-    }
-
     .page {
         page-break-after: always;
     }
@@ -201,5 +214,23 @@
         font-family: "Times New Roman", Times, serif;
         font-size: 12pt;
         color: #000;
+    }
+
+    .table-intrakurikuler tr,
+    .table-intrakurikuler td,
+    .table-intrakurikuler th {
+        border: 1px solid black;
+    }
+
+    .table-ekstrakurikuler tr,
+    .table-ekstrakurikuler td,
+    .table-ekstrakurikuler th {
+        border: 1px solid black;
+    }
+
+    .table-ketidakhadiran tr,
+    .table-ketidakhadiran td,
+    .table-ketidakhadiran th {
+        border: 1px solid black;
     }
 </style>
