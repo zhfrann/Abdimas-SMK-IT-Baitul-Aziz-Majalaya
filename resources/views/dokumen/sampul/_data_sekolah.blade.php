@@ -1,3 +1,13 @@
+<style>
+    .page.data-sekolah {
+        margin: 18mm 14mm 18mm;
+    }
+
+    .data-sekolah>div:first-child {
+        margin-top: 0mm !important;
+    }
+</style>
+
 {{-- Halaman 2: Data Sekolah --}}
 <div class="page data-sekolah">
     <div style="text-align:center; font-weight:bold; font-size:16pt; margin-top:20mm;">

@@ -7,7 +7,8 @@ use App\Models\KelasAjar;
 use App\Models\Sekolah;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Spatie\LaravelPdf\Facades\Pdf;
+// use Spatie\LaravelPdf\Facades\Pdf;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class CetakDokumenController extends Controller
 {
@@ -81,23 +82,31 @@ class CetakDokumenController extends Controller
         ]);
 
         $sekolah = Sekolah::firstOrFail();
-        $kelasAjar = KelasAjar::with(['kelas', 'tahunAjaran', 'waliKelas', 'riwayatKelas.siswa.user', 'riwayatKelas.siswa.kelurahan.kecamatan.kabupaten'])->findOrFail($request->kelas_ajar_id);
+        $kelasAjar = KelasAjar::with([
+            'kelas',
+            'tahunAjaran',
+            'waliKelas',
+            'riwayatKelas.siswa.user',
+            'riwayatKelas.siswa.kelurahan.kecamatan.kabupaten'
+        ])->findOrFail($request->kelas_ajar_id);
 
         $siswaIds = $request->siswa ?? $kelasAjar->riwayatKelas->pluck('riwayat_kelas_id')->toArray();
         $siswaList = $kelasAjar->riwayatKelas->whereIn('riwayat_kelas_id', $siswaIds);
 
         $namaKelas = $kelasAjar->kelas->nama_kelas;
-        $tahunAjaran = $kelasAjar->tahunAjaran->tahun;
+        $tahunAjaran = str_replace('/', '-', $kelasAjar->tahunAjaran->tahun);
         $semester = $kelasAjar->tahunAjaran->semester;
 
-        $pdf = Pdf::view('dokumen.pdf_sampul', [
+        $filename = 'Sampul Rapor ' . $namaKelas . ' ' . $tahunAjaran . ' ' . $semester . '.pdf';
+
+        return Pdf::loadView('dokumen.pdf_sampul', [
             'kelasAjar' => $kelasAjar,
             'siswaList' => $siswaList,
             'sekolah' => $sekolah,
-            // ])->format('A4')->download('Sampul Rapor ' . $namaKelas . ' ' . $tahunAjaran . ' ' . $semester . '.pdf');
-        ])->format('A4');
-
-        return $pdf;
+        ])
+            ->setPaper('a4', 'portrait')
+            // ->download($filename);
+            ->stream($filename);
     }
 
     // Generate PDF Halaman Nilai Rapor
