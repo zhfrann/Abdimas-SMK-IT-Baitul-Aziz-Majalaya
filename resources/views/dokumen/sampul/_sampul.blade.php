@@ -1,3 +1,126 @@
+<style>
+    .cover.page {
+        margin: 18mm;
+    }
+
+    /* .cover {
+        height: calc(297mm - 20mm - 18mm - 2mm);
+        display: flex;
+        flex-direction: column;
+    } */
+
+    .content {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .judul {
+        text-align: center;
+        font-weight: 700;
+        line-height: 1.25;
+        margin-top: 4mm;
+        font-size: 14pt;
+    }
+
+    .logo-wrap {
+        text-align: center;
+        margin-top: 10mm;
+        margin-bottom: 8mm;
+    }
+
+    .logo {
+        width: 52mm;
+        /* mendekati ukuran pada contoh */
+        height: auto;
+        display: inline-block;
+    }
+
+    /* ====== Info program (kiri agak bold) ====== */
+    .info-program {
+        width: 85%;
+        margin: 0 0 0 15%;
+        border-collapse: collapse;
+        font-size: 12pt;
+        margin-top: 2mm;
+    }
+
+    .info-program td {
+        padding: 2px 0;
+    }
+
+    .info-program .kiri {
+        width: 30%;
+        font-weight: 700;
+    }
+
+    .info-program .titik {
+        width: 4%;
+        text-align: center;
+        font-weight: 700;
+    }
+
+    .info-program .kanan {
+        width: 70%;
+        font-weight: 700;
+    }
+
+    /* ====== Label center ====== */
+    .label-center {
+        text-align: center;
+        font-weight: 700;
+        margin: 0 0 3mm 0;
+    }
+
+    .label-nama {
+        margin-top: 32mm;
+    }
+
+    .label-nis {
+        margin-top: -10mm;
+    }
+
+    .box-nama,
+    .box-nis {
+        width: 86%;
+        margin: 0 auto;
+        border: 2px solid #000;
+        text-align: center;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+        padding: 6px 10px;
+    }
+
+    .box-nama {
+        font-size: 13pt;
+        margin-bottom: 5mm;
+    }
+
+    .box-nis {
+        font-size: 13pt;
+        margin-top: 3mm;
+    }
+
+    .content {
+        margin-bottom: 42mm;
+    }
+
+    .footer {
+        margin-top: auto;
+        text-align: center;
+        font-size: 11.5pt;
+        line-height: 1.25;
+        font-weight: 700;
+        /* padding-bottom: 8mm; */
+        padding-bottom: 0;
+    }
+
+    .footer .yayasan {
+        font-size: 12pt;
+        margin-bottom: 2mm;
+    }
+</style>
+
 {{-- Halaman Sampul --}}
 <div class="cover page">
 
