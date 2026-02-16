@@ -33,9 +33,17 @@ class SiswaController extends Controller
     {
         $kelas_ajar->load(['kelas', 'tahunAjaran']);
 
-        $orangTua = OrangTua::query()->orderByDesc('orang_tua_id')->get();
+        $orangTua = collect();
 
-        return view('akademik.siswa.create', compact('kelas_ajar', 'orangTua'));
+        // kalau ada old selected (form submit gagal), ambil 1 record ini saja untuk ditampilkan
+        $selectedOrtuId = session()->getOldInput('orang_tua_id');
+        $selectedOrtu = null;
+
+        if ($selectedOrtuId) {
+            $selectedOrtu = OrangTua::with('kelurahan')->find($selectedOrtuId);
+        }
+
+        return view('akademik.siswa.create', compact('kelas_ajar', 'orangTua', 'selectedOrtu'));
     }
 
     public function store(Request $request, KelasAjar $kelas_ajar)
@@ -584,5 +592,42 @@ class SiswaController extends Controller
             DB::rollBack();
             return back()->withInput()->withErrors(['error' => 'Terjadi kesalahan. Gagal memuat data siswa']);
         }
+    }
+
+    public function ajaxSearchOrangTua(Request $request)
+    {
+        $q = trim((string) $request->get('q', ''));
+        $page = max((int) $request->get('page', 1), 1);
+        $perPage = 20;
+
+        $query = OrangTua::query()
+            ->with('kelurahan')
+            ->orderByDesc('orang_tua_id');
+
+        if ($q !== '') {
+            $query->where(function ($w) use ($q) {
+                $w->where('nama_ayah', 'like', "%{$q}%")
+                    ->orWhere('nama_ibu', 'like', "%{$q}%");
+            });
+        }
+
+        $paginator = $query->paginate($perPage, ['*'], 'page', $page);
+
+        $results = $paginator->getCollection()->map(function ($ot) {
+            return [
+                'id' => $ot->orang_tua_id,
+                'text' => trim(($ot->nama_ayah ?? '') . ' / ' . ($ot->nama_ibu ?? '')),
+                'jalan' => $ot->jalan ?? '',
+                'kelurahan_id' => $ot->kelurahan_id ?? '',
+                'kelurahan_label' => $ot->kelurahan->nama ?? '',
+            ];
+        })->values();
+
+        return response()->json([
+            'results' => $results,
+            'pagination' => [
+                'more' => $paginator->hasMorePages(),
+            ],
+        ]);
     }
 }

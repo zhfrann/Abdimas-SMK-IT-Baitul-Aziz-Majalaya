@@ -199,17 +199,20 @@
                             <div class="col-md-9 mb-3">
                                 <label>Orang Tua</label>
                                 <select name="orang_tua_id" id="orang_tua_id"
-                                    class="form-control @error('orang_tua_id') is-invalid @enderror">
-                                    <option value="">Pilih Orang Tua</option>
-                                    @foreach ($orangTua as $ot)
-                                        <option value="{{ $ot->orang_tua_id }}" data-jalan="{{ e($ot->jalan) }}"
-                                            data-kelurahan-id="{{ $ot->kelurahan_id }}"
-                                            data-kelurahan-label="{{ e($ot->kelurahan->nama ?? '') }}"
-                                            {{ old('orang_tua_id') == $ot->orang_tua_id ? 'selected' : '' }}>
-                                            {{ $ot->nama_ayah }} / {{ $ot->nama_ibu }}
+                                    class="form-control @error('orang_tua_id') is-invalid @enderror" data-trigger>
+                                    <option value="">Ketik untuk mencari...</option>
+
+                                    {{-- kalau old ada, inject option supaya tetap kepilih setelah submit gagal --}}
+                                    @if (!empty($selectedOrtu))
+                                        <option value="{{ $selectedOrtu->orang_tua_id }}" selected
+                                            data-jalan="{{ e($selectedOrtu->jalan) }}"
+                                            data-kelurahan-id="{{ $selectedOrtu->kelurahan_id }}"
+                                            data-kelurahan-label="{{ e($selectedOrtu->kelurahan->nama ?? '') }}">
+                                            {{ $selectedOrtu->nama_ayah }} / {{ $selectedOrtu->nama_ibu }}
                                         </option>
-                                    @endforeach
+                                    @endif
                                 </select>
+
                                 @error('orang_tua_id')
                                     <span class="invalid-feedback d-block">{{ $message }}</span>
                                 @enderror
@@ -383,6 +386,37 @@
                 }));
             }
 
+            async function fetchChoicesResultsWithMeta(urlStr) {
+                const res = await fetch(urlStr, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                if (!res.ok) return {
+                    items: [],
+                    more: false
+                };
+
+                const data = await res.json();
+                const results = data.results || [];
+                const more = !!(data.pagination && data.pagination.more);
+
+                const items = results.map(r => ({
+                    value: String(r.id),
+                    label: r.text,
+                    customProperties: {
+                        jalan: r.jalan || '',
+                        kelurahanId: r.kelurahan_id || '',
+                        kelurahanLabel: r.kelurahan_label || ''
+                    }
+                }));
+
+                return {
+                    items,
+                    more
+                };
+            }
+
             function initRemoteChoices(selectId, routeUrl, {
                 placeholder = 'Ketik untuk mencari...',
                 searchPlaceholder = 'Cari...',
@@ -416,6 +450,67 @@
 
                 el.addEventListener('search', function(event) {
                     doSearch(event.detail.value);
+                });
+
+                return instance;
+            }
+
+            function initRemoteChoicesWithMeta(selectId, routeUrl, {
+                placeholder = 'Ketik untuk mencari...',
+                searchPlaceholder = 'Cari...',
+                minInput = 2
+            } = {}) {
+                const el = document.getElementById(selectId);
+                if (!el) return null;
+
+                const instance = new Choices(el, {
+                    searchEnabled: true,
+                    placeholder: true,
+                    placeholderValue: placeholder,
+                    searchPlaceholderValue: searchPlaceholder,
+                    shouldSort: false,
+                    itemSelectText: '',
+                    searchResultLimit: 15,
+                    renderChoiceLimit: 15
+                });
+
+                const metaMap = new Map();
+
+                const doSearch = debounce(async (value) => {
+                    const q = (value || '').trim();
+                    if (q.length < minInput) return;
+
+                    const url = new URL(routeUrl, window.location.origin);
+                    url.searchParams.set('q', q);
+                    url.searchParams.set('page', '1');
+
+                    const {
+                        items
+                    } = await fetchChoicesResultsWithMeta(url.toString());
+
+                    metaMap.clear();
+                    items.forEach(it => metaMap.set(String(it.value), it.customProperties || {}));
+
+                    instance.setChoices(items, 'value', 'label', true);
+                }, 300);
+
+                el.addEventListener('search', function(event) {
+                    doSearch(event.detail.value);
+                });
+
+                el.addEventListener('change', function() {
+                    const val = String(el.value || '');
+                    if (!val) return;
+
+                    const meta = metaMap.get(val);
+                    if (!meta) return;
+
+                    const opt = el.querySelector(`option[value="${CSS.escape(val)}"]`);
+                    if (!opt) return;
+
+                    opt.dataset.jalan = meta.jalan || '';
+                    opt.dataset.kelurahanId = meta.kelurahanId || '';
+                    opt.dataset.kelurahanLabel = meta.kelurahanLabel || '';
                 });
 
                 return instance;
@@ -458,6 +553,14 @@
             }
 
             // ===== Init choices remote =====
+            const ortuChoices = initRemoteChoicesWithMeta(
+                'orang_tua_id',
+                "{{ route('ajax.orang_tua') }}", {
+                    placeholder: 'Ketik untuk mencari orang tua...',
+                    searchPlaceholder: 'Cari nama ayah / ibu...'
+                }
+            );
+
             const tempatLahirChoices = initRemoteChoices(
                 'tempat_lahir_kabupaten_id',
                 "{{ route('ajax.tempat_lahir.kabupaten') }}", {

@@ -9,7 +9,7 @@
     <div style="margin-top: 5mm;">
         Nama Peserta Didik : …………………………………………………
     </div>
-    <table border="1" cellpadding="6" cellspacing="0"
+    <table border="1" cellpadding="6" cellspacing="0" class="table-mutasi"
         style="width:100%; font-size:12pt; border-collapse:collapse; margin-top: 5mm;">
         <thead>
             <tr>
@@ -31,7 +31,7 @@
                         b. Di Kelas<br>
                         c. Tahun Pelajaran
                     </td>
-                    <td style="width: 20%">
+                    <td style="width: 35%">
                     </td>
                     <td style="vertical-align:top; width: 8%;">
                         <br>
@@ -47,30 +47,45 @@
         </tbody>
     </table>
 
-    <div style="margin-top:10mm; width:100%;">
-        <div style="display:flex; justify-content:space-between; width:100%;">
-            <div style="text-align:center;">
-                Mengetahui<br><br>
-                Orang Tua/Wali<br>
-                <br><br><br>
-                ..................................................<br>
-            </div>
-            <div style="text-align:center;">
-                …………., ………………………………………<br><br>
-                Guru Kelas<br>
-                <br><br><br>
-                ........................................................<br>
-                NUPTK..................................................
-            </div>
-        </div>
-        <div style="margin-top:30mm; text-align:center;">
-            Mengetahui<br><br>
-            Kepala Sekolah<br>
-            <br><br><br>
-            ........................................................<br>
-            NUPTK..................................................
-        </div>
+    <div style="margin-top:10mm; width:100%; page-break-inside: avoid;">
+        <table style="width:100%; border-collapse:collapse;">
+            <tr>
+                <td style="width:40%; text-align:center; vertical-align:top;">
+                    Mengetahui<br><br>
+                    Orang Tua/Wali<br>
+                    <br><br><br>
+                    ..................................................<br><br>
+                </td>
+
+                <!-- Spacer -->
+                <td style="width:20%;"></td>
+
+                <td style="width:40%; text-align:center; vertical-align:top;">
+                    …………., ………………………………………<br><br>
+                    Guru Kelas<br>
+                    <br><br><br>
+                    ........................................................<br>
+                    NUPTK...............................................
+                </td>
+            </tr>
+        </table>
+
+        <table style="width:100%; margin-top:30mm; border-collapse:collapse;">
+            <tr>
+                <td style="width:25%;"></td>
+                <td style="width:50%; text-align:center; vertical-align:top;">
+                    Mengetahui<br><br>
+                    Kepala Sekolah<br>
+                    <br><br><br>
+                    ..................................................<br>
+                    NUPTK......................................<br>
+                </td>
+                <td style="width:25%;"></td>
+            </tr>
+        </table>
+
     </div>
+
 </div>
 
 <style>
@@ -89,9 +104,9 @@
         color: #000;
     }
 
-    table,
-    th,
-    td {
+    table.table-mutasi,
+    .table-mutasi th,
+    .table-mutasi td {
         border: 1px solid #000;
     }
 </style>

@@ -153,11 +153,19 @@ class CetakDokumenController extends Controller
             $rk->rekap_kehadiran = $kehadiran;
         }
 
-        $pdf = Pdf::view('dokumen.pdf_rapor', [
+        $namaKelas = $kelasAjar->kelas->nama_kelas;
+        $tahunAjaran = str_replace('/', '-', $kelasAjar->tahunAjaran->tahun);
+        $semester = $kelasAjar->tahunAjaran->semester;
+
+        $filename = 'Cetak Rapor ' . $namaKelas . ' ' . $tahunAjaran . ' ' . $semester . '.pdf';
+
+        $pdf = Pdf::loadView('dokumen.pdf_rapor', [
             'kelasAjar' => $kelasAjar,
             'siswaList' => $siswaList,
             'sekolah' => $sekolah,
-        ])->format('A4');
+        ])->setPaper('a4', 'portrait')
+            // ->download($filename);
+            ->stream($filename);
 
         return $pdf;
     }
@@ -206,11 +214,19 @@ class CetakDokumenController extends Controller
             $rk->rekap_kehadiran = $kehadiran;
         }
 
-        $pdf = Pdf::view('dokumen.pdf_buku_induk', [
+        $namaKelas = $kelasAjar->kelas->nama_kelas;
+        $tahunAjaran = str_replace('/', '-', $kelasAjar->tahunAjaran->tahun);
+        $semester = $kelasAjar->tahunAjaran->semester;
+
+        $filename = 'Buku Induk tes ' . $namaKelas . ' ' . $tahunAjaran . ' ' . $semester . '.pdf';
+
+        $pdf = Pdf::loadView('dokumen.pdf_buku_induk', [
             'kelasAjar' => $kelasAjar,
             'siswaList' => $siswaList,
             'sekolah' => $sekolah,
-        ])->format('A4');
+        ])->setPaper('a4', 'portrait')
+            // ->download($filename);
+            ->stream($filename);
 
         return $pdf;
     }
@@ -229,6 +245,8 @@ class CetakDokumenController extends Controller
             'jumlah' => 'required|integer|min:1|max:50',
         ]);
 
+        $sekolah = Sekolah::query()->firstOrFail();
+
         $jenis = $request->jenis;
         $jumlah = (int) $request->jumlah;
 
@@ -236,9 +254,14 @@ class CetakDokumenController extends Controller
             ? 'dokumen.pdf_mutasi_keluar'
             : 'dokumen.pdf_mutasi_masuk';
 
-        $pdf = \Spatie\LaravelPdf\Facades\Pdf::view($view, [
+        $filename = "Mutasi $jenis.pdf";
+
+        $pdf = Pdf::loadView($view, [
             'jumlah' => $jumlah,
-        ])->format('A4');
+            'sekolah' => $sekolah,
+        ])->setPaper('a4', 'portrait')
+            // ->download($filename);
+            ->stream($filename);
 
         return $pdf;
     }

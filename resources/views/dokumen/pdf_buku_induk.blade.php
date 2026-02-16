@@ -53,7 +53,7 @@
         </table>
 
         {{-- Tabel Nilai --}}
-        <table border="1" cellpadding="4" cellspacing="0"
+        <table border="1" cellpadding="4" cellspacing="0" class="table-nilai"
             style="width:100%; font-size:11pt; border-collapse:collapse; margin-bottom: 8mm;">
             <thead>
                 <tr>
@@ -87,7 +87,7 @@
         </table>
 
         {{-- Tabel Ekstrakurikuler --}}
-        <table border="1" cellpadding="4" cellspacing="0"
+        <table border="1" cellpadding="4" cellspacing="0" class="table-ekstrakurikuler"
             style="width:100%; font-size:11pt; border-collapse:collapse; margin-bottom: 8mm;">
             <thead>
                 <tr>
@@ -117,7 +117,7 @@
         </table>
 
         {{-- Tabel Ketidakhadiran --}}
-        <table border="1" cellpadding="4" cellspacing="0"
+        <table border="1" cellpadding="4" cellspacing="0" class="table-ketidakhadiran"
             style="width:45%; font-size:11pt; border-collapse:collapse; margin-bottom:18px;">
             <thead>
                 <tr>
@@ -126,19 +126,19 @@
             </thead>
             <tbody>
                 <tr>
-                    <td style="width:5%;">1</td>
+                    <td style="width: 8%; text-align: center;">1</td>
                     <td>Sakit</td>
-                    <td>{{ $rk->rekap_kehadiran['sakit'] }} hari</td>
+                    <td style="width: 24%;">{{ $rk->rekap_kehadiran['sakit'] }} hari</td>
                 </tr>
                 <tr>
-                    <td>2</td>
+                    <td style="width: 8%; text-align: center;">2</td>
                     <td>Izin</td>
-                    <td>{{ $rk->rekap_kehadiran['izin'] }} hari</td>
+                    <td style="width: 24%;">{{ $rk->rekap_kehadiran['izin'] }} hari</td>
                 </tr>
                 <tr>
-                    <td>3</td>
+                    <td style="width: 8%; text-align: center;">3</td>
                     <td>Tanpa Keterangan</td>
-                    <td>{{ $rk->rekap_kehadiran['alpha'] }} hari</td>
+                    <td style="width: 24%;">{{ $rk->rekap_kehadiran['alpha'] }} hari</td>
                 </tr>
             </tbody>
         </table>
@@ -146,11 +146,6 @@
 @endforeach
 
 <style>
-    @page {
-        size: A4;
-        margin: 18mm 12mm 12mm 12mm;
-    }
-
     .page {
         page-break-after: always;
     }
@@ -159,5 +154,23 @@
         font-family: "Times New Roman", Times, serif;
         font-size: 12pt;
         color: #000;
+    }
+
+    .table-nilai tr,
+    .table-nilai td,
+    .table-nilai th {
+        border: 1px solid black;
+    }
+
+    .table-ekstrakurikuler tr,
+    .table-ekstrakurikuler td,
+    .table-ekstrakurikuler th {
+        border: 1px solid black;
+    }
+
+    .table-ketidakhadiran tr,
+    .table-ketidakhadiran td,
+    .table-ketidakhadiran th {
+        border: 1px solid black;
     }
 </style>
