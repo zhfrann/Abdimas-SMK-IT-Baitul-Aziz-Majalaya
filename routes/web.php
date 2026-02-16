@@ -212,3 +212,6 @@ Route::middleware(['auth'])->group(function () {
 // Route::get('/wilayah/kelurahan/{kecamatan_id}', [WilayahController::class, 'kelurahan']);
 Route::get('ajax/tempat-lahir/kabupaten', [WilayahController::class, 'searchKabupaten'])->name('ajax.tempat_lahir.kabupaten');
 Route::get('ajax/domisili/kelurahan', [WilayahController::class, 'searchKelurahan'])->name('ajax.domisili.kelurahan');
+
+Route::get('/ajax/orang-tua', [SiswaController::class, 'ajaxSearchOrangTua'])
+    ->name('ajax.orang_tua');
