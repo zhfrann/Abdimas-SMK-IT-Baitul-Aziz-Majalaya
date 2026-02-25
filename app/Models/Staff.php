@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Staff extends Model
 {
@@ -24,5 +25,8 @@ class Staff extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    
+    public function sekolah(): HasOne
+    {
+        return $this->hasOne(Sekolah::class, 'staff_id', 'staff_id');
+    }
 }

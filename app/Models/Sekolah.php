@@ -22,12 +22,16 @@ class Sekolah extends Model
         'website',
         'email',
         'telp',
-        'nama_kepala_sekolah',
-        'nip_kepala_sekolah',
+        'staff_id'
     ];
 
     public function kelurahan(): BelongsTo
     {
         return $this->belongsTo(Kelurahan::class, 'kelurahan_id', 'kelurahan_id');
+    }
+
+    public function staff(): BelongsTo
+    {
+        return $this->belongsTo(Staff::class, 'staff_id', 'staff_id');
     }
 }
