@@ -5,7 +5,6 @@
 @section('css')
     <link rel="stylesheet" href="/build/css/plugins/style.css" />
     <style>
-        /* ===== Choices DARK MODE FIX (Able Pro uses body[data-pc-theme="dark"]) ===== */
         body[data-pc-theme="dark"] .choices__inner {
             background-color: rgba(255, 255, 255, .06) !important;
             border-color: rgba(255, 255, 255, .18) !important;
@@ -36,13 +35,11 @@
             background-color: rgba(255, 255, 255, .08) !important;
         }
 
-        /* selected item chip (kalau single select, ini text yang tampil) */
         body[data-pc-theme="dark"] .choices__item--selectable,
         body[data-pc-theme="dark"] .choices__list--single .choices__item {
             color: rgba(255, 255, 255, .92) !important;
         }
 
-        /* kalau invalid, tetap merah */
         body[data-pc-theme="dark"] select.is-invalid+.choices .choices__inner {
             border-color: #dc3545 !important;
         }
@@ -122,7 +119,6 @@
                                 @enderror
                             </div>
 
-                            {{-- ✅ Kelurahan: Choices + AJAX Search (ganti yang lama) --}}
                             <div class="col-md-6">
                                 <label class="form-label">Kelurahan</label>
 
@@ -134,7 +130,6 @@
                                         $selectedKelId = old('kelurahan_id', $sekolah->kelurahan_id);
                                     @endphp
 
-                                    {{-- ✅ ini yang bikin default value muncul --}}
                                     @if ($selectedKelId && $kelurahanLabel)
                                         <option value="{{ $selectedKelId }}" selected>{{ $kelurahanLabel }}</option>
                                     @endif
@@ -146,7 +141,6 @@
 
                                 <small class="text-muted">Cari bisa kena kelurahan/kecamatan/kabupaten/provinsi</small>
                             </div>
-
 
                             <div class="col-md-6">
                                 <label class="form-label">Website</label>
@@ -178,22 +172,23 @@
                                 @enderror
                             </div>
 
+                            {{-- Kepala Sekolah sekarang diambil dari relasi staff --}}
                             <div class="col-md-6">
                                 <label class="form-label">Nama Kepala Sekolah</label>
                                 <input type="text" name="nama_kepala_sekolah"
                                     class="form-control @error('nama_kepala_sekolah') is-invalid @enderror"
-                                    value="{{ old('nama_kepala_sekolah', $sekolah->nama_kepala_sekolah) }}">
+                                    value="{{ old('nama_kepala_sekolah', $sekolah->staff?->nama) }}">
                                 @error('nama_kepala_sekolah')
                                     <span class="invalid-feedback">{{ $message }}</span>
                                 @enderror
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">NIP Kepala Sekolah</label>
-                                <input type="text" name="nip_kepala_sekolah"
-                                    class="form-control @error('nip_kepala_sekolah') is-invalid @enderror"
-                                    value="{{ old('nip_kepala_sekolah', $sekolah->nip_kepala_sekolah) }}">
-                                @error('nip_kepala_sekolah')
+                                <label class="form-label">NUPTK Kepala Sekolah</label>
+                                <input type="text" name="nuptk_kepala_sekolah"
+                                    class="form-control @error('nuptk_kepala_sekolah') is-invalid @enderror"
+                                    value="{{ old('nuptk_kepala_sekolah', $sekolah->staff?->nuptk) }}">
+                                @error('nuptk_kepala_sekolah')
                                     <span class="invalid-feedback">{{ $message }}</span>
                                 @enderror
                             </div>
@@ -264,9 +259,6 @@
                     url.searchParams.set('page', '1');
 
                     const items = await fetchSelect2Results(url.toString());
-
-                    // ✅ setChoices dengan replace=true boleh, tapi hanya mengganti "list hasil search"
-                    // pilihan yang sudah selected tetap aman
                     instance.setChoices(items, 'value', 'label', true);
                 }, 300);
 
@@ -275,7 +267,6 @@
                 });
             }
 
-            // init kelurahan
             setTimeout(() => {
                 initRemoteChoices('kelurahan_id', "{{ route('ajax.domisili.kelurahan') }}");
             }, 50);

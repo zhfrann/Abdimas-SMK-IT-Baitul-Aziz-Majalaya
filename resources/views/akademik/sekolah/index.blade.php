@@ -48,6 +48,7 @@
                                     <div class="fw-semibold">{{ $sekolah->npsn }}</div>
                                 </div>
                             </div>
+
                             <div class="col-md-6">
                                 <div class="border rounded p-3">
                                     <div class="text-muted">Nama Sekolah</div>
@@ -61,6 +62,7 @@
                                     <div class="fw-semibold">{{ $sekolah->nss ?? '-' }}</div>
                                 </div>
                             </div>
+
                             <div class="col-md-6">
                                 <div class="border rounded p-3">
                                     <div class="text-muted">Kode Pos</div>
@@ -79,7 +81,7 @@
                                 <div class="border rounded p-3">
                                     <div class="text-muted">Kelurahan</div>
                                     <div class="fw-semibold">
-                                        {{ $sekolah->kelurahan_nama ?? '-' }}
+                                        {{ $sekolah->kelurahan?->nama ?? '-' }}
                                     </div>
                                 </div>
                             </div>
@@ -87,35 +89,45 @@
                             <div class="col-md-6">
                                 <div class="border rounded p-3">
                                     <div class="text-muted">Website</div>
-                                    <div class="fw-semibold">{{ $sekolah->website ?? '-' }}</div>
+                                    <div class="fw-semibold">
+                                        {{ $sekolah->website ?? '-' }}
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <div class="border rounded p-3">
                                     <div class="text-muted">Email</div>
-                                    <div class="fw-semibold">{{ $sekolah->email ?? '-' }}</div>
+                                    <div class="fw-semibold">
+                                        {{ $sekolah->email ?? '-' }}
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <div class="border rounded p-3">
                                     <div class="text-muted">Telepon</div>
-                                    <div class="fw-semibold">{{ $sekolah->telp ?? '-' }}</div>
+                                    <div class="fw-semibold">
+                                        {{ $sekolah->telp ?? '-' }}
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <div class="border rounded p-3">
                                     <div class="text-muted">Nama Kepala Sekolah</div>
-                                    <div class="fw-semibold">{{ $sekolah->nama_kepala_sekolah ?? '-' }}</div>
+                                    <div class="fw-semibold">
+                                        {{ $sekolah->staff?->nama ?? '-' }}
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <div class="border rounded p-3">
-                                    <div class="text-muted">NIP Kepala Sekolah</div>
-                                    <div class="fw-semibold">{{ $sekolah->nip_kepala_sekolah ?? '-' }}</div>
+                                    <div class="text-muted">NUPTK Kepala Sekolah</div>
+                                    <div class="fw-semibold">
+                                        {{ $sekolah->staff?->nuptk ?? '-' }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -126,7 +138,6 @@
         </div>
     </div>
 @endsection
-
 @section('scripts')
     <script type="module">
         import {
