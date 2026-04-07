@@ -219,7 +219,7 @@
                     </div>
 
                     <small class="text-muted d-block mt-2">
-                        KKM kelas (dari DB): <b>{{ (int) $kkm }}</b>
+                        KKM kelas: <b>{{ (int) $kkm }}</b>
                     </small>
                 </div>
             </div>
